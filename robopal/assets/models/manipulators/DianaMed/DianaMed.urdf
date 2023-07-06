@@ -1,0 +1,326 @@
+<?xml version="1.0"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+
+<robot name="DianaMed_kdl">
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0.00010213 -0.0014093 0.086074" rpy="0 0 0" />
+      <mass value="3.1064" />
+      <inertia 
+        ixx="0.014417"
+        ixy="5.8713E-06"
+        ixz="2.8276E-06"
+        iyy="0.013941"
+        iyz="-0.0002214"
+        izz="0.0089653" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/base_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/base_link.STL" />
+        <!-- <mesh filename="package://base_link.STL" /> -->
+      </geometry>
+    </collision>
+  </link>
+  <link name="link1">
+    <inertial>
+      <origin xyz="4.57640929707459E-06 -0.0439746120959298 0.0236145135234007" rpy="0 0 0" />
+      <mass value="2.72698490401415" />
+      <inertia
+        ixx="0.0113371331079453"
+        ixy="-5.01180706615877E-07"
+        ixz="-3.66885437018535E-07"
+        iyy="0.0110327536309882"
+        iyz="-0.00220675575486915"
+        izz="0.00811200466883726" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link1.STL" />
+        <!-- <mesh filename="package://link1.STL" /> -->
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link1.STL" />
+        <!-- <mesh filename="package://link1.STL" /> -->
+      </geometry>
+    </collision>
+  </link>
+  <joint name="j1" type="revolute">
+    <origin xyz="8.7058E-05 -0.00063474 0.2985" rpy="3.1416 0 0" />
+    <parent link="base_link" />
+    <child link="link1" />
+    <!-- <axis xyz="0 -1 0" /> -->
+    <axis xyz="0 0 1" />
+    <limit lower="-3.14" upper="3.14" effort="0" velocity="0" />
+  </joint>
+  <link name="link2">
+    <inertial>
+      <origin xyz="8.26088421748694E-06 -0.0407280306293744 -0.0363117407161708" rpy="0 0 0" />
+      <mass value="3.18168266310627" />
+      <inertia
+        ixx="0.018072107435624"
+        ixy="-8.36079570379431E-08"
+        ixz="1.07670750003258E-07"
+        iyy="0.00961237211101437"
+        iyz="0.00435586439328804"
+        izz="0.016888058079289" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link2.STL" />
+        <!-- <mesh filename="package://link2.STL" />  -->
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link2.STL" />
+        <!-- <mesh filename="package://link2.STL" />  -->
+      </geometry>
+    </collision>
+  </link>
+  <joint name="j2" type="revolute">
+    <origin xyz="0 0 -0.00092116" rpy="1.5708 0 0" />
+    <parent link="link1" />
+    <child link="link2" />
+    <axis xyz="0 0 -1" />
+    <limit lower="-3.14" upper="3.14" effort="0" velocity="0" />
+  </joint>
+  <link
+    name="link3">
+    <inertial>
+      <origin
+        xyz="0.0148078870964089 -0.0159924912448304 0.127197681416813"
+        rpy="0 0 0" />
+      <mass
+        value="3.93616399327803" />
+      <inertia
+        ixx="0.0529699107504458"
+        ixy="0.00295925943864098"
+        ixz="0.0100824736258477"
+        iyy="0.0547048459134381"
+        iyz="-0.00795482322146361"
+        izz="0.013338555535485" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link3.STL" />
+        <!-- <mesh filename="package://link3.STL" />  -->
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link3.STL" />
+        <!-- <mesh filename="package://link3.STL" />  -->
+      </geometry>
+    </collision>
+  </link>
+  <joint name="j3" type="revolute">
+    <origin xyz="0 -0.45818 0.0005" rpy="-1.5708 0 0" />
+    <parent link="link2" />
+    <child link="link3" />
+    <axis xyz="0 0 -1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link name="link4">
+    <inertial>
+      <origin xyz="-0.0145884364859367 -0.0117112984562222 -0.0406158066673303" rpy="0 0 0" />
+      <mass value="1.58468985635004" />
+      <inertia
+        ixx="0.0038731409034452"
+        ixy="-0.000832775020978768"
+        ixz="0.000679010334754415"
+        iyy="0.00422597504724798"
+        iyz="0.00067347297662315"
+        izz="0.00439242812060777" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <!-- <mesh filename="package://link4.STL" /> -->
+        <mesh filename="package://diana_med/meshes/robot/link4.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <!-- <mesh filename="package://link4.STL" /> -->
+        <mesh filename="package://diana_med/meshes/robot/link4.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="j4" type="revolute">
+    <origin xyz="0.064454 0.0005 -0.00070508" rpy="1.5708 0 0" />
+    <parent link="link3" />
+    <child link="link4" />
+    <axis xyz="0 0 1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link name="link5">
+    <inertial>
+      <origin xyz="-0.00209922282949576 0.0288296598531898 0.222844782709322" rpy="0 0 0" />
+      <mass value="1.92687822080767" />
+      <inertia
+        ixx="0.0293223924818884"
+        ixy="0.000126715279757269"
+        ixz="-0.000259318121034694"
+        iyy="0.0270589496231595"
+        iyz="0.00711831662518815"
+        izz="0.00414045111192326" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link5.STL" />
+        <!-- <mesh filename="package://link5.STL" /> -->
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link5.STL" />
+        <!-- <mesh filename="package://link5.STL" /> -->
+      </geometry>
+    </collision>
+  </link>
+  <joint name="j5" type="revolute">
+    <origin xyz="-0.052254 -0.45668 0.0005" rpy="-1.5708 0 0" />
+    <parent link="link4" />
+    <child link="link5" />
+    <axis xyz="0 0 -1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link name="link6">
+    <inertial>
+      <origin xyz="0.038358 -0.00071885 -0.0021112" rpy="0 0 0" />
+      <mass value="1.7304" />
+      <inertia
+        ixx="0.0034648"
+        ixy="6.9318E-05"
+        ixz="-0.00014008"
+        iyy="0.0049229"
+        iyz="2.7274E-06"
+        izz="0.0052571" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link6.STL" />
+        <!-- <mesh filename="package://link6.STL" /> -->
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link6.STL" />
+        <!-- <mesh filename="package://link6.STL" /> -->
+      </geometry>
+    </collision>
+  </link>
+  <joint name="j6" type="revolute">
+    <origin xyz="0 -0.005 -1.1713E-05" rpy="1.5708 0 -3.1416" />
+    <parent link="link5" />
+    <child link="link6" />
+    <axis xyz="0 0 1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link name="link7">
+    <inertial>
+      <origin xyz="0.00068467 1.5999E-05 0.020834" rpy="0 0 0" />
+      <mass value="0.16696" />
+      <inertia
+        ixx="8.7537E-05"
+        ixy="1.9588E-09"
+        ixz="2.6332E-07"
+        iyy="8.8902E-05"
+        iyz="7.5347E-09"
+        izz="0.00014391" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link7.STL" />
+        <!-- <mesh filename="package://link7.STL" /> -->
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://diana_med/meshes/robot/link7.STL" />
+        <!-- <mesh filename="package://link7.STL" /> -->
+      </geometry>
+    </collision>
+  </link>
+  <joint name="j7" type="revolute">
+    <origin xyz="0.076728 -0.1059 0" rpy="-1.5708 0 0" />
+    <parent link="link6" />
+    <child link="link7" />
+    <axis xyz="0 0 -1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="0"
+      velocity="0" />
+  </joint>
+</robot>

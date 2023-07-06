@@ -1,0 +1,111 @@
+<mujoco model="example">
+    <compiler angle="radian"/>
+    <option timestep="0.0005" gravity="0 0 -9.81">
+        <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable"/>
+    </option>
+   <visual>
+        <headlight ambient="0.50 0.50 0.50" diffuse="0.50 0.50 0.50" specular="0.50 0.50 0.50"/>
+   </visual>
+   <asset>
+        <mesh name="robotiq-2f-base" file="meshes/robotiq-2f-base.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="robotiq-2f-driver" file="meshes/robotiq-2f-driver.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="robotiq-2f-coupler" file="meshes/robotiq-2f-coupler.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="robotiq-2f-follower" file="meshes/robotiq-2f-follower.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="robotiq-2f-pad" file="meshes/robotiq-2f-pad.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="robotiq-2f-spring_link" file="meshes/robotiq-2f-spring_link.stl" scale="0.001 0.001 0.001"/>
+    </asset>
+    <default>
+        <default class="robotiq2f85">
+            <joint damping=".1" pos="0 0 0" axis="1 0 0" limited="true"/>
+            <geom rgba=".1 .1 .1 1" type="mesh" contype="0" conaffinity="0" group="1"/>
+            <default class="robotiq_col">
+                <geom rgba=".3 .4 .5 1" type="mesh" contype="1" conaffinity="0" group="3"/>
+            </default>
+            <default class="robotiq_pad_col">
+                <geom rgba=".3 .4 .5 1" type="mesh" contype="1" conaffinity="1" group="3" condim="4"/>
+            </default>
+        </default>
+    </default>
+    <contact>
+        <exclude body1="robotiq_2f_85_right_spring_link" body2="robotiq_2f_85_right_follower"/>
+        <exclude body1="robotiq_2f_85_left_spring_link" body2="robotiq_2f_85_left_follower"/>
+    </contact>
+    <sensor>
+        <jointpos name="robotiq_2f_85" joint="robotiq_2f_85_right_driver_joint"/>
+    </sensor>
+    <equality>
+        <connect anchor="0 0.037 0.043" body1="robotiq_2f_85_right_spring_link" body2="robotiq_2f_85_right_follower" name="robotiq_2f_85_right"/>
+        <connect anchor="0 0.037 0.043" body1="robotiq_2f_85_left_spring_link" body2="robotiq_2f_85_left_follower" name="robotiq_2f_85_left"/>
+        <joint joint1="robotiq_2f_85_right_driver_joint" joint2="robotiq_2f_85_left_driver_joint"/>
+    </equality>
+    <actuator>
+        <position name="robotiq_2f_85" joint="robotiq_2f_85_right_driver_joint" ctrlrange="0 1" ctrllimited="true"/>
+    </actuator>
+
+   <worldbody>
+        <body name="end_effector" pos="0 0 0" quat="0 1 0 0" childclass="robotiq2f85">
+            <geom mesh="robotiq-2f-base"/>
+            <geom class="robotiq_col" type="mesh" mesh="robotiq-2f-base" euler="0 0 0"/>
+            <body name="robotiq_2f_85_right_driver" pos="0 0.0306011 0.054904">
+                <inertial pos="0 0.01575 0.05295" quat="0.738425 0.674335 0 0" mass="0.0002" diaginertia="0.00043212 0.000431866 0.000360253"/>
+                <joint name="robotiq_2f_85_right_driver_joint" range="0 0.834"/>
+                <geom mesh="robotiq-2f-driver"/>
+                <geom pos="0 0.0315 -0.0041" mesh="robotiq-2f-coupler"/>
+                <geom class="robotiq_col" pos="0 0.0315 -0.0041" type="mesh" mesh="robotiq-2f-coupler"/>
+                <body name="robotiq_2f_85_right_follower" pos="0 0.0376 0.043">
+                    <inertial pos="0 0 0.055" quat="0.707107 0.707107 0 0" mass="0.0002" diaginertia="0.000380833 0.000380833 0.00036"/>
+                    <joint name="robotiq_2f_85_right_follower_joint" range="-2.96706 2.96706"/>
+                    <geom mesh="robotiq-2f-follower"/>
+                    <geom type="mesh" mesh="robotiq-2f-pad" rgba="1 1 1 1"/>
+                    <geom class="robotiq_pad_col" type="box" size=".01 .003 .0175" pos="0 -.021 .031"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .045" axisangle="0.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .036" axisangle="0.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .028" axisangle="0.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .019" axisangle="0.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .045" axisangle="-.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .036" axisangle="-.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .028" axisangle="-.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .019" axisangle="-.1 1 0 1.57"/>
+                </body>
+            </body>
+            <body name="robotiq_2f_85_right_spring_link" pos="0 0.012 0.0614">
+                <inertial pos="0 0 0.055" quat="0.707107 0.707107 0 0" mass="0.0001" diaginertia="0.000190833 0.000190833 0.00018"/>
+                <joint name="robotiq_2f_85_right_spring_link_joint" range="-2.96706 2.96706"/>
+                <geom mesh="robotiq-2f-spring_link"/>
+                <geom class="robotiq_col" type="box" size=".0125 .007 .014" pos="0 .032 .0365" euler="-.7 0 0"/>
+                <geom class="robotiq_col" type="box" size=".0180 .007 .022" pos="0 .012 0.013" euler="-.7 0 0"/>
+                <site type="sphere" size="0.01" pos="0 0.037 0.043" rgba="1 0 0 1" group="3"/>
+            </body>
+            <body name="robotiq_2f_85_left_driver" pos="0 -0.0306011 0.054904" quat="0 0 0 1">
+                <inertial pos="0 0.01575 0.05295" quat="0.738425 0.674335 0 0" mass="0.0002" diaginertia="0.00043212 0.000431866 0.000360253"/>
+                <joint name="robotiq_2f_85_left_driver_joint" range="0 0.834"/>
+                <geom mesh="robotiq-2f-driver"/>
+                <geom pos="0 0.0315 -0.0041" mesh="robotiq-2f-coupler"/>
+                <geom class="robotiq_col" pos="0 0.0315 -0.0041" type="mesh" mesh="robotiq-2f-coupler"/>
+                <body name="robotiq_2f_85_left_follower" pos="0 0.0376 0.043">
+                    <inertial pos="0 0 0.055" quat="0.707107 0.707107 0 0" mass="0.0002" diaginertia="0.000380833 0.000380833 0.00036"/>
+                    <joint name="robotiq_2f_85_left_follower_joint" range="-2.96706 2.96706"/>
+                    <geom mesh="robotiq-2f-follower"/>
+                    <geom type="mesh" mesh="robotiq-2f-pad" rgba="1 1 1 1"/>
+                    <geom class="robotiq_pad_col" type="box" size=".01 .003 .0175" pos="0 -.021 .031"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .045" axisangle="0.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .036" axisangle="0.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .028" axisangle="0.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .019" axisangle="0.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .045" axisangle="-.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .036" axisangle="-.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .028" axisangle="-.1 1 0 1.57"/>
+                    <geom class="robotiq_pad_col" type="capsule" size=".004 .008" pos="0 -.019 .019" axisangle="-.1 1 0 1.57"/>
+                </body>
+            </body>
+            <body name="robotiq_2f_85_left_spring_link" pos="0 -0.012 0.0614" quat="0 0 0 1">
+                    <inertial pos="0 0 0.055" quat="0.707107 0.707107 0 0" mass="0.0001" diaginertia="0.000190833 0.000190833 0.00018"/>
+                    <joint name="robotiq_2f_85_left_spring_link_joint" range="-2.96706 2.96706"/>
+                    <geom mesh="robotiq-2f-spring_link"/>
+                    <geom class="robotiq_col" type="box" size=".0125 .007 .014" pos="0 .032 .0365" euler="-.7 0 0"/>
+                    <geom class="robotiq_col" type="box" size=".0180 .007 .022" pos="0 .012 0.013" euler="-.7 0 0"/>
+                    <site type="sphere" size="0.01" pos="0 0.037 0.043" rgba="1 0 0 1" group="3"/>
+                </body>
+        </body>
+   </worldbody>
+</mujoco>

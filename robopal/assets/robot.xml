@@ -1,0 +1,80 @@
+<mujoco model="empty_floor">
+  <compiler angle="radian" />
+  <option timestep="0.0005" gravity="0 0 -9.81">
+      <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable" />
+  </option>
+  <asset>
+    <texture builtin="gradient" height="256" rgb1=".9 .9 1." rgb2=".2 .3 .4" type="skybox" width="256" />
+    <texture file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/textures/wood-tiles.png" type="2d" name="texplane" />
+    <material name="floorplane" reflectance="0.01" shininess="0.0" specular="0.0" texrepeat="2 2" texture="texplane" texuniform="true" />
+  <mesh name="0_base_link" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/base_link.STL" />
+        <mesh name="0_link1" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link1.STL" />
+        <mesh name="0_link2" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link2.STL" />
+        <mesh name="0_link3" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link3.STL" />
+        <mesh name="0_link4" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link4.STL" />
+        <mesh name="0_link5" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link5.STL" />
+        <mesh name="0_link6" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link6.STL" />
+        <mesh name="0_link7" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link7.STL" />
+    </asset>
+
+  <worldbody>
+    
+    <geom condim="3" material="floorplane" name="floor" pos="0 0 0" size="3 3 .125" type="plane" />
+    <light diffuse=".8 .8 .8" dir="0 -.15 -1" directional="false" pos="1 1 8.0" specular="0.3 0.3 0.3" castshadow="false" />
+    <light diffuse=".8 .8 .8" dir="0 -.15 -1" directional="false" pos="-3. -3. 8.0" specular="0.3 0.3 0.3" castshadow="false" />
+    
+    <camera mode="fixed" name="frontview" pos="1.6 0 1.45" quat="0.56 0.43 0.43 0.56" />
+    
+    <camera mode="fixed" name="birdview" pos="-0.2 0 3.0" quat="0.7071 0 0 0.7071" />
+    
+    <camera mode="fixed" name="agentview" pos="0.5 0 1.35" quat="0.653 0.271 0.271 0.653" />
+    
+    <camera mode="fixed" name="sideview" pos="-0.05651774593317116 1.2761224129427358 1.4879572214102434" quat="0.009905065491771751 0.006877963156909582 0.5912228352893879 0.806418094001364" />
+  <body name="0_base_link">
+            <geom type="mesh" contype="0" conaffinity="0" group="1" pos="0 0 0" rgba="1 1 1 1" mesh="0_base_link" />
+            <body name="0_link1" pos="8.7058e-05 -0.00063474 0.2985" quat="-3.67321e-06 1 0 0">
+                <inertial pos="4.57641e-06 -0.0439746 0.0236145" quat="0.685631 -0.172505 0.172644 0.685818" mass="2.72698" diaginertia="0.0122186 0.0113371 0.00692616" />
+                <joint name="0_j1" pos="0 0 0" axis="0 0 1" limited="true" range="-2.56 2.56" damping="0.1" />
+                <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="0_link1" />
+                <body name="0_link2" pos="0 0 -0.00092116" quat="0.707105 0.707108 0 0">
+                    <inertial pos="8.26088e-06 -0.040728 -0.0363117" quat="0.596612 0.379593 -0.379572 0.596564" mass="3.18168" diaginertia="0.0189254 0.0180721 0.00757505" />
+                    <joint name="0_j2" pos="0 0 0" axis="0 0 -1" limited="true" range="-1.57 1.57" damping="0.1" />
+                    <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="0_link2" />
+                    <body name="0_link3" pos="0 -0.45818 0.0005" quat="0.707105 -0.707108 0 0">
+                        <inertial pos="0.0148079 -0.0159925 0.127198" quat="0.874546 -0.136758 -0.0611978 0.461217" mass="3.93616" diaginertia="0.0569273 0.0547312 0.00935482" />
+                        <joint name="0_j3" pos="0 0 0" axis="0 0 -1" limited="true" range="-2.56 2.56" damping="0.1" />
+                        <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="0_link3" />
+                        <body name="0_link4" pos="0.064454 0.0005 -0.00070508" quat="0.707105 0.707108 0 0">
+                            <inertial pos="-0.0145884 -0.0117113 -0.0406158" quat="0.00473736 0.651043 0.564294 0.507635" mass="1.58469" diaginertia="0.00499445 0.00482606 0.00267104" />
+                            <joint name="0_j4" pos="0 0 0" axis="0 0 1" limited="true" range="0.0 3.05" damping="0.1" />
+                            <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="0_link4" />
+                            <body name="0_link5" pos="-0.052254 -0.45668 0.0005" quat="0.707105 -0.707108 0 0">
+                                <inertial pos="-0.00209922 0.0288297 0.222845" quat="0.985159 0.138333 -0.00891494 0.101222" mass="1.92688" diaginertia="0.0293358 0.0290794 0.00210656" />
+                                <joint name="0_j5" pos="0 0 0" axis="0 0 -1" limited="true" range="-3.05 3.05" damping="0.1" />
+                                <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="0_link5" />
+                                <body name="0_link6" pos="0 -0.005 -1.1713e-05" quat="-2.59734e-06 -2.59735e-06 -0.707108 -0.707105">
+                                    <inertial pos="0.038358 -0.00071885 -0.0021112" quat="0.0131349 0.678937 -0.0198942 0.733809" mass="1.7304" diaginertia="0.005268 0.00492614 0.00345065" />
+                                    <joint name="0_j6" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14 3.14" damping="0.01" />
+                                    <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="0_link6" />
+                                    <body name="0_link7" pos="0.076728 -0.1059 0" quat="0.707105 -0.707108 0 0">
+                                        <joint name="0_j7" pos="0 0 0" axis="0 0 -1" limited="true" range="-3.14 3.14" damping="0.01" />
+                                        <inertial pos="0.00068467 1.5999e-05 0.020834" quat="0.000547318 0.708756 -0.000448023 0.705453" mass="0.16696" diaginertia="0.000143911 8.8902e-05 8.75358e-05" />
+                                        <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="0_link7" />
+                                        <geom type="mesh" rgba="1 1 1 1" mesh="0_link7" />
+                                    </body>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+<actuator><motor name="0_a1" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j1" />
+        <motor name="0_a2" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j2" />
+        <motor name="0_a3" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j3" />
+        <motor name="0_a4" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j4" />
+        <motor name="0_a5" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j5" />
+        <motor name="0_a6" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j6" />
+        <motor name="0_a7" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j7" />
+    </actuator><default /><contact /><sensor /><equality /></mujoco>

@@ -1,0 +1,32 @@
+<mujoco>
+    <asset>
+        <mesh name="cambase" file="meshes/cambase.STL" />
+        <mesh name="cam" file="meshes/cam.STL" />
+        <mesh name="stick" file="meshes/stick.STL" />
+    </asset>
+   <worldbody>
+        <body name="end_effector">
+            <inertial pos="0 0 0" quat="1 0 0 0" mass="0" diaginertia="0 0 0"/>
+            <geom type="mesh" rgba="1 1 1 1" mesh="cambase" />
+
+            <body name="cam" pos="0.065054 0.00068038 -0.013835" quat="-2.59734e-06 0.707105 0.707108 -2.59735e-06">
+                <inertial pos="0 0 0" quat="1 0 0 0" mass="0" diaginertia="0 0 0"/>
+                <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.69804 0.69804 0.69804 1" mesh="cam" />
+                <camera name="cam" mode="fixed" pos="0.0175 0.00 0.0038" quat="0 0 1 0" fovy="45"/>
+            </body>
+            <body name="rod" pos="0 0 0" quat="0.707105 -0.707108 0 0" >
+                <inertial pos="0 0 0" quat="1 0 0 0" mass="0.0000" diaginertia="0.0000 0.0000 0.0000"/>
+                <geom type="mesh" mesh="stick"  rgba="1 1 1 1" friction="0.2 0.05 0.01"/>
+                <body name="end" pos="0 0.15 0">
+                    <inertial pos="0 0 0" quat="1 0 0 0" mass="0.0000" diaginertia="0.0000 0.0000 0.0000"/>
+                    <geom size="0.005" quat="0 0 1 1" rgba="1 0 0 1" type="sphere" friction="0.3 0.005 0.001"/>
+                    <site name="gripper_frame" size="0.001" quat="0 0 1 1"/>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+    <sensor>
+        <force name="wall_force_sensor" site="gripper_frame" cutoff="3.0"/>
+    </sensor>
+</mujoco>
+
