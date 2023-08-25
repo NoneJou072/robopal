@@ -14,9 +14,9 @@
   </a>
 </p>
 
-**robopal** 是一个基于 [MuJoCo](http://mujoco.org/) 的开源机器人仿真框架，主要用于机械臂的深度强化学习训练与
+**robopal** 是一个基于 [MuJoCo](http://mujoco.org/) 动力学引擎与 [pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 机器人动力学库搭建的多平台开源机器人仿真框架，主要用于机械臂的深度强化学习训练与
 控制算法验证。框架内提供了多种控制方案与示例环境，方便使用者进行进行开发。
-截至目前的开发版本，主要包含下述功能：
+截至目前包含了下述功能：
 * 底层关节位置/扭矩控制器  
   使用 Ruckig 规划关节位置、速度、加速度，实现平滑运动, 并基于 pd 控制与动力学计算扭矩
 * 中间笛卡尔位置控制器  
@@ -35,9 +35,10 @@
 
 ### Environments
 
-* Ubuntu 20.04/22.04
-* [MuJoCo-2.3.6](http://mujoco.org/)
+* **Windows** (10+) / Linux
+* [MuJoCo-2.3.7](http://mujoco.org/)
 * Python 3.9+
+* [pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 2.6.20 
 
 ### Quick Install  
 
@@ -46,18 +47,3 @@
    $ cd robopal
    $ pip install -e .
    ```
-### Build From Source
-
-1. 项目部署：
-
-   ```commandline
-   $ git clone https://github.com/NoneJou072/robopal
-   $ cd robopal
-   $ pip3 install -e .
-   ```
-2. PyKDL部署：
-   https://github.com/orocos/orocos_kinematics_dynamics  
-   如果是conda环境，可能会出现冲突问题，解决方法如下：
-   https://blog.csdn.net/qq_43557907/article/details/127818837
-
----

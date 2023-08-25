@@ -82,7 +82,7 @@ class ArmBase(object):
             qpos_states = []
             for i in range(self.jnt_num):
                 qpos_states.append(self.robot_data.joint(self.joint_index[i]).qpos[0])
-            return qpos_states
+            return np.array(qpos_states)
 
         @arm_qpos.setter
         def arm_qpos(self, value):

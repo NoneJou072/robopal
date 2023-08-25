@@ -1,6 +1,5 @@
 from ruckig import InputParameter, OutputParameter, Result, Ruckig
 import numpy as np
-import PyKDL as KDL
 
 
 class OTG:
@@ -48,15 +47,15 @@ class OTG:
 def cartesian_poly5_vel_plan(posa, posb, vel_a, vel_b, acc_a, acc_b, duration):
     """
     输入：
-    posa:  起始位姿A(KDL::Frame)
-    posb:  末端位姿A(KDL::Frame)
+    posa:  起始位姿A()
+    posb:  末端位姿A()
     vel_a: 起始笛卡尔速度(array)(6维)
     vel_b: 末端笛卡尔速度(array)(6维)
     acc_a: 起始笛卡尔加速度(array)(6维)
     acc_b: 末端笛卡尔加速度(array)(6维)
     duration: 期望运行时间(s)
     输出：
-    Trajectory: 类,包含位置(六维XYZRPY,KDL::Frame)，速度(6维)，加速度(6维)
+    Trajectory: 类,包含位置(六维XYZRPY)，速度(6维)，加速度(6维)
     """
     # Extract positions
     posa_xyz = np.array([posa.p[0], posa.p[1], posa.p[2]])

@@ -6,7 +6,7 @@ from robopal.utils import RobotGenerator
 class BiDianaMed(ArmBase):
     def __init__(self):
         robot = RobotGenerator(
-            name='Bidiana_omni',
+            name='robot',
             scene='default',
             chassis='Omnidirect',
             manipulator='Bimanual',

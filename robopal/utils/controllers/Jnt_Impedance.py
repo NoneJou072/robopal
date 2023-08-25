@@ -37,8 +37,8 @@ class Jnt_Impedance(object):
         self.kj = k
 
     def torque_joint(self, coriolis_gravity, q_curr: np.array, qd_curr: np.array, desired_pos, desired_ori, tau_last):
-        q_target = self.kdl_solver.ikSolver(np.array(desired_pos), np.array(desired_ori).reshape((3, 3)),
-                                            q_curr)  # 计算当前关节的目标位置
+        q_target = self.kdl_solver.ik(np.array(desired_pos), np.array(desired_ori).reshape((3, 3)),
+                                      q_curr)  # 计算当前关节的目标位置
         M = self.kdl_solver.getInertiaMat(q_curr[:7])  # 机器人的质量矩阵
         ok = False
         tau = tau_last

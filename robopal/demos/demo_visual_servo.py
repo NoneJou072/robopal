@@ -5,7 +5,7 @@ import cv2
 import threading
 import math
 from scipy.spatial.transform import Rotation as RR
-from robopal.envs.single_base import SingleArmEnv
+from robopal.envs.joint_pd_env import SingleArmEnv
 
 
 class Visual_servo(SingleArmEnv):
