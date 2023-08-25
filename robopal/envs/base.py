@@ -29,16 +29,16 @@ class MujocoEnv(object):
         self.mj_model = self.robot.robot_model
         self.mj_data = self.robot.robot_data
         self.viewer = None
-        self.cur_time = None
-        self.timestep = None
-        self.model_timestep = None
-        self.control_timestep = None
+        self.cur_time = 0
+        self.timestep = 0
+        self.model_timestep = 0
+        self.control_timestep = 0
         self.robot_dof = self.robot.jnt_num
         self.traj = deque(maxlen=200)
 
-        self._rendererInit()
-        self._initializeTime()
-        self._setInitPose()
+        self._renderer_init()
+        self._initialize_time()
+        self._set_init_pose()
 
     def step(self, action):
         """ 
@@ -51,11 +51,16 @@ class MujocoEnv(object):
         self.preStep(action)
         mujoco.mj_step(self.mj_model, self.mj_data)
 
-    def render(self):
-        """ render mujoco
+    def reset(self):
+        """ Reset the simulate environment, in order to execute next episode.
 
-        :return: None
         """
+        mujoco.mj_resetData(self.mj_model, self.mj_data)
+        self._set_init_pose()
+        mujoco.mj_step(self.mj_model, self.mj_data)
+
+    def render(self, mode="human"):
+        """ render mujoco """
         if self.is_render is True and self.viewer is not None:
             if self.renderer == "mujoco_viewer":
                 if self.viewer.is_alive is True:
@@ -69,7 +74,11 @@ class MujocoEnv(object):
                     self.viewer.close()
                     sys.exit(0)
 
-    def _rendererInit(self):
+    def close(self):
+        """ close the environment. """
+        pass
+
+    def _renderer_init(self):
         """ Initialize renderer, choose official renderer with "viewer"(joined from version 2.3.3),
             another renderer with "mujoco_viewer"
         """
@@ -79,9 +88,10 @@ class MujocoEnv(object):
                 self.viewer = mujoco_viewer.MujocoViewer(self.mj_model, self.mj_data)
             elif self.renderer == "viewer":
                 from mujoco import viewer
+                # This function does not block, allowing user code to continue execution.
                 self.viewer = viewer.launch_passive(self.mj_model, self.mj_data)
 
-    def _initializeTime(self):
+    def _initialize_time(self):
         """ Initializes the time constants used for simulation.
 
         :param control_freq (float): Hz rate to run control loop at within the simulation
@@ -95,7 +105,7 @@ class MujocoEnv(object):
             raise ValueError("Control frequency {} is invalid".format(self.control_freq))
         self.control_timestep = 1.0 / self.control_freq
 
-    def _setInitPose(self):
+    def _set_init_pose(self):
         """ Set or reset init joint position when called env reset func.
 
         """
@@ -104,7 +114,7 @@ class MujocoEnv(object):
                 self.mj_data.joint(self.robot.arm[i].joint_index[j]).qpos = self.robot.arm[i].init_pose[j]
         mujoco.mj_forward(self.mj_model, self.mj_data)
 
-    def renderTraj(self, pos):
+    def render_traj(self, pos):
         """ Render the trajectory from deque above,
             you can push the cartesian position into this deque.
 
@@ -125,18 +135,10 @@ class MujocoEnv(object):
         """
         raise NotImplementedError
 
-    def getBodyID(self, name: str):
+    def get_body_id(self, name: str):
         return mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_BODY, name)
 
-    def reset(self):
-        """ Reset the simulate environment, in order to execute next episode.
-
-        """
-        mujoco.mj_resetData(self.mj_model, self.mj_data)
-        self._setInitPose()
-        mujoco.mj_step(self.mj_model, self.mj_data)
-
-    def setupMujocoConfig(self):
+    def setup_mujoco_config(self):
         """ Setup mujoco global config while using viewer as renderer.
             It should be noted that the render thread need locked.
         """

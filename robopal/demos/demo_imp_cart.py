@@ -55,7 +55,7 @@ class ImpedGymEnv(SingleArmEnv):
     def step(self, action):
         self.timer += 1
 
-        # if 1000 <= self.cur_time < 2200:
+        # if 1000 <= self.timer < 2200:
         #     self.mj_data.xfrc_applied[7][0] = 30  # 表示连杆所受外力的力矩，第一维是每个body的ID，第二维有六个量（x，y，z方向的受力，后边是力矩）
         # else:
         #     self.mj_data.xfrc_applied[7][0] = 0  # 还原数值，不施加外力

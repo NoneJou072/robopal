@@ -35,22 +35,15 @@ It is convenient for subsequent development and maintenance. Compared with other
 
 ### Environments
 
-* Ubuntu 20.04/22.04
-* [MuJoCo-2.3.5](http://mujoco.org/)
+* **Windows** (10+) / Linux
+* [MuJoCo-2.3.7](http://mujoco.org/)
 * Python 3.9+
+* [pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 2.6.20 
 
-### Quick Install
-
-1. Project deployment：
+### Quick Install  
 
    ```commandline
    $ git clone https://github.com/NoneJou072/robopal
    $ cd robopal
    $ pip install -e .
    ```
-2. Install PyKDL：  
-   https://github.com/orocos/orocos_kinematics_dynamics  
-   If it is a conda environment, there may be conflicts. The solution is as follows:
-   https://blog.csdn.net/qq_43557907/article/details/127818837
-
----

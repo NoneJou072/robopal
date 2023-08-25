@@ -1,5 +1,5 @@
 import numpy as np
-from robopal.envs.joint_pd_env import SingleArmEnv
+from robopal.envs.jnt_ctrl_env import SingleArmEnv
 import robopal.utils.KDL_utils.transform as T
 
 
@@ -63,8 +63,8 @@ class PosCtrlEnv(SingleArmEnv):
             p_incre, r_incre = self.PDControl(p_goal=action[:3], p_cur=p_cur,
                                               r_goal=r_target, r_cur=r_cur, vel_goal=self.vel_des)
             p_goal = p_incre + p_cur
-            # r_goal = T.quat2Mat(r_incre + r_cur)
-            r_goal = T.quat2Mat(r_target)
+            r_goal = T.quat2Mat(r_incre + r_cur)
+            # r_goal = T.quat2Mat(r_target)
 
         action = self.kdl_solver.ik(p_goal, r_goal, q_init=self.robot.single_arm.arm_qpos)
         return super().step(action)

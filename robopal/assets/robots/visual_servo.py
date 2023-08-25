@@ -7,7 +7,7 @@ class DianaMed(ArmBase):
     def __init__(self):
         self.robot = RobotGenerator(
             scene='visual_imped',
-            chassis='Omnidirect',
+            # chassis='Omnidirect',
             manipulator='DianaMed',
             gripper='Swab_gripper',
             g2m_body=['0_link7']
@@ -36,14 +36,12 @@ class DianaMed(ArmBase):
         self.robot.add_texture('aruco', type='2d',
                                file=os.path.join(os.path.dirname(__file__), '../textures/aruco.png'))
         self.robot.add_material('aruco', texture='aruco', texrepeat='1 1', texuniform='false')
-        self.robot.add_body(node='worldbody',name='aruco')
+        self.robot.add_body(node='worldbody', name='aruco')
         self.robot.add_geom(node='aruco', name='aruco_box', pos='0.919 0 1.27', mass='0.001',
                             euler="0 -1.57 0", size='0.05 0.05 0.001', type='box', material='aruco')
-        self.robot.add_joint(node='aruco', name='aruco_x' ,type='slide' ,axis='1 0 0')
-        self.robot.add_joint(node='aruco', name='aruco_y' ,type='slide' ,axis='0 1 0')
-        self.robot.add_joint(node='aruco', name='aruco_z' ,type='slide' ,axis='0 0 1')
-
-
+        self.robot.add_joint(node='aruco', name='aruco_x', type='slide', axis='1 0 0')
+        self.robot.add_joint(node='aruco', name='aruco_y', type='slide', axis='0 1 0')
+        self.robot.add_joint(node='aruco', name='aruco_z', type='slide', axis='0 0 1')
 
     @property
     def init_qpos(self):

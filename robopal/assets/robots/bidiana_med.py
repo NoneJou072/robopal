@@ -8,7 +8,7 @@ class BiDianaMed(ArmBase):
         robot = RobotGenerator(
             name='robot',
             scene='default',
-            chassis='Omnidirect',
+            # chassis='Omnidirect',
             manipulator='Bimanual',
             gripper='robotiq_gripper',
             g2m_body=['0_right_link7', '0_left_link7']

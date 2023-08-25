@@ -5,16 +5,16 @@
   </option>
   <asset>
     <texture builtin="gradient" height="256" rgb1=".9 .9 1." rgb2=".2 .3 .4" type="skybox" width="256" />
-    <texture file="d:\workfiles\robopal\robopal\assets\textures\wood-tiles.png" type="2d" name="texplane" />
+    <texture file="D:\WorkFiles\robopal\robopal\assets\textures\wood-tiles.png" type="2d" name="texplane" />
     <material name="floorplane" reflectance="0.01" shininess="0.0" specular="0.0" texrepeat="2 2" texture="texplane" texuniform="true" />
-  <mesh name="0_base_link" file="d:\workfiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/base_link.STL" />
-        <mesh name="0_link1" file="d:\workfiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link1.STL" />
-        <mesh name="0_link2" file="d:\workfiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link2.STL" />
-        <mesh name="0_link3" file="d:\workfiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link3.STL" />
-        <mesh name="0_link4" file="d:\workfiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link4.STL" />
-        <mesh name="0_link5" file="d:\workfiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link5.STL" />
-        <mesh name="0_link6" file="d:\workfiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link6.STL" />
-        <mesh name="0_link7" file="d:\workfiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link7.STL" />
+  <mesh name="0_base_link" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/base_link.STL" />
+        <mesh name="0_link1" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link1.STL" />
+        <mesh name="0_link2" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link2.STL" />
+        <mesh name="0_link3" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link3.STL" />
+        <mesh name="0_link4" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link4.STL" />
+        <mesh name="0_link5" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link5.STL" />
+        <mesh name="0_link6" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link6.STL" />
+        <mesh name="0_link7" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link7.STL" />
     </asset>
 
   <worldbody>

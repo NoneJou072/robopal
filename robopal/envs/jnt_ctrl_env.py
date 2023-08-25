@@ -1,6 +1,7 @@
 import numpy as np
 from robopal.envs.base import MujocoEnv
 from robopal.utils.KDL_utils import KDL_utils
+from robopal.utils.controllers import Jnt_Impedance, Jnt_PD
 
 
 class SingleArmEnv(MujocoEnv):
@@ -19,6 +20,7 @@ class SingleArmEnv(MujocoEnv):
                  robot=None,
                  is_render=False,
                  renderer="viewer",
+                 jnt_controller='PD',
                  control_freq=200,
                  is_interpolate=False
                  ):
@@ -29,36 +31,44 @@ class SingleArmEnv(MujocoEnv):
             renderer=renderer,
             control_freq=control_freq
         )
+
         self.kdl_solver = KDL_utils(robot.urdf_path)
+
+        if jnt_controller == 'PD':
+            self.jnt_controller = Jnt_PD(self.robot)
+        elif jnt_controller == 'IMPEDANCE':
+            self.jnt_controller = Jnt_Impedance(self.robot)
+        else:
+            raise ValueError('Invalid controller name.')
+
         self.interpolator = None
         if is_interpolate:
-            self._initInterpolator(self.robot.single_arm)
-
-    def actuate_J(self, q_target: np.ndarray, qdot_target: np.ndarray, Arm):
-        """ Compute desired torque with robot dynamics modeling:
-            > M(q)qdd + C(q, qd)qd + G(q) + tau_F(qd) = tau_ctrl + tau_env
-
-        :param q_target: joint position
-        :param qdot_target: joint velocity
-        """
-        acc_desire = [
-            self.robot.kp[i] * (q_target[i] - Arm.arm_qpos[i]) +
-            self.robot.kd[i] * (qdot_target[i] - Arm.arm_qvel[i]) for i in range(Arm.jnt_num)]
-        qM = self.kdl_solver.getInertiaMat(Arm.arm_qpos)
-        tau_target = np.dot(qM, acc_desire) + np.array(
-            [self.mj_data.joint(Arm.joint_index[i]).qfrc_bias[0] for i in range(len(Arm.joint_index))])
-        # Send torque to simulation
-        for i in range(7):
-            self.mj_data.actuator(Arm.actuator_index[i]).ctrl = tau_target[i]
+            self._init_interpolator(self.robot.single_arm)
 
     def preStep(self, action):
-        q_target, qdot_target = action, np.zeros(self.robot_dof)
-        if self.interpolator is not None:
+        if self.interpolator is None:
+            q_target, qdot_target = action, np.zeros(self.robot_dof)
+        else:
             try:
                 q_target, qdot_target = self.interpolator.updateState()
             except ValueError:
                 print(action)
-        self.actuate_J(q_target, qdot_target, self.robot.single_arm)
+
+        m = self.kdl_solver.getInertiaMat(self.robot.single_arm.arm_qpos)
+        c = self.kdl_solver.getCoriolisMat(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)
+        g = self.kdl_solver.getGravityMat(self.robot.single_arm.arm_qpos)
+
+        torque = self.jnt_controller.compute_jnt_torque(
+            q_des=q_target,
+            v_des=qdot_target,
+            q_cur=self.robot.single_arm.arm_qpos,
+            v_cur=self.robot.single_arm.arm_qvel,
+            coriolis_gravity=c[-1] + g,
+            M=m
+        )
+        # Send torque to simulation
+        for i in range(7):
+            self.mj_data.actuator(self.robot.single_arm.actuator_index[i]).ctrl = torque[i]
 
     def step(self, action):
         if self.interpolator is not None:
@@ -70,7 +80,7 @@ class SingleArmEnv(MujocoEnv):
                                  "Current Model-Timestep:{}".format(self.model_timestep))
             super().step(action)
 
-    def _initInterpolator(self, Arm):
+    def _init_interpolator(self, Arm):
         from robopal.utils.interpolators import OTG
         self.interpolator = OTG(
             OTG_Dof=self.robot_dof,
@@ -95,6 +105,7 @@ if __name__ == "__main__":
         robot=DianaMed(),
         is_render=True,
         renderer='viewer',
+        jnt_controller='PD',
         control_freq=200,
         is_interpolate=True
     )

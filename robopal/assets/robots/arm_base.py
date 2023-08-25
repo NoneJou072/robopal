@@ -93,7 +93,7 @@ class ArmBase(object):
             qvel_states = []
             for i in range(self.jnt_num):
                 qvel_states.append(self.robot_data.joint(self.joint_index[i]).qvel[0])
-            return qvel_states
+            return np.array(qvel_states)
 
         @property
         def arm_torq(self):

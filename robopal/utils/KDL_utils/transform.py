@@ -1,7 +1,5 @@
 import numpy as np
 from numpy import sin, cos
-# from numba import jit
-import time
 
 
 def euler2Quat(rpy, degrees: bool = False):

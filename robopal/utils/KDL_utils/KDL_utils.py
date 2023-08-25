@@ -8,6 +8,7 @@ class KDL_utils:
         # Load the urdf model
         urdf_path = urdf_path
         self.model = pin.buildModelFromUrdf(urdf_path)
+
         # Create data required by the algorithms
         self.data = self.model.createData()
 
@@ -115,27 +116,3 @@ class KDL_utils:
         """
         pin.computeAllTerms(self.model, self.data, q, v)
         return self.data.dJ
-
-    def orientation_error(self, desired: np.ndarray, current: np.ndarray) -> np.ndarray:
-        """computer ori error from ori to cartesian 姿态矩阵的偏差3*3的
-        Args:
-            desired (np.ndarray): desired orientation
-            current (np.ndarray): current orientation
-
-        Returns:
-            _type_: orientation error(from pose(3*3) to eulor angular(3*1))
-        """
-        rc1 = current[:, 0]
-        rc2 = current[:, 1]
-        rc3 = current[:, 2]
-        rd1 = desired[:, 0]
-        rd2 = desired[:, 1]
-        rd3 = desired[:, 2]
-        if (np.cross(rc1, rd1) + np.cross(rc2, rd2) + np.cross(rc3, rd3)).all() <= 0.0001:
-            w1, w2, w3 = 0.5, 0.5, 0.5
-        else:
-            w1, w2, w3 = 0.9, 0.5, 0.3
-
-        error = w1 * np.cross(rc1, rd1) + w2 * np.cross(rc2, rd2) + w3 * np.cross(rc3, rd3)
-
-        return error

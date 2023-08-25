@@ -1,25 +1,9 @@
 import mujoco
 import numpy as np
-from robopal.envs.task_pd_env import PosCtrlEnv
+from robopal.envs.task_ctrl_env import PosCtrlEnv
 import robopal.utils.KDL_utils.transform as T
 from robopal.utils.ompl_base import TrajPlanning
 import cv2
-
-'''
-Note: 0.29 is the height of chassis, the end effector of arm is represented 
-by the basic frame of arm, but not in the mj world. The solution for a short time 
-is cut the height of table on Z.
-
-'''
-
-
-def primitive(func, checker=None):
-    """ primitive """
-
-    def primitive_wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-
-    return primitive_wrapper
 
 
 class MotionPlanEnv(PosCtrlEnv):
@@ -111,7 +95,6 @@ class MotionPlanEnv(PosCtrlEnv):
             mat[name] = self.mj_data.body(name).xmat.copy()
         return pos, quat, mat
 
-    @primitive
     def move(self, pos, quat):
         def checkArriveState(state):
             current_pos, current_mat = self.kdl_solver.getEeCurrentPose(self.robot.single_arm.arm_qpos)
@@ -131,7 +114,6 @@ class MotionPlanEnv(PosCtrlEnv):
             if checkArriveState(self.action):
                 break
 
-    @primitive
     def gripper_ctrl(self, cmd: str):
         if cmd == "open":
             self.mj_data.actuator("0_gripper_l_finger_joint").ctrl = 20

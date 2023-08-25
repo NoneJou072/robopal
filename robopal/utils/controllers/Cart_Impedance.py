@@ -57,7 +57,7 @@ class Cart_Impedance(object):
         xd_error = np.concatenate([-x_pos_vel, -x_ori_vel])  # 末端姿态和位置的拼接
         sum = np.multiply(self.Bc, xd_error)
         pos_error = desired_pos - x_pos  # 位置偏差
-        ori_error = self.kdl_solver.orientation_error(desired_ori.reshape([3, 3]), x_ori)  # 姿态偏差
+        ori_error = self.orientation_error(desired_ori.reshape([3, 3]), x_ori)  # 姿态偏差
         x_error = np.concatenate([pos_error, ori_error])  # 两者拼接
 
         sum += np.multiply(self.Kc, x_error)
@@ -65,3 +65,27 @@ class Cart_Impedance(object):
         tau += np.dot(coef, sum)
         self.tor = tau
         return self.tor
+
+    def orientation_error(self, desired: np.ndarray, current: np.ndarray) -> np.ndarray:
+        """computer ori error from ori to cartesian 姿态矩阵的偏差3*3的
+        Args:
+            desired (np.ndarray): desired orientation
+            current (np.ndarray): current orientation
+
+        Returns:
+            _type_: orientation error(from pose(3*3) to eulor angular(3*1))
+        """
+        rc1 = current[:, 0]
+        rc2 = current[:, 1]
+        rc3 = current[:, 2]
+        rd1 = desired[:, 0]
+        rd2 = desired[:, 1]
+        rd3 = desired[:, 2]
+        if (np.cross(rc1, rd1) + np.cross(rc2, rd2) + np.cross(rc3, rd3)).all() <= 0.0001:
+            w1, w2, w3 = 0.5, 0.5, 0.5
+        else:
+            w1, w2, w3 = 0.9, 0.5, 0.3
+
+        error = w1 * np.cross(rc1, rd1) + w2 * np.cross(rc2, rd2) + w3 * np.cross(rc3, rd3)
+
+        return error

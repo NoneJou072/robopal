@@ -1,13 +1,13 @@
-"""
-    UnityForceVisual 以 mujoco 为后端，unity 为前端，基于导纳控制算法，将所受外力
-    可视化，用于效果展示。
-"""
 import numpy as np
 from robopal.demos.demo_admit_rl.demo_admit_test import AdmitGymEnv
 from robopal.utils.plugins.unity_interface.mjremote import mjremote
 
 
 class VisualForceAdmit(AdmitGymEnv):
+    """
+        UnityForceVisual 以 mujoco 为后端，unity 为前端，基于导纳控制算法，将所受外力
+        可视化，用于效果展示。
+    """
     def __init__(self,
                  robot=None,
                  is_render=False,
