@@ -15,22 +15,13 @@
 </p>
 
 **robopal** is an open source robot simulation framework based on [MuJoCo](http://mujoco.org/), mainly used for deep reinforcement learning training and
-Control algorithm verification. A variety of control schemes and example environments are provided within the framework, which is convenient for users to carry out development.
-As of now, the development version mainly includes the following functions:
-* Bottom joint position/torque controller
-  Use Ruckig to plan joint positions, velocities, accelerations for smooth motion, and calculate torques based on pd control and dynamics
-* Intermediate Cartesian position controller
-  Position/rotation control in Cartesian space based on pd control and kinematics
-* Upper controller
-  Upper-level control of the robot
+Control algorithm verification. A variety of control schemes and example environments are provided within the framework.  
 
-In the process of program writing, we abstracted and encapsulated each environment, standardized code writing and wrote code documents,
-It is convenient for subsequent development and maintenance. Compared with other frameworks, this framework has the following advantages:
-* With higher motion accuracy, it is more in line with the motion in the real environment
+Compared with other frameworks, ours has the following advantages:
+* Higher motion accuracy, it is more in line with the motion in the real environment
 * High portability, more concise code, easy to learn and use
 * Rich task environment, such as compliant control, motion imitation, visual servoing, etc.
 
----
 ## Installation  
 
 ### Environments
@@ -47,3 +38,10 @@ It is convenient for subsequent development and maintenance. Compared with other
    $ cd robopal
    $ pip install -e .
    ```
+
+## Controller
+The development version mainly includes the following controllers:
+* Joint Space Controller  
+  Use Ruckig to plan joint positions, velocities, accelerations for smooth motion, and calculate torques based on pd control and dynamics
+* Cartesian Space Controller  
+  Position/rotation control in Cartesian space based on pd control and kinematics

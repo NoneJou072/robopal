@@ -14,36 +14,33 @@
   </a>
 </p>
 
-**robopal** 是一个基于 [MuJoCo](http://mujoco.org/) 动力学引擎与 [pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 机器人动力学库搭建的多平台开源机器人仿真框架，主要用于机械臂的深度强化学习训练与
-控制算法验证。框架内提供了多种控制方案与示例环境，方便使用者进行进行开发。
-截至目前包含了下述功能：
-* 底层关节位置/扭矩控制器  
-  使用 Ruckig 规划关节位置、速度、加速度，实现平滑运动, 并基于 pd 控制与动力学计算扭矩
-* 中间笛卡尔位置控制器  
-  基于 pd 控制与运动学实现笛卡尔空间下的位置/旋转控制
-* 上层控制器  
-  对机器人进行上层控制
+**robopal** 是一个基于 [MuJoCo](http://mujoco.org/) 动力学引擎与 [pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 机器人动力学库搭建的多平台开源机器人仿真框架，主要用于机械臂的深度强化学习训练与控制算法验证。框架内提供了多种控制方案与示例环境，
 
-在程序编写过程中，我们对每个环境进行了抽象与层级封装，规范化代码写法并撰写代码文档，
-方便后续的开发与维护。本框架与其他框架相比，具有如下优点：
-* 具有更高的运动精度，更符合真实环境中的运动
+本框架与其他框架相比，具有如下优点：
+* 更高的控制精度，更贴合真实的机械臂运动情况
 * 高度可移植性，代码更简洁，方便学习与使用
 * 丰富的任务环境， 如柔顺控制，动作模仿，视觉伺服等
 
 ---
-## Installation  
+## 安装  
 
-### Environments
+### 环境
 
 * **Windows** (10+) / Linux
 * [MuJoCo-2.3.7](http://mujoco.org/)
 * Python 3.9+
 * [pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 2.6.20 
 
-### Quick Install  
+### 快速安装
 
    ```commandline
    $ git clone https://github.com/NoneJou072/robopal
    $ cd robopal
    $ pip install -e .
    ```
+## 控制器
+目前包含了下述内容：
+* 关节空间控制器  
+  使用 Ruckig 规划关节位置、速度、加速度，实现平滑运动, 使用阻抗控制计算扭矩
+* 笛卡尔空间控制器  
+  基于 pd 控制与运动学实现笛卡尔空间下的位置和姿态控制
