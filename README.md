@@ -24,14 +24,14 @@ Compared with other frameworks, ours has the following advantages:
 
 ## Installation  
 
-### Environments
+### Required environments
 
 * **Windows** (10+) / Linux
-* [MuJoCo-2.3.7](http://mujoco.org/)
 * Python 3.9+
+* [MuJoCo-2.3.7](http://mujoco.org/)
 * [pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 2.6.20 
 
-### Quick Install  
+### Install from source
 
    ```commandline
    $ git clone https://github.com/NoneJou072/robopal

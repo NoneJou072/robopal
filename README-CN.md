@@ -31,7 +31,7 @@
 * Python 3.9+
 * [pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 2.6.20 
 
-### 快速安装
+### 从源码安装
 
    ```commandline
    $ git clone https://github.com/NoneJou072/robopal
