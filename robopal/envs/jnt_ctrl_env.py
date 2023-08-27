@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
     env = SingleArmEnv(
         robot=DianaMed(),
-        is_render=True,
+        is_render=False,
         renderer='viewer',
         jnt_controller='IMPEDANCE',
         control_freq=200,

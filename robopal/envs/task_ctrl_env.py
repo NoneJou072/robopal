@@ -1,6 +1,6 @@
 import numpy as np
 from robopal.envs.jnt_ctrl_env import SingleArmEnv
-import robopal.utils.KDL_utils.transform as T
+import robopal.utils.transform as T
 
 
 class PosCtrlEnv(SingleArmEnv):

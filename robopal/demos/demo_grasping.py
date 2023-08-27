@@ -1,7 +1,7 @@
 import mujoco
 import numpy as np
 from robopal.envs.task_ctrl_env import PosCtrlEnv
-import robopal.utils.KDL_utils.transform as T
+import robopal.utils.transform as T
 from robopal.utils.ompl_base import TrajPlanning
 import cv2
 

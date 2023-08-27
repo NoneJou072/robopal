@@ -1,5 +1,5 @@
 from robopal.utils import RobotGenerator
-from robopal.assets.robots.arm_base import *
+from robopal.assets.robots.base import *
 import os
 
 

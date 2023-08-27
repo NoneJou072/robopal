@@ -1,6 +1,5 @@
-import PyKDL as kdl
+import mujoco
 import numpy as np
-import mujoco as mj
 import cv2
 import threading
 import math
@@ -47,7 +46,7 @@ class Visual_servo(SingleArmEnv):
         return np.array(K, dtype=float)
 
     def camera_viewer(self):
-        renderer = mj.Renderer(self.mj_model)
+        renderer = mujoco.Renderer(self.mj_model)
         while self.viewer.is_alive is True:
             renderer.update_scene(self.mj_data, camera="0_cam")
             org = renderer.render()
