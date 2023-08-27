@@ -36,6 +36,10 @@ class MujocoEnv(object):
         self.robot_dof = self.robot.jnt_num
         self.traj = deque(maxlen=200)
 
+        # keyboard flag
+        self.render_paused = True
+        self.exit_flag = False
+
         self._renderer_init()
         self._initialize_time()
         self._set_init_pose()
@@ -46,10 +50,13 @@ class MujocoEnv(object):
         :param action: Input action
         :return: None
         """
-        self.cur_time += 1
-        mujoco.mj_forward(self.mj_model, self.mj_data)
-        self.preStep(action)
-        mujoco.mj_step(self.mj_model, self.mj_data)
+        if self.render_paused:
+            self.cur_time += 1
+            mujoco.mj_forward(self.mj_model, self.mj_data)
+            self.preStep(action)
+            mujoco.mj_step(self.mj_model, self.mj_data)
+        if self.exit_flag is True:
+            self.close()
 
     def reset(self):
         """ Reset the simulate environment, in order to execute next episode.
@@ -61,7 +68,7 @@ class MujocoEnv(object):
 
     def render(self, mode="human"):
         """ render mujoco """
-        if self.is_render is True and self.viewer is not None:
+        if self.is_render is True and self.viewer is not None and self.render_paused is True:
             if self.renderer == "mujoco_viewer":
                 if self.viewer.is_alive is True:
                     self.viewer.render()
@@ -76,12 +83,19 @@ class MujocoEnv(object):
 
     def close(self):
         """ close the environment. """
-        pass
+        self.viewer.close()
+        sys.exit(0)
 
     def _renderer_init(self):
         """ Initialize renderer, choose official renderer with "viewer"(joined from version 2.3.3),
             another renderer with "mujoco_viewer"
         """
+        def key_callback(keycode):
+            if keycode == 32:
+                self.render_paused = not self.render_paused
+            elif keycode == 256:
+                self.exit_flag = not self.exit_flag
+
         if self.is_render is True:
             if self.renderer == "mujoco_viewer":
                 import mujoco_viewer
@@ -89,7 +103,7 @@ class MujocoEnv(object):
             elif self.renderer == "viewer":
                 from mujoco import viewer
                 # This function does not block, allowing user code to continue execution.
-                self.viewer = viewer.launch_passive(self.mj_model, self.mj_data)
+                self.viewer = viewer.launch_passive(self.mj_model, self.mj_data, key_callback=key_callback)
 
     def _initialize_time(self):
         """ Initializes the time constants used for simulation.

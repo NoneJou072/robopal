@@ -34,11 +34,6 @@ class BiDianaMed(ArmBase):
         self.arm_state = len(self.arm)  # default order: left first, then right !
         self.jnt_num = self.left_arm.jnt_num + self.right_arm.jnt_num + self.arm_base.jnt_num
 
-        # joint PD
-        # self.kp = np.array([2, 2, 2, 2, 2, 2, 2])
-        # self.kp = np.array([1000, 800, 600, 600, 600, 600, 600])
-        self.kp = 625 * np.ones(self.jnt_num)
-        self.kd = 275 * np.ones(self.jnt_num)
         print("BiDianaMed init !")
 
     @property

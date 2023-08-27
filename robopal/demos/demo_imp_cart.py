@@ -3,9 +3,6 @@ from robopal.envs import SingleArmEnv
 
 
 class ImpedGymEnv(SingleArmEnv):
-    """
-        This class is only for impedance controlling without cosserat.
-    """
 
     def __init__(self,
                  robot=None,
@@ -23,7 +20,7 @@ class ImpedGymEnv(SingleArmEnv):
         )
         # 全局属性
         self.timer = 0
-        self.init_pos, self.init_rot = self.kdl_solver.getEeCurrentPose(self.robot.single_arm.arm_qpos)
+        self.init_pos, self.init_rot = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
         self.q_curr = np.zeros(7)
         self.qd_curr = np.zeros(7)
         self.desire_ee_force = np.zeros(3)
@@ -60,14 +57,14 @@ class ImpedGymEnv(SingleArmEnv):
         # else:
         #     self.mj_data.xfrc_applied[7][0] = 0  # 还原数值，不施加外力
 
-        if self.timer in range(0, 650):
-            self.goal_pos = np.array([0.94, 0.005, 0.38])
-        elif self.timer in range(650, 1400):
-            self.goal_pos = np.array([0.94, -0.04, 0.38])
-        elif self.timer in range(1400, 2000):
-            self.goal_pos = np.array([0.94, 0.04, 0.31])
+        # if self.timer in range(0, 650):
+        #     self.goal_pos = np.array([0.94, 0.005, 0.38])
+        # elif self.timer in range(650, 1400):
+        #     self.goal_pos = np.array([0.94, -0.04, 0.38])
+        # elif self.timer in range(1400, 2000):
+        #     self.goal_pos = np.array([0.94, 0.04, 0.31])
 
-            # 重设imped参数的参考值
+        # 重设imped参数的参考值
         self.Cart_imped.set_cart_Params(self.mc, self.dc, self.kc)  # cart space
         # 状态
         self.q_curr, self.qd_curr, self.x_pos, self.x_ori, self.var_pos, self.var_h_e = self._get_state()
@@ -83,17 +80,16 @@ class ImpedGymEnv(SingleArmEnv):
     def preStep(self, action):
         # 根据阻抗控制获取末端输入力矩
         self.tau_last = self.tor
+        x_pos, x_ori = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
         self.tor = self.Cart_imped.torque_cartesian(
             self.mj_data.qfrc_bias[self.robot.single_arm.get_Arm_id()[0]:],
             self.robot.single_arm.arm_qpos,
             self.robot.single_arm.arm_qvel,
-            self.mj_data.site_xpos[0],
-            self.mj_data.site_xmat[0].reshape([3, 3]),
-            self.goal_pos,
-            np.array([0, 0, 1, 0, 1, 0, -1, 0, 0]))
-        print(self.mj_data.site_xpos[0])
+            x_pos,
+            x_ori,
+            desired_pos=self.goal_pos,
+            desired_ori=np.array([0, 0, 1, 0, 1, 0, -1, 0, 0]))
 
-        # print(self.mj_data.qfrc_bias[self.robot.single_arm.get_Arm_id()[0]:self.robot.single_arm.get_Arm_id()[6]+1])
         for i in range(7):
             self.mj_data.actuator(self.robot.single_arm.actuator_index[i]).ctrl = self.tor[i]
 
@@ -108,8 +104,7 @@ class ImpedGymEnv(SingleArmEnv):
     def _get_state(self):
         q_curr = self.robot.single_arm.arm_qpos
         qd_curr = self.robot.single_arm.arm_qvel
-        x_pos = self.mj_data.site_xpos[0]
-        x_ori = self.mj_data.site_xmat[0].reshape([3, 3])
+        x_pos, x_ori = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
         var_pos = self.goal_pos - x_pos
         var_h_e = self.tor[:7] - self.tau_last
         self.tau_last = self.tor
@@ -137,13 +132,13 @@ if __name__ == "__main__":
     env = ImpedGymEnv(
         robot=DianaMed(),
         is_render=True,
-        renderer="mujoco_viewer",
+        renderer="viewer",
         control_freq=200,
         is_interpolate=True,
     )
 
     for i in range(int(1e6)):
-        action = np.array([1, 0, 1])
+        action = np.array([0.5, 0, 1])
         obs, reward, done, _ = env.step(action)
         if env.is_render:
             env.render()

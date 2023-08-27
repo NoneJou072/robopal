@@ -29,8 +29,18 @@ class Jnt_Impedance(object):
             *args,
             **kwargs
     ):
-        # robot的关节空间控制的计算公式（multiply等同于向量相乘）
-        tau = np.multiply(self.kj, q_des - q_cur) - np.multiply(self.Bj, v_cur)
-        tau = np.dot(kwargs['M'], tau)  # 乘上质量矩阵会更稳定一些
-        tau += kwargs['coriolis_gravity'][:7]  # 加上科氏力和重力矩
+        """ robot的关节空间控制的计算公式
+            Compute desired torque with robot dynamics modeling:
+            > M(q)qdd + C(q, qd)qd + G(q) + tau_F(qd) = tau_ctrl + tau_env
+
+        :param q_des:
+        :param v_des:
+        :param q_cur:
+        :param v_cur:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        acc_desire = self.kj * (q_des - q_cur) + self.Bj * (v_des - v_cur)
+        tau = np.dot(kwargs['M'], acc_desire) + kwargs['coriolis_gravity']
         return tau

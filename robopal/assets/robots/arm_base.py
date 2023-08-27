@@ -16,9 +16,6 @@ class ArmBase(object):
         self.robot_model = mujoco.MjModel.from_xml_path(filename=self.xml_path, assets=None)
         self.robot_data = mujoco.MjData(self.robot_model)
         self.arm = []
-        # joint PD
-        self.kp = None
-        self.kd = None
 
     class Arm:
         """

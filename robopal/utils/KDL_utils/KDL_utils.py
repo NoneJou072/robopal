@@ -107,7 +107,7 @@ class KDL_utils:
         """
         return J_quat(q)
 
-    def jacobian_dot(self, q: np.ndarray, v: np.ndarray) -> np.ndarray:
+    def get_jac_dot(self, q: np.ndarray, v: np.ndarray) -> np.ndarray:
         """
 
         :param q:

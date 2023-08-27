@@ -25,9 +25,6 @@ class DianaMed(ArmBase):
         self.arm.append(self.single_arm)
 
         self.jnt_num = self.single_arm.jnt_num
-        # joint PD
-        self.kp = 500 * np.ones(self.jnt_num)
-        self.kd = 44.57 * np.ones(self.jnt_num)
 
         print("DianaMed init !")
 

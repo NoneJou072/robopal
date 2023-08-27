@@ -1,7 +1,7 @@
 import numpy as np
 from robopal.envs.base import MujocoEnv
 from robopal.utils.KDL_utils import KDL_utils
-from robopal.utils.controllers import Jnt_Impedance, Jnt_PD
+from robopal.utils.controllers import Jnt_Impedance
 
 
 class SingleArmEnv(MujocoEnv):
@@ -20,7 +20,7 @@ class SingleArmEnv(MujocoEnv):
                  robot=None,
                  is_render=False,
                  renderer="viewer",
-                 jnt_controller='PD',
+                 jnt_controller='IMPEDANCE',
                  control_freq=200,
                  is_interpolate=False
                  ):
@@ -34,9 +34,7 @@ class SingleArmEnv(MujocoEnv):
 
         self.kdl_solver = KDL_utils(robot.urdf_path)
 
-        if jnt_controller == 'PD':
-            self.jnt_controller = Jnt_PD(self.robot)
-        elif jnt_controller == 'IMPEDANCE':
+        if jnt_controller == 'IMPEDANCE':
             self.jnt_controller = Jnt_Impedance(self.robot)
         else:
             raise ValueError('Invalid controller name.')
@@ -105,7 +103,7 @@ if __name__ == "__main__":
         robot=DianaMed(),
         is_render=True,
         renderer='viewer',
-        jnt_controller='PD',
+        jnt_controller='IMPEDANCE',
         control_freq=200,
         is_interpolate=True
     )
