@@ -1,14 +1,14 @@
 import numpy as np
 from os.path import join, dirname
 import os
-from robopal.utils.KDL_utils import KDL_utils
+from robopal.utils.pin_utils import PinSolver
 work_space_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 
 class Cart_Impedance(object):
     def __init__(self):
         urdf_path = join(dirname(__file__), "../../assets/models/manipulators/DianaMed/DianaMed.urdf")
-        self.kdl_solver = KDL_utils(urdf_path)
+        self.kdl_solver = PinSolver(urdf_path)
         # hyper-parameters of impedance
         self.Mc = np.zeros(6)
         self.Bc = np.zeros(6)
@@ -35,6 +35,7 @@ class Cart_Impedance(object):
     def torque_cartesian(self, coriolis_gravity, q_curr, qd_curr, x_pos: np.array, x_ori: np.array, desired_pos,
                          desired_ori):
         J = self.kdl_solver.getJac(q_curr)
+        print(self.kdl_solver.getJac(np.array([1, 0.301, 0.2, 2.151, -0.40, -1.281, 0.4])))
         J_inv = self.kdl_solver.getJac_pinv(q_curr)
         Jd = self.kdl_solver.get_jac_dot(q_curr, qd_curr)  # 雅各比矩阵的微分
 

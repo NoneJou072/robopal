@@ -19,7 +19,8 @@ class MujocoEnv(object):
                  robot=None,
                  is_render=False,
                  renderer="viewer",
-                 control_freq=1000):
+                 control_freq=1000,
+                 is_camera_used=False):
 
         self.robot = robot
         self.is_render = is_render
@@ -36,7 +37,7 @@ class MujocoEnv(object):
 
         self.renderer = None
         if is_render:
-            self.renderer = MjRenderer(self.mj_model, self.mj_data, renderer)
+            self.renderer = MjRenderer(self.mj_model, self.mj_data, renderer, is_camera_used)
 
         self._initialize_time()
         self._set_init_pose()

@@ -1,7 +1,7 @@
 import numpy as np
 import time
 from robopal.envs.base import MujocoEnv
-from robopal.utils.KDL_utils import KDL_utils
+from robopal.utils.pin_utils import PinSolver
 from robopal.utils.interpolators import OTG
 
 
@@ -31,7 +31,7 @@ class DoubleArmEnv(MujocoEnv):
         )
         self.left_arm = self.robot.left_arm
         self.right_arm = self.robot.right_arm
-        self.kdl_solver = KDL_utils(robot.urdf_path)
+        self.kdl_solver = PinSolver(robot.urdf_path)
         self.base_time = self.control_timestep
 
         if is_interpolate:

@@ -1,8 +1,7 @@
 import numpy as np
 from robopal.envs.base import MujocoEnv
+from robopal.utils.pin_utils import PinSolver
 from robopal.utils.KDL_utils import KDL_utils
-from robopal.utils.controllers import Jnt_Impedance
-
 
 class SingleArmEnv(MujocoEnv):
     """
@@ -22,19 +21,22 @@ class SingleArmEnv(MujocoEnv):
                  renderer="viewer",
                  jnt_controller='IMPEDANCE',
                  control_freq=200,
-                 is_interpolate=False
+                 is_interpolate=False,
+                 is_camera_used=False
                  ):
 
         super().__init__(
             robot=robot,
             is_render=is_render,
             renderer=renderer,
-            control_freq=control_freq
+            control_freq=control_freq,
+            is_camera_used=is_camera_used
         )
 
-        self.kdl_solver = KDL_utils(robot.urdf_path)
+        self.kdl_solver = PinSolver(robot.urdf_path)
 
         if jnt_controller == 'IMPEDANCE':
+            from robopal.utils.controllers import Jnt_Impedance
             self.jnt_controller = Jnt_Impedance(self.robot)
         else:
             raise ValueError('Invalid controller name.')
@@ -101,11 +103,12 @@ if __name__ == "__main__":
 
     env = SingleArmEnv(
         robot=DianaMed(),
-        is_render=False,
+        is_render=True,
         renderer='viewer',
         jnt_controller='IMPEDANCE',
         control_freq=200,
-        is_interpolate=True
+        is_interpolate=True,
+        is_camera_used=False
     )
     env.reset()
     for t in range(int(1e6)):

@@ -1,9 +1,7 @@
-import mujoco
 import numpy as np
 from robopal.envs.task_ctrl_env import PosCtrlEnv
 import robopal.utils.transform as T
 from robopal.utils.ompl_base import TrajPlanning
-import cv2
 
 
 class MotionPlanEnv(PosCtrlEnv):
@@ -119,17 +117,6 @@ class MotionPlanEnv(PosCtrlEnv):
             self.mj_data.actuator("0_gripper_l_finger_joint").ctrl = 20
         elif cmd == "close":
             self.mj_data.actuator("0_gripper_l_finger_joint").ctrl = -20
-
-    def camera_viewer(self):
-        renderer = mujoco.Renderer(self.mj_model)
-        while True:
-            renderer.update_scene(self.mj_data, camera="0_gripper_cam")
-            org = renderer.render()
-            image = org[:, :, ::-1]
-            cv2.imshow('RGB Image', image)
-            cv2.waitKey(1)
-            if self.viewer.is_running() is False:
-                break
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ from robopal.utils.Update_Jaco3 import Update_Jaco as J_quat
 import pinocchio as pin
 
 
-class KDL_utils:
+class PinSolver:
     def __init__(self, urdf_path: str):
         # Load the urdf model
         urdf_path = urdf_path
@@ -89,7 +89,8 @@ class KDL_utils:
         :param q:
         :return:
         """
-        return pin.computeJointJacobian(self.model, self.data, q, self.JOINT_NUM)
+        # return pin.computeJointJacobian(self.model, self.data, q, self.JOINT_NUM)
+        return pin.computeJointJacobians(self.model, self.data, q)
 
     def getJac_pinv(self, q: np.ndarray) -> np.ndarray:
         """ Computing the Jacobian_pinv in the joint frame
@@ -114,5 +115,6 @@ class KDL_utils:
         :param v:
         :return:
         """
+        pin.forwardKinematics(self.model, self.data, q)
         pin.computeAllTerms(self.model, self.data, q, v)
         return self.data.dJ

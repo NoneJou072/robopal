@@ -1,8 +1,9 @@
 import numpy as np
-from robopal.envs import SingleArmEnv
+from robopal.envs import MujocoEnv
+from robopal.utils.pin_utils import PinSolver
 
 
-class ImpedGymEnv(SingleArmEnv):
+class ImpedGymEnv(MujocoEnv):
 
     def __init__(self,
                  robot=None,
@@ -16,11 +17,11 @@ class ImpedGymEnv(SingleArmEnv):
             is_render=is_render,
             renderer=renderer,
             control_freq=control_freq,
-            is_interpolate=is_interpolate,
         )
+        self.kdl_solver = PinSolver(robot.urdf_path)
+
         # 全局属性
         self.timer = 0
-        self.init_pos, self.init_rot = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
         self.q_curr = np.zeros(7)
         self.qd_curr = np.zeros(7)
         self.desire_ee_force = np.zeros(3)
@@ -71,11 +72,10 @@ class ImpedGymEnv(SingleArmEnv):
         # 变阻抗参数
         # self.imped.K = self.imped.adapted_K(h_e=self.h_e)
         # self.imped.B = self.imped.adapted_B(vel=self.curr_vel)
-        # 将关节扭矩下发至仿真
+
         super().step(action)
-        _ = None
-        done = True
-        return self._get_obs(), self.reward(action), done, _
+
+        return self._get_obs(), 0.0, True, {}
 
     def preStep(self, action):
         # 根据阻抗控制获取末端输入力矩
@@ -109,11 +109,6 @@ class ImpedGymEnv(SingleArmEnv):
         var_h_e = self.tor[:7] - self.tau_last
         self.tau_last = self.tor
         return [q_curr, qd_curr, x_pos, x_ori, var_pos, var_h_e]
-
-    def reward(self, action):
-        reward = 0.0
-        print(f"reward:{reward}")
-        return reward
 
     def _get_obs(self):
         obs = np.zeros(shape=self.obs_dim, dtype=np.float32)

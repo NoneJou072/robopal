@@ -12,7 +12,7 @@
             <body name="cam" pos="0.065054 0.00068038 -0.013835" quat="-2.59734e-06 0.707105 0.707108 -2.59735e-06">
                 <inertial pos="0 0 0" quat="1 0 0 0" mass="0" diaginertia="0 0 0"/>
                 <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.69804 0.69804 0.69804 1" mesh="cam" />
-                <camera name="cam" mode="fixed" pos="0.0175 0.00 0.0038" quat="0 0 1 0" fovy="45"/>
+                <camera name="cam" mode="fixed" pos="0.0175 0.00 0.007" quat="0 0 1 0" fovy="45"/>
             </body>
             <body name="rod" pos="0 0 0" quat="0.707105 -0.707108 0 0" >
                 <inertial pos="0 0 0" quat="1 0 0 0" mass="0.0000" diaginertia="0.0000 0.0000 0.0000"/>

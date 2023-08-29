@@ -3,21 +3,32 @@ from collections import deque
 import sys
 import threading
 import numpy as np
+import cv2
+from queue import Queue
 
 
 class MjRenderer:
-    def __init__(self, mj_model, mj_data, renderer, is_camera_used):
+    def __init__(self, mj_model, mj_data, renderer, is_camera_used=False):
         self.mj_model = mj_model
         self.mj_data = mj_data
+
         self.renderer = renderer
         self.viewer = None
+        self._renderer_init()
+
         self.traj = deque(maxlen=200)
 
         # keyboard flag
         self.render_paused = True
         self.exit_flag = False
 
-        self._renderer_init()
+        self._image = None
+        self.image_queue = Queue()
+
+        self.image_renderer = mujoco.Renderer(self.mj_model)
+
+        if is_camera_used:
+            self.cam_start()
 
     def _renderer_init(self):
         """ Initialize renderer, choose official renderer with "viewer"(joined from version 2.3.3),
@@ -30,23 +41,20 @@ class MjRenderer:
             elif keycode == 256:
                 self.exit_flag = not self.exit_flag
 
-        if self.renderer == "mujoco_viewer":
-            import mujoco_viewer
-            self.viewer = mujoco_viewer.MujocoViewer(self.mj_model, self.mj_data)
+        if self.renderer == "unity":
+            # TODO: support unity renderer
+            raise ValueError("Unity renderer not supported now.")
         elif self.renderer == "viewer":
             from mujoco import viewer
             # This function does not block, allowing user code to continue execution.
             self.viewer = viewer.launch_passive(self.mj_model, self.mj_data, key_callback=key_callback)
+        else:
+            raise ValueError('Invalid renderer name.')
 
     def render(self):
         """ render mujoco """
         if self.viewer is not None and self.render_paused is True:
-            if self.renderer == "mujoco_viewer":
-                if self.viewer.is_alive is True:
-                    self.viewer.render()
-                else:
-                    sys.exit(0)
-            elif self.renderer == "viewer":
+            if self.renderer == "viewer":
                 if self.viewer.is_running():
                     self.viewer.sync()
                 else:
@@ -54,6 +62,7 @@ class MjRenderer:
                     sys.exit(0)
                 if self.exit_flag is True:
                     self.close()
+                self.image_queue.put(self.render_pixels_from_camera())
 
     def close(self):
         """ close the environment. """
@@ -73,7 +82,7 @@ class MjRenderer:
 
         :param pos: One of the cartesian position of the trajectory to render.
         """
-        if self.renderer == "mujoco_viewer" and self.is_render is True:
+        if self.renderer == "mujoco_viewer":
             if self.cur_time % 10 == 0:
                 self.traj.append(pos.copy())
             for point in self.traj:
@@ -94,16 +103,29 @@ class MjRenderer:
                       [0, 0, 1]], dtype=np.float32)
         return K
 
-    def camera_viewer(self):
-        renderer = mujoco.Renderer(self.mj_model)
-        while self.viewer.is_alive is True:
-            renderer.update_scene(self.mj_data, camera="0_cam")
-            org = renderer.render()
-            self.image = org[:, :, ::-1]
-            cv2.imshow('RGB Image', self.image)
-            cv2.waitKey(1)
+    def render_pixels_from_camera(self, cam='0_cam'):
+        self.image_renderer.update_scene(self.mj_data, camera=cam)
+        org = self.image_renderer.render()
+        image = org[:, :, ::-1]
+        self._image = image
+        return image
+
+    def get_pixels_from_renderer(self):
+        return self._image
+
+    def camera_viewer(self, image_queue):
+        cv2.namedWindow('RGB Image', cv2.WINDOW_NORMAL)
+        while self.viewer.is_running() is True:
+            if not image_queue.empty():
+                rgb = self.image_queue.get()
+                cv2.imshow('RGB Image', rgb)
+                cv2.waitKey(1)
+        cv2.destroyAllWindows()
 
     def cam_start(self):
-        cam_thread = threading.Thread(target=self.camera_viewer)
+        cam_thread = threading.Thread(
+            target=self.camera_viewer,
+            kwargs=dict(image_queue=self.image_queue)
+        )
         cam_thread.daemon = True
         cam_thread.start()
