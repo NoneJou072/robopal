@@ -4,6 +4,8 @@ import pinocchio as pin
 
 
 class PinSolver:
+    """ Pinocchio solver for kinematics and dynamics """
+
     def __init__(self, urdf_path: str):
         # Load the urdf model
         urdf_path = urdf_path
@@ -28,10 +30,10 @@ class PinSolver:
         """ Position the end effector of a manipulator robot to a given pose (position and orientation)
             The method employs a simple Jacobian-based iterative algorithm, which is called closed-loop inverse kinematics (CLIK).
 
-        :param pos:
-        :param rot:
-        :param q_init:
-        :return:
+        :param pos: desired position
+        :param rot: desired rotation
+        :param q_init: initial joint position
+        :return: joint position
         """
         oM_des = pin.SE3(rot, pos)
         q = q_init
@@ -59,35 +61,35 @@ class PinSolver:
         return q.flatten()
 
     def getInertiaMat(self, q: np.ndarray) -> np.ndarray:
-        """
+        """ Computing the inertia matrix in the joint frame
 
-        :param q:
-        :return:
+        :param q: joint position
+        :return: inertia matrix
         """
         return pin.crba(self.model, self.data, q)
 
     def getCoriolisMat(self, q: np.ndarray, qdot: np.ndarray) -> np.ndarray:
-        """
+        """ Computing the Coriolis matrix in the joint frame
 
-        :param q:
-        :param qdot:
+        :param q: joint position
+        :param qdot: joint velocity
         :return:
         """
         return pin.computeCoriolisMatrix(self.model, self.data, q, qdot)
 
     def getGravityMat(self, q: np.ndarray) -> np.ndarray:
-        """
+        """ Computing the gravity matrix in the joint frame
 
-        :param q:
-        :return:
+        :param q: joint position
+        :return: gravity matrix
         """
         return pin.computeGeneralizedGravity(self.model, self.data, q)
 
     def getJac(self, q: np.ndarray) -> np.ndarray:
         """ Computing the Jacobian in the joint frame
 
-        :param q:
-        :return:
+        :param q: joint position
+        :return: Jacobian
         """
         # return pin.computeJointJacobian(self.model, self.data, q, self.JOINT_NUM)
         return pin.computeJointJacobians(self.model, self.data, q)
@@ -95,25 +97,25 @@ class PinSolver:
     def getJac_pinv(self, q: np.ndarray) -> np.ndarray:
         """ Computing the Jacobian_pinv in the joint frame
 
-        :param q:
-        :return:
+        :param q: joint position
+        :return: Jacobian_pinv
         """
         return np.linalg.pinv(self.getJac(q))
 
     def getJacQuaternion(self, q) -> np.ndarray:
-        """
+        """ Computing the Jacobian in the joint frame
 
-        :param q:
-        :return:
+        :param q: joint position
+        :return: Jacobian
         """
         return J_quat(q)
 
     def get_jac_dot(self, q: np.ndarray, v: np.ndarray) -> np.ndarray:
-        """
+        """ Computing the Jacobian_dot in the joint frame
 
-        :param q:
-        :param v:
-        :return:
+        :param q: joint position
+        :param v: joint velocity
+        :return: Jacobian_dot
         """
         pin.forwardKinematics(self.model, self.data, q)
         pin.computeAllTerms(self.model, self.data, q, v)

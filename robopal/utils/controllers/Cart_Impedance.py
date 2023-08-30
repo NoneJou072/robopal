@@ -1,8 +1,6 @@
 import numpy as np
 from os.path import join, dirname
-import os
 from robopal.utils.pin_utils import PinSolver
-work_space_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 
 class Cart_Impedance(object):
@@ -35,7 +33,6 @@ class Cart_Impedance(object):
     def torque_cartesian(self, coriolis_gravity, q_curr, qd_curr, x_pos: np.array, x_ori: np.array, desired_pos,
                          desired_ori):
         J = self.kdl_solver.getJac(q_curr)
-        print(self.kdl_solver.getJac(np.array([1, 0.301, 0.2, 2.151, -0.40, -1.281, 0.4])))
         J_inv = self.kdl_solver.getJac_pinv(q_curr)
         Jd = self.kdl_solver.get_jac_dot(q_curr, qd_curr)  # 雅各比矩阵的微分
 
@@ -46,9 +43,9 @@ class Cart_Impedance(object):
         pos_error = desired_pos - x_pos  # 位置偏差
         ori_error = self.orientation_error(desired_ori.reshape([3, 3]), x_ori)  # 姿态偏差
         x_error = np.concatenate([pos_error, ori_error])  # 两者拼接
-        v_error = np.dot(J, qd_curr)
+        v_error = -np.dot(J, qd_curr)
 
-        sum = self.Kc * x_error - np.dot(np.dot(Md, Jd), qd_curr) + self.Bc * (-v_error)
+        sum = self.Kc * x_error - np.dot(np.dot(Md, Jd), qd_curr) + self.Bc * v_error
         inertial = np.dot(M, J_inv)  # the inertial matrix in the end-effector frame
         tau = np.dot(inertial, sum) + coriolis_gravity
         return tau

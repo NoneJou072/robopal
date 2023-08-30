@@ -3,3 +3,7 @@ ruckig~=0.9.2
 
 # required for gym-wrapper
 gymnasium
+
+# required for cv
+opencv-python
+opencv-contrib-python

@@ -1,12 +1,6 @@
-import os
-import sys
-
-dir_path = os.path.dirname(os.getcwd())
-sys.path.append(os.path.dirname(dir_path))
-
 import numpy as np
-import gym
-from gym import spaces
+import gymnasium as gym
+from gymnasium import spaces
 
 
 class GymWrapper(gym.Env):
@@ -22,7 +16,7 @@ class GymWrapper(gym.Env):
     def step(self, action):
         return self.env.step(action)
 
-    def reset(self):
+    def reset(self, *args, **kwargs):
         return self.env.reset()
 
     def render(self, mode="human"):

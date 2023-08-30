@@ -1,18 +1,20 @@
 import numpy as np
 from robopal.envs.base import MujocoEnv
 from robopal.utils.pin_utils import PinSolver
-from robopal.utils.KDL_utils import KDL_utils
+
 
 class SingleArmEnv(MujocoEnv):
-    """
+    """ Single arm environment.
 
-    :param xml_path(string): Load xml file from xml_path to build the mujoco model.
+    :param robot(str): Robot configuration.
     :param is_render: Choose if use the renderer to render the scene or not.
     :param renderer: Choose official renderer with "viewer",
             another renderer with "mujoco_viewer"
+    :param jnt_controller: Choose the joint controller.
     :param control_freq: Upper-layer control frequency.
             Note that high frequency will cause high time-lag.
     :param is_interpolate: Use interpolator while stepping.
+    :param is_camera_used: Use camera or not.
     """
 
     def __init__(self,
@@ -99,20 +101,18 @@ class SingleArmEnv(MujocoEnv):
 
 
 if __name__ == "__main__":
-    from robopal.assets.robots import DianaMed
+    from robopal.assets.robots.diana_med import DianaMed
 
     env = SingleArmEnv(
         robot=DianaMed(),
-        is_render=True,
         renderer='viewer',
-        jnt_controller='IMPEDANCE',
+        is_render=True,
         control_freq=200,
         is_interpolate=True,
-        is_camera_used=False
     )
     env.reset()
     for t in range(int(1e6)):
-        action = np.array([0.1, 0.301, 0.2, 2.151, -0.40, -1.281, 0.4])
+        action = np.array([0.33116, -0.39768533, 0.66947228, 0.33116, -0.39768533, 0.66947228, 0])
         env.step(action)
         if env.is_render:
             env.render()
