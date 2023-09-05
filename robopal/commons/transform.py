@@ -2,7 +2,7 @@ import numpy as np
 from numpy import sin, cos
 
 
-def euler2Quat(rpy, degrees: bool = False):
+def euler_2_quat(rpy, degrees: bool = False):
     """
     degrees:bool
     True is the angle value, and False is the radian value
@@ -30,7 +30,7 @@ def euler2Quat(rpy, degrees: bool = False):
     return np.array([x, y, z, w])
 
 
-def euler2Mat(euler):
+def euler_2_mat(euler):
     """
     Converts euler angles into rotation matrix form
 
@@ -64,7 +64,14 @@ def euler2Mat(euler):
     return mat
 
 
-def quat2Mat(quaternion):
+def quat_2_mat(quaternion):
+    """
+    The rotation vector modulus is the angle
+    Not using the Rodriguez formula
+
+    :param quaternion:  1*4 quaternion
+    :return:  3*3 rotation matrix
+    """
     w, x, y, z = quaternion
 
     norm = np.sqrt(w ** 2 + x ** 2 + y ** 2 + z ** 2)
@@ -90,8 +97,8 @@ def quat2Mat(quaternion):
     return rotation_matrix
 
 
-def vec2Mat(vec):
-    '''
+def vec2_mat(vec):
+    """
     The rotation vector modulus is the angle
     Not using the Rodriguez formula
 
@@ -99,7 +106,7 @@ def vec2Mat(vec):
     it is necessary to normalize the rotation vector into a unit vector,
     calculate the four components of the quaternion according to the formula,
     and then convert the quaternion into a rotation matrix.
-    '''
+    """
     x = vec[0]
     y = vec[1]
     z = vec[2]
@@ -115,7 +122,40 @@ def vec2Mat(vec):
     return rotation_matrix
 
 
-def mat2Quat(mat):
+def mat_2_vec(mat):
+    """
+    The rotation vector modulus is the angle
+    Not using the Rodriguez formula
+
+    When calculating the rotation matrix,
+    it is necessary to normalize the rotation vector into a unit vector,
+    calculate the four components of the quaternion according to the formula,
+    and then convert the quaternion into a rotation matrix.
+    """
+    a = mat[0][0]
+    b = mat[0][1]
+    c = mat[0][2]
+    d = mat[1][0]
+    e = mat[1][1]
+    f = mat[1][2]
+    g = mat[2][0]
+    h = mat[2][1]
+    i = mat[2][2]
+    theta = np.arccos((a + e + i - 1) / 2)
+    x = (h - f) / (2 * np.sin(theta))
+    y = (g - c) / (2 * np.sin(theta))
+    z = (d - b) / (2 * np.sin(theta))
+    return np.array([x, y, z])
+
+
+def mat_2_quat(mat):
+    """
+    The rotation vector modulus is the angle
+    Not using the Rodriguez formula
+
+    :param mat: 3*3 rotation matrix
+    :return: 1*4 quaternion
+    """
     trace = np.trace(mat)
     if trace > 0:
         S = np.sqrt(trace + 1.0) * 2  # S = 4*qw
@@ -142,16 +182,16 @@ def mat2Quat(mat):
         qy = (mat[1, 2] + mat[2, 1]) / S
         qz = 0.25 * S
 
-    quaternion = np.array([qw, qx, qy, qz]) #w,x,y,z
+    quaternion = np.array([qw, qx, qy, qz])  # w,x,y,z
     return quaternion
 
 
-def makeTransform(pos=None, rot=None) -> np.ndarray:
+def make_transform(pos=None, rot=None) -> np.ndarray:
     """ concatenate both 1*3 or 3*1 position array and 3*3 rotation matrix
         to a 4*4 transform matrix
 
     E.g.:
-    >>> T = makeTransform(np.zeros(3), np.zeros(shape=(3, 3)))
+    >>> T = make_transform(np.zeros(3), np.zeros(shape=(3, 3)))
 
     :param pos: 1*3 position
     :param rot: 3*3 rotation
@@ -159,22 +199,5 @@ def makeTransform(pos=None, rot=None) -> np.ndarray:
     """
     pos = np.asarray(pos).reshape(3, 1)
     rot = np.asarray(rot)
-    Trans = np.concatenate([rot, pos], axis=1)
-    Trans = np.concatenate([Trans, np.array([[0, 0, 0, 1]])], axis=0)
-    return Trans
-
-# @jit(nopython=True)
-def mat_transpose(mat):
-    rows = len(mat)
-    cols = len(mat[0])
-    matrix_t = np.zeros(rows*cols).reshape(rows,cols)
-    # matrix_t = [[0.0000 for _ in range(rows)] for _ in range(cols)]
-
-
-    for i in range(rows):
-        for j in range(cols):
-            # print(mat[i][j])
-            matrix_t[j][i] = mat[i][j]
-
-    return matrix_t
-
+    return np.vstack((np.hstack((rot, pos)),
+                      np.array([0, 0, 0, 1])))

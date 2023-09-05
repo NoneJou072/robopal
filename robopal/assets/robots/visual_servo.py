@@ -1,4 +1,4 @@
-from robopal.utils import RobotGenerator
+from robopal.commons import RobotGenerator
 from robopal.assets.robots.base import *
 import os
 

@@ -1,6 +1,6 @@
 import numpy as np
 from robopal.envs import MujocoEnv
-from robopal.utils.pin_utils import PinSolver
+from robopal.commons.pin_utils import PinSolver
 
 
 class ImpedGymEnv(MujocoEnv):
@@ -20,7 +20,7 @@ class ImpedGymEnv(MujocoEnv):
         self.kdl_solver = PinSolver(robot.urdf_path)
 
         # 导入阻抗模块
-        from robopal.utils.controllers.Cart_Impedance import Cart_Impedance
+        from robopal.commons.controllers.Cart_Impedance import Cart_Impedance
         self.Cart_imped = Cart_Impedance()
         self.Cart_imped.set_cart_Params(
             m=np.diag(0.1 * np.ones(6)),

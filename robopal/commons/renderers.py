@@ -1,18 +1,20 @@
 import mujoco
 from collections import deque
 import sys
-import threading
 import numpy as np
-import cv2
 from queue import Queue
+# TODO: separate a script
+import cv2
 
 
 class MjRenderer:
-    def __init__(self, mj_model, mj_data, renderer, is_camera_used=False):
+    def __init__(self, mj_model, mj_data, renderer, is_camera_used=False, cam_mode='rgb'):
         self.mj_model = mj_model
         self.mj_data = mj_data
 
         self.renderer = renderer
+        self.enable_camera_viewer = is_camera_used
+        self.cam_mode = cam_mode
         self.viewer = None
         self._renderer_init()
 
@@ -26,9 +28,6 @@ class MjRenderer:
         self.image_queue = Queue()
 
         self.image_renderer = mujoco.Renderer(self.mj_model)
-
-        if is_camera_used:
-            self.cam_start()
 
     def _renderer_init(self):
         """ Initialize renderer, choose official renderer with "viewer"(joined from version 2.3.3),
@@ -48,24 +47,31 @@ class MjRenderer:
             from mujoco import viewer
             # This function does not block, allowing user code to continue execution.
             self.viewer = viewer.launch_passive(self.mj_model, self.mj_data, key_callback=key_callback)
+            if self.enable_camera_viewer:
+                cv2.namedWindow('RGB Image', cv2.WINDOW_NORMAL)
         else:
             raise ValueError('Invalid renderer name.')
 
     def render(self):
         """ render mujoco """
-        if self.viewer is not None and self.render_paused is True:
-            if self.renderer == "viewer":
-                if self.viewer.is_running():
-                    self.viewer.sync()
-                else:
-                    self.viewer.close()
-                    sys.exit(0)
-                if self.exit_flag is True:
-                    self.close()
-                # self.image_queue.put(self.render_pixels_from_camera())
+        if self.viewer is not None and self.render_paused is True and self.renderer == "viewer":
+            if self.viewer.is_running():
+                self.viewer.sync()
+            else:
+                self.close()
+            if self.exit_flag is True:
+                self.close()
+            # self.image_queue.put(self.render_pixels_from_camera())
+            if self.enable_camera_viewer:
+                enable_depth = True if self.cam_mode == 'depth' else False
+                rgb = self.render_pixels_from_camera('0_cam', enable_depth=enable_depth)
+                cv2.imshow('RGB Image', rgb)
+                cv2.waitKey(1)
 
     def close(self):
         """ close the environment. """
+        if self.enable_camera_viewer:
+            cv2.destroyAllWindows()
         self.viewer.close()
         sys.exit(0)
 
@@ -117,21 +123,3 @@ class MjRenderer:
 
     def get_pixels_from_renderer(self):
         return self._image
-
-    def camera_viewer(self, image_queue):
-        cv2.namedWindow('RGB Image', cv2.WINDOW_NORMAL)
-        while self.viewer.is_running() is True:
-            # if not image_queue.empty():
-                # rgb = self.image_queue.get()
-            rgb = self.render_pixels_from_camera()
-            cv2.imshow('RGB Image', rgb)
-            cv2.waitKey(1)
-        cv2.destroyAllWindows()
-
-    def cam_start(self):
-        cam_thread = threading.Thread(
-            target=self.camera_viewer,
-            kwargs=dict(image_queue=self.image_queue)
-        )
-        cam_thread.daemon = True
-        cam_thread.start()

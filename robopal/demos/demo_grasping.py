@@ -1,7 +1,7 @@
 import numpy as np
 from robopal.envs.task_ctrl_env import PosCtrlEnv
-import robopal.utils.transform as T
-from robopal.utils.ompl_base import TrajPlanning
+import robopal.commons.transform as T
+from robopal.commons.ompl_base import TrajPlanning
 
 
 class MotionPlanEnv(PosCtrlEnv):
@@ -96,7 +96,7 @@ class MotionPlanEnv(PosCtrlEnv):
     def move(self, pos, quat):
         def checkArriveState(state):
             current_pos, current_mat = self.kdl_solver.getEeCurrentPose(self.robot.single_arm.arm_qpos)
-            current_quat = T.mat2Quat(current_mat)
+            current_quat = T.mat_2_quat(current_mat)
             error = np.sum(np.abs(state[:3] - current_pos)) + np.sum(np.abs(state[3:] - current_quat))
             if error <= 0.01:
                 return True

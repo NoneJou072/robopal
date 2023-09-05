@@ -1,6 +1,6 @@
 import numpy as np
 from os.path import join, dirname
-from robopal.utils.pin_utils import PinSolver
+from robopal.commons.pin_utils import PinSolver
 
 
 class Cart_Impedance(object):

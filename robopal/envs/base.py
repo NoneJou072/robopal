@@ -1,7 +1,7 @@
 import abc
 
 import mujoco
-from robopal.utils.renderers import MjRenderer
+from robopal.commons.renderers import MjRenderer
 
 
 class MujocoEnv(object):
@@ -20,7 +20,8 @@ class MujocoEnv(object):
                  is_render=False,
                  renderer="viewer",
                  control_freq=1000,
-                 is_camera_used=False):
+                 is_camera_used=False,
+                 cam_mode='rgb'):
 
         self.robot = robot
         self.is_render = is_render
@@ -37,7 +38,7 @@ class MujocoEnv(object):
 
         self.renderer = None
         if is_render:
-            self.renderer = MjRenderer(self.mj_model, self.mj_data, renderer, is_camera_used)
+            self.renderer = MjRenderer(self.mj_model, self.mj_data, renderer, is_camera_used, cam_mode)
 
         self._initialize_time()
         self._set_init_pose()

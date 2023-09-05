@@ -34,8 +34,8 @@ class Visual_servo(SingleArmEnv):
         self.tau_last = np.zeros(7)
 
         # 导入阻抗模块
-        from robopal.utils.controllers.Jnt_Impedance import Jnt_Impedance
-        from robopal.utils.controllers.Cart_Impedance import Cart_Impedance
+        from robopal.commons.controllers.Jnt_Impedance import Jnt_Impedance
+        from robopal.commons.controllers.Cart_Impedance import Cart_Impedance
         self.Jnt_imped = Jnt_Impedance()
         self.Cart_imped = Cart_Impedance()
 

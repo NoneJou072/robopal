@@ -1,6 +1,6 @@
 import numpy as np
 from robopal.envs.jnt_ctrl_env import SingleArmEnv
-import robopal.utils.transform as T
+import robopal.commons.transform as T
 
 
 class PosCtrlEnv(SingleArmEnv):
@@ -27,7 +27,7 @@ class PosCtrlEnv(SingleArmEnv):
         self._vel_des = np.zeros(3)
 
         _, r_init_m = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
-        self.init_rot_quat = T.mat2Quat(r_init_m)
+        self.init_rot_quat = T.mat_2_quat(r_init_m)
 
     @property
     def vel_cur(self):
@@ -55,15 +55,15 @@ class PosCtrlEnv(SingleArmEnv):
             raise ValueError("Fault action length.")
         if self.is_pd is False:
             p_goal = action[:3]
-            r_goal = T.quat2Mat(self.init_rot_quat if len(action) == 3 else action[3:])
+            r_goal = T.quat_2_mat(self.init_rot_quat if len(action) == 3 else action[3:])
         else:
             p_cur, r_cur_m = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
-            r_cur = T.mat2Quat(r_cur_m)
+            r_cur = T.mat_2_quat(r_cur_m)
             r_target = self.init_rot_quat if len(action) == 3 else action[3:]
             p_incre, r_incre = self.PDControl(p_goal=action[:3], p_cur=p_cur,
                                               r_goal=r_target, r_cur=r_cur, vel_goal=self.vel_des)
             p_goal = p_incre + p_cur
-            r_goal = T.quat2Mat(r_incre + r_cur)
+            r_goal = T.quat_2_mat(r_incre + r_cur)
             # r_goal = T.quat2Mat(r_target)
 
         action = self.kdl_solver.ik(p_goal, r_goal, q_init=self.robot.single_arm.arm_qpos)

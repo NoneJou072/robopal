@@ -1,20 +1,19 @@
 import cv2
 import numpy as np
-from scipy.spatial.transform import Rotation as RR
 from robopal.envs.jnt_ctrl_env import SingleArmEnv
+import robopal.commons.transform as trans
+from scipy.spatial.transform import Rotation as RR
 
-if cv2.__version__ < '4.0.0':
-    raise EnvironmentError('The cv2 version is too low.')
 
-
-class Visual_servo(SingleArmEnv):
+class VisualServo(SingleArmEnv):
     def __init__(self,
                  robot=None,
                  is_render=False,
                  renderer="viewer",
                  control_freq=200,
                  is_interpolate=False,
-                 is_camera_used=True
+                 is_camera_used=True,
+                 cam_mode='rgb'
                  ):
         super().__init__(
             robot=robot,
@@ -22,7 +21,8 @@ class Visual_servo(SingleArmEnv):
             renderer=renderer,
             control_freq=control_freq,
             is_interpolate=is_interpolate,
-            is_camera_used=is_camera_used
+            is_camera_used=is_camera_used,
+            cam_mode=cam_mode
         )
 
         self.camera_intrinsic_matrix = self.renderer.get_cam_intrinsic()
@@ -33,20 +33,15 @@ class Visual_servo(SingleArmEnv):
 
     def aruco_detection(self, marker_size):
         cv_image = self.renderer.get_pixels_from_renderer()
-        print(cv_image)
-        # if cv_image is not None:
-        #     corners, marker_ids, _ = self.detector.detectMarkers(cv_image)
-        #     if marker_ids is not None:
-        #         rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(
-        #             corners, marker_size, self.camera_intrinsic_matrix, self.distCoeffs
-        #         )
-        #         return rvec.flatten()[:3], tvec.flatten()[:3], True
-        return np.zeros(3), np.zeros(3), False
 
-    def make_transform(self, r, p: np.ndarray):
-        p = p.reshape(3, 1)
-        return np.vstack((np.hstack((r, p)),
-                          np.array([0, 0, 0, 1])))
+        if cv_image is not None:
+            corners, marker_ids, _ = self.detector.detectMarkers(cv_image)
+            if marker_ids is not None:
+                rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(
+                    corners, marker_size, self.camera_intrinsic_matrix, self.distCoeffs
+                )
+                return rvec.flatten()[:3], tvec.flatten()[:3], True
+        return np.zeros(3), np.zeros(3), False
 
     def step(self, action=None):
         var_lambda = 1.6
@@ -59,12 +54,13 @@ class Visual_servo(SingleArmEnv):
 
         hand2cam_p = np.array([0.0, 0.00, 0.007])
         hand2cam_r = np.array([-3.14, 0, 1.57])
+        # hand2cam_M = trans.euler_2_mat(hand2cam_r)
         hand2cam_M = RR.from_euler('xyz', hand2cam_r).as_matrix()
-        kdl_hand2cam_f = self.make_transform(hand2cam_M, hand2cam_p)
+        kdl_hand2cam_f = trans.make_transform(hand2cam_p, hand2cam_M)
 
         jac_pinv = self.kdl_solver.getJac_pinv(self.robot.single_arm.arm_qpos)
         base2hand_p, base2hand_r = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
-        kdl_base2hand_f = self.make_transform(base2hand_r, base2hand_p)
+        kdl_base2hand_f = trans.make_transform(base2hand_p, base2hand_r)
 
         kdl_base2cam_f = kdl_base2hand_f @ kdl_hand2cam_f
         np_base2cam = kdl_base2cam_f[:3, :3]
@@ -72,9 +68,11 @@ class Visual_servo(SingleArmEnv):
         cam2aruco_r, cam2aruco_p, detected_already = self.aruco_detection(marker_size)
         if detected_already:
             T_ca = cam2aruco_p.reshape(3, 1)
+            # R_ca = trans.vec2_mat(cam2aruco_r)
             R_ca = RR.from_rotvec(cam2aruco_r).as_matrix()
 
             T_acd = desire_p
+            # R_acd = trans.quat_2_mat(desire_r)
             R_acd = RR.from_quat(desire_r).as_matrix()
 
             R_c_cd = R_ca @ R_acd
@@ -82,6 +80,7 @@ class Visual_servo(SingleArmEnv):
 
             R_cd_c = R_c_cd.T
             T_cd_c = -np.matmul(R_cd_c, T_c_cd)
+            # error_R = trans.mat_2_vec(R_cd_c).reshape(3, 1)
             error_R = RR.from_matrix(R_cd_c).as_rotvec().reshape(3, 1)
 
             error = np.concatenate([T_cd_c, error_R], axis=0)
@@ -114,13 +113,14 @@ class Visual_servo(SingleArmEnv):
 if __name__ == "__main__":
     from robopal.assets.robots.visual_servo import DianaMed
 
-    env = Visual_servo(
+    env = VisualServo(
         robot=DianaMed(),
         is_render=True,
         control_freq=200,
         is_interpolate=False,
         renderer='viewer',
         is_camera_used=True,
+        cam_mode='rgb'
     )
     env.reset()
     for t in range(int(1e6)):

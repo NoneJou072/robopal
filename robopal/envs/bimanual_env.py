@@ -1,8 +1,8 @@
 import numpy as np
 import time
 from robopal.envs.base import MujocoEnv
-from robopal.utils.pin_utils import PinSolver
-from robopal.utils.interpolators import OTG
+from robopal.commons.pin_utils import PinSolver
+from robopal.commons.interpolators import OTG
 
 
 class DoubleArmEnv(MujocoEnv):

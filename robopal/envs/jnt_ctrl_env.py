@@ -1,6 +1,6 @@
 import numpy as np
 from robopal.envs.base import MujocoEnv
-from robopal.utils.pin_utils import PinSolver
+from robopal.commons.pin_utils import PinSolver
 
 
 class SingleArmEnv(MujocoEnv):
@@ -24,7 +24,8 @@ class SingleArmEnv(MujocoEnv):
                  jnt_controller='IMPEDANCE',
                  control_freq=200,
                  is_interpolate=False,
-                 is_camera_used=False
+                 is_camera_used=False,
+                 cam_mode='rgb'
                  ):
 
         super().__init__(
@@ -32,13 +33,14 @@ class SingleArmEnv(MujocoEnv):
             is_render=is_render,
             renderer=renderer,
             control_freq=control_freq,
-            is_camera_used=is_camera_used
+            is_camera_used=is_camera_used,
+            cam_mode=cam_mode
         )
 
         self.kdl_solver = PinSolver(robot.urdf_path)
 
         if jnt_controller == 'IMPEDANCE':
-            from robopal.utils.controllers import Jnt_Impedance
+            from robopal.commons.controllers import Jnt_Impedance
             self.jnt_controller = Jnt_Impedance(self.robot)
         else:
             raise ValueError('Invalid controller name.')
@@ -80,7 +82,7 @@ class SingleArmEnv(MujocoEnv):
             super().step(action)
 
     def _init_interpolator(self, Arm):
-        from robopal.utils.interpolators import OTG
+        from robopal.commons.interpolators import OTG
         self.interpolator = OTG(
             OTG_Dof=self.robot_dof,
             control_cycle=self.control_timestep,

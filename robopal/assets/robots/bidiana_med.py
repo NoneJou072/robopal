@@ -1,6 +1,6 @@
 from robopal.assets.robots.base import *
 import os
-from robopal.utils import RobotGenerator
+from robopal.commons import RobotGenerator
 
 
 class BiDianaMed(ArmBase):

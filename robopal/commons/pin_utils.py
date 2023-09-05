@@ -1,5 +1,5 @@
 import numpy as np
-from robopal.utils.Update_Jaco3 import Update_Jaco as J_quat
+from robopal.commons.Update_Jaco3 import Update_Jaco as J_quat
 import pinocchio as pin
 
 
