@@ -33,7 +33,7 @@ class Jnt_Impedance(object):
             Compute desired torque with robot dynamics modeling:
             > M(q)qdd + C(q, qd)qd + G(q) + tau_F(qd) = tau_ctrl + tau_env
 
-        :param q_des:
+        :param q_des: desired joint position
         :param v_des:
         :param q_cur:
         :param v_cur:

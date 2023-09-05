@@ -15,7 +15,10 @@
         <mesh name="0_link5" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link5.STL" />
         <mesh name="0_link6" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link6.STL" />
         <mesh name="0_link7" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link7.STL" />
-    </asset>
+    <mesh name="0_cambase" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/grippers/Swab_gripper/meshes/cambase.STL" />
+        <mesh name="0_cam" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/grippers/Swab_gripper/meshes/cam.STL" />
+        <mesh name="0_stick" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/grippers/Swab_gripper/meshes/stick.STL" />
+    <texture name="aruco" type="2d" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/robots/../textures/aruco.png" /><material name="aruco" texture="aruco" texrepeat="1 1" texuniform="false" /></asset>
 
   <worldbody>
     
@@ -30,6 +33,10 @@
     <camera mode="fixed" name="agentview" pos="0.5 0 1.35" quat="0.653 0.271 0.271 0.653" />
     
     <camera mode="fixed" name="sideview" pos="-0.05651774593317116 1.2761224129427358 1.4879572214102434" quat="0.009905065491771751 0.006877963156909582 0.5912228352893879 0.806418094001364" />
+    <body name="object" pos="1.1 0 0.6">
+        <inertial pos="0.0 0.0 0.0" mass="10" diaginertia="0.184 0.1 0.1" />
+        <geom type="box" size="0.05 0.2 0.2" friction="0.0000 0.000 0.0000" rgba="1 0 0 0.5" />
+    </body>
   <body name="0_base_link">
             <geom type="mesh" contype="0" conaffinity="0" group="1" pos="0 0 0" rgba="1 1 1 1" mesh="0_base_link" />
             <body name="0_link1" pos="8.7058e-05 -0.00063474 0.2985" quat="-3.67321e-06 1 0 0">
@@ -61,7 +68,26 @@
                                         <inertial pos="0.00068467 1.5999e-05 0.020834" quat="0.000547318 0.708756 -0.000448023 0.705453" mass="0.16696" diaginertia="0.000143911 8.8902e-05 8.75358e-05" />
                                         <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="0_link7" />
                                         <geom type="mesh" rgba="1 1 1 1" mesh="0_link7" />
-                                    </body>
+                                    <body name="0_end_effector">
+            <inertial pos="0 0 0" quat="1 0 0 0" mass="0" diaginertia="0 0 0" />
+            <geom type="mesh" rgba="1 1 1 1" mesh="0_cambase" />
+
+            <body name="0_cam" pos="0.065054 0.00068038 -0.013835" quat="-2.59734e-06 0.707105 0.707108 -2.59735e-06">
+                <inertial pos="0 0 0" quat="1 0 0 0" mass="0" diaginertia="0 0 0" />
+                <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.69804 0.69804 0.69804 1" mesh="0_cam" />
+                <camera name="0_cam" mode="fixed" pos="0.0175 0.00 0.007" quat="0 0 1 0" fovy="45" />
+            </body>
+            <body name="0_rod" pos="0 0 0" quat="0.707105 -0.707108 0 0">
+                <inertial pos="0 0 0" quat="1 0 0 0" mass="0.0000" diaginertia="0.0000 0.0000 0.0000" />
+                <geom type="mesh" mesh="0_stick" rgba="1 1 1 1" friction="0.2 0.05 0.01" />
+                <body name="0_end" pos="0 0.15 0">
+                    <inertial pos="0 0 0" quat="1 0 0 0" mass="0.0000" diaginertia="0.0000 0.0000 0.0000" />
+                    <geom size="0.005" quat="0 0 1 1" rgba="1 0 0 1" type="sphere" friction="0.3 0.005 0.001" />
+                    <site name="0_gripper_frame" size="0.001" quat="0 0 1 1" />
+                </body>
+            </body>
+        </body>
+    </body>
                                 </body>
                             </body>
                         </body>
@@ -69,7 +95,7 @@
                 </body>
             </body>
         </body>
-    </worldbody>
+    <body name="aruco"><geom name="aruco_box" pos="0.919 0 1.27" mass="0.001" euler="0 -1.57 0" size="0.05 0.05 0.001" type="box" material="aruco" /><joint name="aruco_x" type="slide" axis="1 0 0" /><joint name="aruco_y" type="slide" axis="0 1 0" /><joint name="aruco_z" type="slide" axis="0 0 1" /></body></worldbody>
 <actuator><motor name="0_a1" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j1" />
         <motor name="0_a2" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j2" />
         <motor name="0_a3" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j3" />
@@ -77,4 +103,5 @@
         <motor name="0_a5" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j5" />
         <motor name="0_a6" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j6" />
         <motor name="0_a7" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j7" />
-    </actuator><default /><contact /><sensor /><equality /></mujoco>
+    </actuator><default /><contact /><sensor><force name="0_wall_force_sensor" site="0_gripper_frame" cutoff="3.0" />
+    </sensor><equality /></mujoco>

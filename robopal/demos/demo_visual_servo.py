@@ -33,13 +33,14 @@ class Visual_servo(SingleArmEnv):
 
     def aruco_detection(self, marker_size):
         cv_image = self.renderer.get_pixels_from_renderer()
-        if cv_image is not None:
-            corners, marker_ids, _ = self.detector.detectMarkers(cv_image)
-            if marker_ids is not None:
-                rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(
-                    corners, marker_size, self.camera_intrinsic_matrix, self.distCoeffs
-                )
-                return rvec.flatten()[:3], tvec.flatten()[:3], True
+        print(cv_image)
+        # if cv_image is not None:
+        #     corners, marker_ids, _ = self.detector.detectMarkers(cv_image)
+        #     if marker_ids is not None:
+        #         rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(
+        #             corners, marker_size, self.camera_intrinsic_matrix, self.distCoeffs
+        #         )
+        #         return rvec.flatten()[:3], tvec.flatten()[:3], True
         return np.zeros(3), np.zeros(3), False
 
     def make_transform(self, r, p: np.ndarray):

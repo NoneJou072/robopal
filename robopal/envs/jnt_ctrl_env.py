@@ -51,10 +51,7 @@ class SingleArmEnv(MujocoEnv):
         if self.interpolator is None:
             q_target, qdot_target = action, np.zeros(self.robot_dof)
         else:
-            try:
-                q_target, qdot_target = self.interpolator.updateState()
-            except ValueError:
-                print(action)
+            q_target, qdot_target = self.interpolator.updateState()
 
         m = self.kdl_solver.getInertiaMat(self.robot.single_arm.arm_qpos)
         c = self.kdl_solver.getCoriolisMat(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)

@@ -62,7 +62,7 @@ class MjRenderer:
                     sys.exit(0)
                 if self.exit_flag is True:
                     self.close()
-                self.image_queue.put(self.render_pixels_from_camera())
+                # self.image_queue.put(self.render_pixels_from_camera())
 
     def close(self):
         """ close the environment. """
@@ -103,10 +103,15 @@ class MjRenderer:
                       [0, 0, 1]], dtype=np.float32)
         return K
 
-    def render_pixels_from_camera(self, cam='0_cam'):
+    def render_pixels_from_camera(self, cam='0_cam', enable_depth=True):
         self.image_renderer.update_scene(self.mj_data, camera=cam)
-        org = self.image_renderer.render()
-        image = org[:, :, ::-1]
+        if enable_depth is True:
+            self.image_renderer.enable_depth_rendering()
+            org = self.image_renderer.render()
+            image = org[:, :]
+        else:
+            org = self.image_renderer.render()
+            image = org[:, :, ::-1]
         self._image = image
         return image
 
@@ -116,10 +121,11 @@ class MjRenderer:
     def camera_viewer(self, image_queue):
         cv2.namedWindow('RGB Image', cv2.WINDOW_NORMAL)
         while self.viewer.is_running() is True:
-            if not image_queue.empty():
-                rgb = self.image_queue.get()
-                cv2.imshow('RGB Image', rgb)
-                cv2.waitKey(1)
+            # if not image_queue.empty():
+                # rgb = self.image_queue.get()
+            rgb = self.render_pixels_from_camera()
+            cv2.imshow('RGB Image', rgb)
+            cv2.waitKey(1)
         cv2.destroyAllWindows()
 
     def cam_start(self):
