@@ -305,10 +305,10 @@ class Visual_servo(SingleArmEnv):
 
 
 if __name__ == "__main__":
-    from robopal.assets.robots.visual_servo import DianaMed
+    from robopal.assets.robots.diana_med import DianaAruco
 
     env = Visual_servo(
-        robot=DianaMed(),
+        robot=DianaAruco(),
         is_render=True,
         control_freq=200,
         is_interpolate=True,

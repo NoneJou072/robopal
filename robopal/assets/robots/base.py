@@ -1,21 +1,41 @@
 import mujoco
 import numpy as np
+from robopal.commons import RobotGenerator
 
 
 class ArmBase(object):
     def __init__(self,
-                 name=None,
-                 urdf_path=None,
-                 xml_path=None,
-                 gripper=None
+                 name: str = None,
+                 scene: str = 'default',
+                 chassis: str = None,
+                 manipulator: str = None,
+                 gripper: str = None,
+                 g2m_body: list = None,
+                 urdf_path: str = None,
+                 xml_path: str = None,
                  ):
         self.name = name
+        self.robot = RobotGenerator(
+            scene=scene,
+            chassis=chassis,
+            manipulator=manipulator,
+            gripper=gripper,
+            g2m_body=g2m_body
+        )
+        self.add_assets()
+
         self.urdf_path = urdf_path
-        self.xml_path = xml_path
-        self.gripper = gripper
+        if isinstance(xml_path, str):
+            self.xml_path =xml_path
+        else:
+            self.xml_path = self.robot.xml
+
         self.robot_model = mujoco.MjModel.from_xml_path(filename=self.xml_path, assets=None)
         self.robot_data = mujoco.MjData(self.robot_model)
         self.arm = []
+
+    def add_assets(self):
+        pass
 
     class Arm:
         """
