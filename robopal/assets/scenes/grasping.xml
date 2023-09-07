@@ -3,29 +3,13 @@
   <option timestep="0.0005" gravity="0 0 -9.81">
       <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable"/>
   </option>
+
   <asset>
+    <mesh name="complete_table" file="../objects/table/complete_table.STL" scale="1.0 1.0 0.66"/>
     <texture builtin="gradient" height="256" rgb1=".9 .9 1." rgb2=".2 .3 .4" type="skybox" width="256"/>
     <texture file="../textures/wood-tiles.png" type="2d" name="texplane"/>
     <material name="floorplane" reflectance="0.01" shininess="0.0" specular="0.0" texrepeat="2 2" texture="texplane" texuniform="true"/>
   </asset>
-  <asset>
-        <mesh file="../objects/can/can.stl" name="can_mesh" scale="1.0 1.0 1.5"/>
-        <texture file="../objects/can/can.png" name="tex-can"/>
-        <material name="coke" reflectance="0.7" texrepeat="5 5" texture="tex-can" texuniform="true"/>
-  </asset>
-
-  <asset>
-        <mesh file="../objects/can/can.stl" name="cer_mesh" scale="1.0 1.0 1.5"/>
-        <texture file="../objects/can/ceramic.png" name="tex-cer"/>
-        <material name="ceramic" reflectance="0.7" texrepeat="5 5" texture="tex-cer" texuniform="true"/>
-  </asset>
-
-  <asset>
-        <mesh file="../objects/can/can.stl" name="gla_mesh" scale="1.0 1.0 1.5"/>
-        <texture file="../objects/can/glass.png" name="tex-gla"/>
-        <material name="glass" reflectance="0.7" texrepeat="5 5" texture="tex-gla" texuniform="true"/>
-  </asset>
-
 
   <worldbody>
     <!-- Floor -->
@@ -40,65 +24,39 @@
     <camera mode="fixed" name="agentview" pos="0.5 0 1.35" quat="0.653 0.271 0.271 0.653"/>
     <!-- side view -->
     <camera mode="fixed" name="sideview" pos="-0.05651774593317116 1.2761224129427358 1.4879572214102434" quat="0.009905065491771751 0.006877963156909582 0.5912228352893879 0.806418094001364" />
-  
-    <body name="table" pos="1 0.3 0.35">
-        <geom name="table" type="box" size="0.7 1.0 0.05" rgba="0.9 0.9 0.9 1"/>
-        <joint type="free" stiffness="0" damping="0.01" frictionloss="0" armature="0"/>
-        <body name="leg1" pos="0.35 0.7 -0.2">
-            <geom name="leg1_geom" type="cylinder" size="0.05 0.15" rgba="0.5 0.5 0.5 1" />
-                <inertial pos="0 0 0" quat="1 0 0 0" mass="0.01" diaginertia="0.0008 0.0008 0.0008"/>
-            <!-- <joint type="hinge" axis="1 0 0" pos="0 0 0" /> -->
-        </body>
-        <body name="leg2" pos="-0.35 0.7 -0.2">
-            <geom name="leg2_geom" type="cylinder" size="0.05 0.15" rgba="0.5 0.5 0.5 1" />
-                <inertial pos="0 0 0" quat="1 0 0 0" mass="0.01" diaginertia="0.0008 0.0008 0.0008"/>
-            <!-- <joint type="hinge" axis="1 0 0" pos="0 0 0" /> -->
-        </body>
-        <body name="leg3" pos="0.35 -0.7 -0.2">
-            <geom name="leg3_geom" type="cylinder" size="0.05 0.15" rgba="0.5 0.5 0.5 1" />
-                <inertial pos="0 0 0" quat="1 0 0 0" mass="0.01" diaginertia="0.0008 0.0008 0.0008"/>
-            <!-- <joint type="hinge" axis="1 0 0" pos="0 0 0" /> -->
-        </body>
-        <body name="leg4" pos="-0.35 -0.7 -0.2">
-            <geom name="leg4_geom" type="cylinder" size="0.05 0.15" rgba="0.5 0.5 0.5 1" />
-                <inertial pos="0 0 0" quat="1 0 0 0" mass="0.01" diaginertia="0.0008 0.0008 0.0008"/>
-            <!-- <joint type="hinge" axis="1 0 0" pos="0 0 0" /> -->
-        </body>
-        </body>
-         <body pos="0.8 0.3 0.46" name="coke_can">
-			<joint name="object0:joint" type="free" damping="0.01" />
-			<!-- <geom name= 'coke_can' pos="0 0 0" size="0.02 0.02 0.02" type="box" solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" material="coke" group="1" condim="4" /> -->
-			<!-- <geom pos="0 0 0" mesh="can_mesh" type="mesh" material="coke"   group="1"/> -->
-			<geom name= 'coke_can' pos="0 0 0" size="0.02 0.02 " type="box" solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" material="coke" group="1" condim="4" />
 
-			<site name="coke_can" pos="0 0 0" quat='-0.707 0 0.707 0' size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+    <body name="table" pos="1.0 0.3 0.0" euler = "0 0 0">
+        <geom pos="-0.6 -0.3 0.411" euler = "0 0 1.57" type="box" rgba="0.792157 0.819608 0.933333 1" size="0.3 0.6 0.01" />
+        <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.792157 0.819608 0.933333 1" mesh="complete_table" friction="0.95 0.9 0.9"/>
+        <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="complete_table"/>
+    </body>
 
-			<site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="can_bottom_site"/>
-			<site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="can_top_site"/>
-			<site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="can_horizontal_radius_site"/>
-		</body>
+      <body pos="0.8 0.2 0.46" name="red_block">
+        <joint name="object0:joint" type="free" />
+        <geom name= 'red_block' size="0.02 0.02 " rgba="1 0 0 1" type="box" solimp="0.998 0.998 0.001" friction="0.5 0.9 0.9" group="1" condim="4" />
+        <site name="red_block" pos="0 0 0" quat='-0.707 0 0.707 0' size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="can_bottom_site"/>
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="can_top_site"/>
+        <site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="can_horizontal_radius_site"/>
+    </body>
 
-        <body pos="0.8 0.0 0.46" name="ceramic_can">
-			<joint name="object1:joint" type="free" damping="0.01" />
-			<geom name="ceramic_can" pos="0 0 0" mesh="can_mesh" type="mesh" solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" material="ceramic" group="1" condim="4"/>
-			<geom pos="0 0 0" mesh="can_mesh" type="mesh" material="ceramic"   group="1"/>
-			<site name="ceramic_can" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+    <body pos="0.8  0.0 0.46" name="blue_block">
+        <joint name="object1:joint" type="free"/>
+        <geom name="blue_block" size="0.02 0.02 " rgba="0 0 1 1" type="box" solimp="0.998 0.998 0.001" friction="0.5 0.3 0.1" group="1" condim="4"/>
+        <site name="blue_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="ceramic_bottom_site"/>
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="ceramic_top_site"/>
+        <site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="ceramic_horizontal_radius_site"/>
+    </body>
 
-			<site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="ceramic_bottom_site"/>
-			<site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="ceramic_top_site"/>
-			<site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="ceramic_horizontal_radius_site"/>
-		</body>
-
-        <body pos="0.8 -0.2 0.46" name="glass_can">
-			<joint name="object2:joint" type="free" damping="0.01" />
-			<geom name="glass_can" pos="0 0 0" mesh="can_mesh" type="mesh" solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" material="glass" group="1" condim="4"/>
-			<geom pos="0 0 0" mesh="can_mesh" type="mesh" material="glass"   group="1"/>
-			<site name="glass_can" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
-	
-			<site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="glass_bottom_site"/>
-			<site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="glass_top_site"/>
-			<site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="glass_horizontal_radius_site"/>
-		</body>
+    <body pos="0.8 -0.2 0.46" name="green_block">
+        <joint name="object2:joint" type="free" damping="0.01" />
+        <geom name="green_block" size="0.02 0.02 " rgba="0 1 0 1" type="box" solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.5 0.3 0.1" group="1" condim="4"/>
+        <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="glass_bottom_site"/>
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="glass_top_site"/>
+        <site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="glass_horizontal_radius_site"/>
+    </body>
   
   </worldbody>
 </mujoco>

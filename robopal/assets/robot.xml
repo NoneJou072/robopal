@@ -1,20 +1,26 @@
 <mujoco model="empty_floor">
-  <compiler angle="radian" />
+    <compiler angle="radian" />
   <option timestep="0.0005" gravity="0 0 -9.81">
       <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable" />
   </option>
+
   <asset>
+    <mesh name="complete_table" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/scenes/../objects/table/complete_table.STL" scale="1.0 1.0 0.66" />
     <texture builtin="gradient" height="256" rgb1=".9 .9 1." rgb2=".2 .3 .4" type="skybox" width="256" />
-    <texture file="/home/ubuntu/zhr/robopal/robopal/assets/textures/wood-tiles.png" type="2d" name="texplane" />
+    <texture file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/textures/wood-tiles.png" type="2d" name="texplane" />
     <material name="floorplane" reflectance="0.01" shininess="0.0" specular="0.0" texrepeat="2 2" texture="texplane" texuniform="true" />
-  <mesh name="0_base_link" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/base_link.STL" />
-        <mesh name="0_link1" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link1.STL" />
-        <mesh name="0_link2" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link2.STL" />
-        <mesh name="0_link3" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link3.STL" />
-        <mesh name="0_link4" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link4.STL" />
-        <mesh name="0_link5" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link5.STL" />
-        <mesh name="0_link6" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link6.STL" />
-        <mesh name="0_link7" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link7.STL" />
+  <mesh name="0_base_link" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/base_link.STL" />
+        <mesh name="0_link1" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link1.STL" />
+        <mesh name="0_link2" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link2.STL" />
+        <mesh name="0_link3" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link3.STL" />
+        <mesh name="0_link4" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link4.STL" />
+        <mesh name="0_link5" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link5.STL" />
+        <mesh name="0_link6" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link6.STL" />
+        <mesh name="0_link7" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link7.STL" />
+    <mesh name="0_electric_gripper_base" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/grippers/rethink_gripper/meshes/electric_gripper_base.stl" />
+        <mesh name="0_standard_narrow" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/grippers/rethink_gripper/meshes/standard_narrow.stl" />
+        <mesh name="0_half_round_tip" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/grippers/rethink_gripper/meshes/half_round_tip.stl" />
+        <mesh name="0_connector_plate" file="/home/zhouhr/mujoco_diana/robopal/robopal/assets/models/grippers/rethink_gripper/meshes/connector_plate.stl" />
     </asset>
 
   <worldbody>
@@ -30,7 +36,43 @@
     <camera mode="fixed" name="agentview" pos="0.5 0 1.35" quat="0.653 0.271 0.271 0.653" />
     
     <camera mode="fixed" name="sideview" pos="-0.05651774593317116 1.2761224129427358 1.4879572214102434" quat="0.009905065491771751 0.006877963156909582 0.5912228352893879 0.806418094001364" />
-  <body name="0_base_link">
+
+    <body name="table" pos="1.0 0.3 0.0" euler="0 0 0">
+        <geom pos="-0.6 -0.3 0.411" euler="0 0 1.57" type="box" rgba="0.792157 0.819608 0.933333 1" size="0.3 0.6 0.01" />
+        <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.792157 0.819608 0.933333 1" mesh="complete_table" friction="0.95 0.9 0.9" />
+        <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="complete_table" />
+    </body>
+
+      <body pos="0.8 0.2 0.46" name="red_block">
+        <joint name="object0:joint" type="free" />
+        <geom name="red_block" size="0.02 0.02 " rgba="1 0 0 1" type="box" solimp="0.998 0.998 0.001" friction="0.5 0.9 0.9" group="1" condim="4" />
+        <site name="red_block" pos="0 0 0" quat="-0.707 0 0.707 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="can_bottom_site" />
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="can_top_site" />
+        <site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="can_horizontal_radius_site" />
+    </body>
+
+    <body pos="0.8  0.0 0.46" name="blue_block">
+        <joint name="object1:joint" type="free" />
+        <geom name="blue_block" size="0.02 0.02 " rgba="0 0 1 1" type="box" solimp="0.998 0.998 0.001" friction="0.5 0.3 0.1" group="1" condim="4" />
+        <site name="blue_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="ceramic_bottom_site" />
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="ceramic_top_site" />
+        <site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="ceramic_horizontal_radius_site" />
+    </body>
+
+    <body pos="0.8 -0.2 0.46" name="green_block">
+        <joint name="object2:joint" type="free" damping="0.01" />
+        <geom name="green_block" size="0.02 0.02 " rgba="0 1 0 1" type="box" solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.5 0.3 0.1" group="1" condim="4" />
+        <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="glass_bottom_site" />
+        <site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="glass_top_site" />
+        <site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="glass_horizontal_radius_site" />
+    </body>
+  
+  <body name="0_mount_base_link" pos="0 0 0.42">
+            <geom type="sphere" size="0.01" contype="0" conaffinity="0" group="1" pos="0 0 0" rgba="1 1 1 1" />
+        <body name="0_base_link">
             <geom type="mesh" contype="0" conaffinity="0" group="1" pos="0 0 0" rgba="1 1 1 1" mesh="0_base_link" />
             <body name="0_link1" pos="8.7058e-05 -0.00063474 0.2985" quat="-3.67321e-06 1 0 0">
                 <inertial pos="4.57641e-06 -0.0439746 0.0236145" quat="0.685631 -0.172505 0.172644 0.685818" mass="2.72698" diaginertia="0.0122186 0.0113371 0.00692616" />
@@ -61,7 +103,49 @@
                                         <inertial pos="0.00068467 1.5999e-05 0.020834" quat="0.000547318 0.708756 -0.000448023 0.705453" mass="0.16696" diaginertia="0.000143911 8.8902e-05 8.75358e-05" />
                                         <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="0_link7" />
                                         <geom type="mesh" rgba="1 1 1 1" mesh="0_link7" />
-                                    </body>
+                                    <body name="0_gripper_base" pos="0 0 0" quat="0 1 0 0">
+            <site name="0_ft_frame" pos="0 0 0" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" group="1" />
+            <inertial pos="0 0 0" quat="-0.5 0.5 0.5 0.5" mass="0.0001" diaginertia="3e-08 2e-08 2e-08" />
+            <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="0_connector_plate" name="connector_plate" pos="0 0 0.0018" rgba="0.499 0.499 0.499 1" />
+            <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="0_electric_gripper_base" name="electric_gripper_base" pos="0 0 0.0194" rgba="0.499 0.499 0.499 1" />
+            <geom size="0.029 0.05" quat="0 0 0.707107 0.707107" type="cylinder" group="0" name="gripper_base_col" pos="0.004 0.0 0.04" />
+            
+            <body name="0_eef" pos="0 0 0.109" quat="0.707105 0 0 -0.707105">
+                <site name="0_grip_site" pos="0 0 0" size="0.01 0.01 0.01" rgba="1 0 0 0.5" type="sphere" group="1" />
+                <site name="0_ee_x" pos="0.1 0 0" size="0.005 .1" quat="0.707105  0 0.707108 0 " rgba="1 0 0 0" type="cylinder" group="1" />
+                <site name="0_ee_y" pos="0 0.1 0" size="0.005 .1" quat="0.707105 0.707108 0 0" rgba="0 1 0 0" type="cylinder" group="1" />
+                <site name="0_ee_z" pos="0 0 0.1" size="0.005 .1" quat="1 0 0 0" rgba="0 0 1 0" type="cylinder" group="1" />
+                
+                
+            </body>
+            <body name="0_l_finger" pos="0 0.01 0.0444">
+                <inertial pos="0 0 0" quat="0 0 0 -1" mass="0.0001" diaginertia="0.001 0.001 0.001" />
+                <joint name="0_l_finger_joint" pos="0 0 0" axis="0 1 0" type="slide" limited="true" range="-0.0115 0.020833" damping="100" armature="1.0" frictionloss="1.0" />
+                <geom name="l_finger" quat="0 0 0 -1" type="mesh" contype="0" conaffinity="0" group="1" mesh="0_standard_narrow" rgba="0.499 0.499 0.499 1" />
+                <geom size="0.005 0.00675 0.0375" pos="0 0.01725 0.04" quat="0 0 0 -1" type="box" group="0" conaffinity="1" contype="0" name="l_finger_g0" friction="0 0 0" />
+                <geom size="0.005 0.025 0.0085" pos="-0.005 -0.003 0.0083" quat="0 0 0 -1" type="box" group="0" conaffinity="1" contype="0" name="l_finger_g1" friction="0 0 0" />
+                <body name="0_l_finger_tip" pos="0 0.01725 0.075">
+                    <inertial pos="0 0 0" quat="0 0 0 1" mass="0.0001" diaginertia="0.001 0.001 0.001" />
+                    <geom name="l_fingertip_g0_vis" quat="0 0 0 1" type="mesh" contype="0" conaffinity="0" group="1" mesh="0_half_round_tip" rgba="0.499 0.499 0.499 1" />
+                    <geom size="0.004 0.004 0.0185" pos="0 -0.0045 -0.015" quat="0 0 0 -1" type="box" group="0" conaffinity="1" contype="0" name="l_fingertip_g0" friction="0.95 0.3 0.1" />
+                    <geom size="0.0035 0.004 0.0165" pos="0 -0.0047 -0.017" type="box" conaffinity="1" contype="0" name="l_fingerpad_g0" friction="0.95 0.3 0.1" />
+                </body>
+            </body>
+            <body name="0_r_finger" pos="0 -0.01 0.0444">
+                <inertial pos="0 0 0" mass="0.0001" diaginertia="0.001 0.001 0.001" />
+                <joint name="0_r_finger_joint" pos="0 0 0" axis="0 -1 0" type="slide" limited="true" range="-0.020833 0.0115" damping="100" armature="1.0" frictionloss="1.0" />
+                <geom name="r_finger" type="mesh" contype="0" conaffinity="0" group="1" mesh="0_standard_narrow" rgba="0.499 0.499 0.499 1" />
+                <geom size="0.005 0.00675 0.0375" pos="0 -0.01725 0.04" type="box" group="0" conaffinity="1" contype="0" name="r_finger_g0" friction="0 0 0" />
+                <geom size="0.005 0.025 0.0085" pos="0.005 0.003 0.0083" type="box" group="0" conaffinity="1" contype="0" name="r_finger_g1" friction="0 0 0" />
+                <body name="0_r_finger_tip" pos="0 -0.01725 0.075">
+                    <inertial pos="0 0 0" mass="0.0001" diaginertia="0.001 0.001 0.001" />
+                    <geom name="r_fingertip_g0_vis" type="mesh" contype="0" conaffinity="0" group="1" mesh="0_half_round_tip" rgba="0.499 0.499 0.499 1" />
+                    <geom size="0.004 0.004 0.0185" pos="0 0.0045 -0.015" type="box" group="0" conaffinity="1" contype="0" name="r_fingertip_g0" friction="0.95 0.3 0.1" />
+                    <geom size="0.0035 0.004 0.0165" pos="0 0.0047 -0.017" type="box" conaffinity="1" contype="0" name="r_fingerpad_g0" friction="0.95 0.3 0.1" />
+                </body>
+            </body>
+        </body>
+    </body>
                                 </body>
                             </body>
                         </body>
@@ -69,6 +153,7 @@
                 </body>
             </body>
         </body>
+    </body>
     </worldbody>
 <actuator><motor name="0_a1" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j1" />
         <motor name="0_a2" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j2" />
@@ -77,4 +162,8 @@
         <motor name="0_a5" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j5" />
         <motor name="0_a6" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j6" />
         <motor name="0_a7" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_j7" />
-    </actuator><default /><contact /><sensor /><equality /></mujoco>
+    <motor name="0_gripper_l_finger_joint" ctrllimited="true" ctrlrange="-100.0 100.0" joint="0_l_finger_joint" />
+    </actuator><default /><contact /><sensor><force name="0_force_ee" site="0_ft_frame" />
+        <torque name="0_torque_ee" site="0_ft_frame" />
+    </sensor><equality><joint joint1="0_r_finger_joint" joint2="0_l_finger_joint" />
+    </equality></mujoco>

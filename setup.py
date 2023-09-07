@@ -10,11 +10,11 @@ setup(
     url="https://github.com/NoneJou072/robopal",
     python_requires=">=3",
     install_requires=[
-        "numpy>=1.25.0",
+        "numpy>=1.24.0",
         'mujoco==2.3.7',
         'ruckig~=0.9.2',
     ],
     extras_require={
-        'interactive': ['gym~=0.21.0']
+        'interactive': ['gymnasium']
     },
 )

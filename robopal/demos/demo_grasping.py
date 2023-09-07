@@ -23,7 +23,7 @@ class MotionPlanEnv(PosCtrlEnv):
 
         self.action = None
 
-        can_list = ['coke_can', 'ceramic_can', 'glass_can']
+        can_list = ['red_block', 'blue_block', 'green_block']
         self.can_pos, self.can_quat, self.can_rotm = self.getObjPose(can_list)
 
     def getObjPose(self, name_list):
@@ -39,7 +39,7 @@ class MotionPlanEnv(PosCtrlEnv):
 
     def move(self, pos, quat):
         def checkArriveState(state):
-            current_pos, current_mat = self.kdl_solver.getEeCurrentPose(self.robot.single_arm.arm_qpos)
+            current_pos, current_mat = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
             current_quat = T.mat_2_quat(current_mat)
             error = np.sum(np.abs(state[:3] - current_pos)) + np.sum(np.abs(state[3:] - current_quat))
             if error <= 0.01:
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     env.reset()
 
     env.gripper_ctrl('open')
-    env.move(env.can_pos['coke_can'], env.can_quat['coke_can'])
+    env.move(env.can_pos['blue_block'], env.can_quat['blue_block'])
     env.gripper_ctrl('close')
 
     for t in range(int(1e6)):

@@ -7,7 +7,7 @@ class ArmBase(object):
     def __init__(self,
                  name: str = None,
                  scene: str = 'default',
-                 chassis: str = None,
+                 chassis: str = 'default',
                  manipulator: str = None,
                  gripper: str = None,
                  g2m_body: list = None,

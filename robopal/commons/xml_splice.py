@@ -3,7 +3,7 @@ from os import path
 
 ASSETS_PATH = path.join(path.dirname(path.dirname(__file__)), 'assets')
 MODELS_PATH = path.join(ASSETS_PATH, 'models')
-CHASSISES_DIR_PATH = path.join(MODELS_PATH, 'chassises')
+CHASSISES_DIR_PATH = path.join(MODELS_PATH, 'mounts')
 GRIPPERS_DIR_PATH = path.join(MODELS_PATH, 'grippers')
 MANIPULATORS_DIR_PATH = path.join(MODELS_PATH, 'manipulators')
 SCENES_DIR_PATH = path.join(ASSETS_PATH, 'scenes')
@@ -13,7 +13,7 @@ class XMLSplicer:
     def __init__(self,
                  name='robot',
                  scene='default',
-                 chassis=None,
+                 chassis='default',
                  manipulator=None,
                  gripper=None,
                  **kwargs,
@@ -261,7 +261,7 @@ class XMLSplicer:
             else:
                 manipulator_path = path.join(MANIPULATORS_DIR_PATH, manipulator, '{}.xml'.format(manipulator))
             self.add_component_from_xml(manipulator_path,
-                                        goal_body=(0, '0_base_car_link') if chassis is not None else (0, 'worldbody'))
+                                        goal_body=(0, '0_mount_base_link') if chassis is not None else (0, 'worldbody'))
             if isinstance(gripper, str):
                 for goal_body in enumerate(kwargs['g2m_body']):
                     gripper_path = path.join(GRIPPERS_DIR_PATH, gripper, '{}.xml'.format(gripper))
