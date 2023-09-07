@@ -6,10 +6,12 @@ class DianaMedBase(ArmBase):
     def __init__(self,
                  scene='default',
                  gripper=None,
+                 mount=None
                  ):
         super().__init__(
             name="diana_med",
             scene=scene,
+            chassis=mount,
             manipulator='DianaMed',
             gripper=gripper,
             g2m_body=['0_link7'],
@@ -55,4 +57,5 @@ class DianaAruco(DianaMedBase):
 class DianaGrasp(DianaMedBase):
     def __init__(self):
         super().__init__(scene='grasping',
-                         gripper='rethink_gripper', )
+                         gripper='rethink_gripper',
+                         mount='top_point')

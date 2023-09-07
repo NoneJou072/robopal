@@ -13,7 +13,7 @@ class XMLSplicer:
     def __init__(self,
                  name='robot',
                  scene='default',
-                 chassis='default',
+                 chassis=None,
                  manipulator=None,
                  gripper=None,
                  **kwargs,

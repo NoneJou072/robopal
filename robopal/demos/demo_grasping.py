@@ -3,7 +3,7 @@ from robopal.envs.task_ctrl_env import PosCtrlEnv
 import robopal.commons.transform as T
 
 
-class MotionPlanEnv(PosCtrlEnv):
+class PickAndPlaceEnv(PosCtrlEnv):
     def __init__(self,
                  robot=None,
                  is_render=True,
@@ -32,7 +32,7 @@ class MotionPlanEnv(PosCtrlEnv):
         mat = {}
         for name in name_list:
             pos[name] = self.mj_data.body(name).xpos.copy()
-            pos[name][2] -= 0.21
+            pos[name][2] -= 0.33
             quat[name] = self.mj_data.body(name).xquat.copy()
             mat[name] = self.mj_data.body(name).xmat.copy()
         return pos, quat, mat
@@ -64,7 +64,7 @@ class MotionPlanEnv(PosCtrlEnv):
 if __name__ == "__main__":
     from robopal.assets.robots.diana_med import DianaGrasp
 
-    env = MotionPlanEnv(
+    env = PickAndPlaceEnv(
         robot=DianaGrasp(),
         renderer="viewer",
         is_render=True,
@@ -77,6 +77,7 @@ if __name__ == "__main__":
     env.gripper_ctrl('open')
     env.move(env.can_pos['blue_block'], env.can_quat['blue_block'])
     env.gripper_ctrl('close')
+    env.move(env.can_pos['blue_block'] + np.array([0, 0, 0.1]), env.can_quat['blue_block'])
 
     for t in range(int(1e6)):
         env.step(env.action)
