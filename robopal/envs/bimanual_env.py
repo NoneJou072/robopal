@@ -58,7 +58,7 @@ class DoubleArmEnv(MujocoEnv):
         """
         acc_desire = [self.robot.kp[i] * (q_target[i] - Arm.arm_qpos[i]) -
                       self.robot.kd[i] * Arm.arm_qvel[i] for i in range(len(Arm.joint_index))]
-        qM = self.kdl_solver.getInertiaMat(Arm.arm_qpos)
+        qM = self.kdl_solver.get_inertia_mat(Arm.arm_qpos)
         tau_target = np.dot(qM, acc_desire) + np.array([self.mj_data.joint(Arm.joint_index[i]).qfrc_bias[0] for i in
                                                         range(len(Arm.joint_index))])
         # Send torque to simulation

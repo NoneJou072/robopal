@@ -55,9 +55,9 @@ class SingleArmEnv(MujocoEnv):
         else:
             q_target, qdot_target = self.interpolator.updateState()
 
-        m = self.kdl_solver.getInertiaMat(self.robot.single_arm.arm_qpos)
-        c = self.kdl_solver.getCoriolisMat(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)
-        g = self.kdl_solver.getGravityMat(self.robot.single_arm.arm_qpos)
+        m = self.kdl_solver.get_inertia_mat(self.robot.single_arm.arm_qpos)
+        c = self.kdl_solver.get_coriolis_mat(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)
+        g = self.kdl_solver.get_gravity_mat(self.robot.single_arm.arm_qpos)
 
         torque = self.jnt_controller.compute_jnt_torque(
             q_des=q_target,
@@ -107,11 +107,11 @@ if __name__ == "__main__":
         renderer='viewer',
         is_render=True,
         control_freq=200,
-        is_interpolate=True,
+        is_interpolate=False,
     )
     env.reset()
     for t in range(int(1e6)):
-        action = np.array([0.33116, -0.39768533, 0.66947228, 0.33116, -0.39768533, 0.66947228, 0])
+        action = np.array([0.33116, -0.39768533, 0.96947228, 0.33116, -0.39768533, 0.66947228, 0])
         env.step(action)
         if env.is_render:
             env.render()

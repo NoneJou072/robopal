@@ -42,6 +42,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
             current_pos, current_mat = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
             current_quat = T.mat_2_quat(current_mat)
             error = np.sum(np.abs(state[:3] - current_pos)) + np.sum(np.abs(state[3:] - current_quat))
+            print(error)
             if error <= 0.01:
                 return True
             return False
@@ -69,7 +70,7 @@ if __name__ == "__main__":
         renderer="viewer",
         is_render=True,
         control_freq=200,
-        is_interpolate=True,
+        is_interpolate=False,
         is_pd=True
     )
     env.reset()
@@ -77,9 +78,14 @@ if __name__ == "__main__":
     env.gripper_ctrl('open')
     env.move(env.can_pos['blue_block'], env.can_quat['blue_block'])
     env.gripper_ctrl('close')
+    print(1)
+
     env.move(env.can_pos['blue_block'] + np.array([0, 0, 0.1]), env.can_quat['blue_block'])
+    print(1)
 
     for t in range(int(1e6)):
+        print(111)
         env.step(env.action)
+        print(env.action)
         if env.is_render:
             env.render()

@@ -46,8 +46,7 @@ class VisualServo(SingleArmEnv):
     def step(self, action=None):
         var_lambda = 1.6
         marker_size = 0.05
-        gain = 0.01
-        self.gain = 2
+        gain = 0.2
 
         desire_p = np.array([0.0, 0., 0.2]).reshape(3, 1)
         desire_r = np.array([0.70575314, -0.70673064, 0.0, 0.0])
@@ -58,7 +57,7 @@ class VisualServo(SingleArmEnv):
         hand2cam_M = RR.from_euler('xyz', hand2cam_r).as_matrix()
         kdl_hand2cam_f = trans.make_transform(hand2cam_p, hand2cam_M)
 
-        jac_pinv = self.kdl_solver.getJac_pinv(self.robot.single_arm.arm_qpos)
+        jac_pinv = self.kdl_solver.get_jac_pinv(self.robot.single_arm.arm_qpos)
         base2hand_p, base2hand_r = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
         kdl_base2hand_f = trans.make_transform(base2hand_p, base2hand_r)
 
@@ -68,24 +67,27 @@ class VisualServo(SingleArmEnv):
         cam2aruco_r, cam2aruco_p, detected_already = self.aruco_detection(marker_size)
         if detected_already:
             T_ca = cam2aruco_p.reshape(3, 1)
-            # R_ca = trans.vec2_mat(cam2aruco_r)
-            R_ca = RR.from_rotvec(cam2aruco_r).as_matrix()
+            R_ca = trans.vec2_mat(cam2aruco_r)
 
             T_acd = desire_p
-            # R_acd = trans.quat_2_mat(desire_r)
+            R_acd = trans.quat_2_mat(desire_r)
+            # print(R_acd)
             R_acd = RR.from_quat(desire_r).as_matrix()
+            # print(R_acd)
 
             R_c_cd = R_ca @ R_acd
             T_c_cd = R_ca @ T_acd + T_ca
 
             R_cd_c = R_c_cd.T
             T_cd_c = -np.matmul(R_cd_c, T_c_cd)
-            # error_R = trans.mat_2_vec(R_cd_c).reshape(3, 1)
+            error_R = trans.mat_2_vec(R_cd_c).reshape(3, 1)
+            # print(error_R)
             error_R = RR.from_matrix(R_cd_c).as_rotvec().reshape(3, 1)
+            # print(error_R)
 
             error = np.concatenate([T_cd_c, error_R], axis=0)
             print(np.linalg.norm(error))
-            if np.linalg.norm(error) > gain:
+            if np.linalg.norm(error) > 0.01:
                 Lin_v = -var_lambda * np.matmul(R_c_cd, T_cd_c)
                 Ang_v = -var_lambda * error_R
 
@@ -97,7 +99,6 @@ class VisualServo(SingleArmEnv):
 
                 V_camera[1] = -V_camera[1]
                 V_camera[2] = -V_camera[2]
-
                 V_camera[4] = -V_camera[4]
                 V_camera[5] = -V_camera[5]
             else:
@@ -106,7 +107,7 @@ class VisualServo(SingleArmEnv):
             V_camera = np.zeros(6)
 
         V_dian = np.dot(jac_pinv, V_camera).reshape(-1)
-        action = self.gain * V_dian * 0.2 + self.robot.single_arm.arm_qpos
+        action = gain * V_dian + self.robot.single_arm.arm_qpos
         return super().step(action)
 
 

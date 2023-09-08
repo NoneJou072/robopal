@@ -1,6 +1,6 @@
 import numpy as np
-from robopal.commons.Update_Jaco3 import Update_Jaco as J_quat
 import pinocchio as pin
+import robopal.commons.transform as trans
 
 
 class PinSolver:
@@ -17,14 +17,18 @@ class PinSolver:
         self.JOINT_NUM = self.model.nq
         print(f"pinocchio model {self.model.name} init!")
 
-    def fk(self, q: np.ndarray):
+    def fk(self, q: np.ndarray, rot_format: str = 'matrix'):
         """ Perform the forward kinematics over the kinematic tree
 
         :param q: joint position
+        :param rot_format: 'matrix' or 'quat'
         :return: end's translation, rotation
         """
         pin.forwardKinematics(self.model, self.data, q)
-        return self.data.oMi[-1].translation, self.data.oMi[-1].rotation
+        if rot_format == 'matrix':
+            return self.data.oMi[-1].translation, self.data.oMi[-1].rotation
+        elif rot_format == 'quat':
+            return self.data.oMi[-1].translation, trans.mat_2_quat(self.data.oMi[-1].rotation)
 
     def ik(self, pos: np.ndarray, rot: np.ndarray, q_init: np.ndarray) -> np.ndarray:
         """ Position the end effector of a manipulator robot to a given pose (position and orientation)
@@ -52,7 +56,7 @@ class PinSolver:
                 break
             if i >= IT_MAX:
                 break
-            J = self.getJac(q)
+            J = self.get_jac(q)
             J = -np.dot(pin.Jlog6(iMd.inverse()), J)
             v = - J.T.dot(np.linalg.solve(J.dot(J.T) + damp * np.eye(6), err))
             q = pin.integrate(self.model, q, v * DT)
@@ -60,7 +64,7 @@ class PinSolver:
 
         return q.flatten()
 
-    def getInertiaMat(self, q: np.ndarray) -> np.ndarray:
+    def get_inertia_mat(self, q: np.ndarray) -> np.ndarray:
         """ Computing the inertia matrix in the joint frame
 
         :param q: joint position
@@ -68,7 +72,7 @@ class PinSolver:
         """
         return pin.crba(self.model, self.data, q)
 
-    def getCoriolisMat(self, q: np.ndarray, qdot: np.ndarray) -> np.ndarray:
+    def get_coriolis_mat(self, q: np.ndarray, qdot: np.ndarray) -> np.ndarray:
         """ Computing the Coriolis matrix in the joint frame
 
         :param q: joint position
@@ -77,7 +81,7 @@ class PinSolver:
         """
         return pin.computeCoriolisMatrix(self.model, self.data, q, qdot)
 
-    def getGravityMat(self, q: np.ndarray) -> np.ndarray:
+    def get_gravity_mat(self, q: np.ndarray) -> np.ndarray:
         """ Computing the gravity matrix in the joint frame
 
         :param q: joint position
@@ -85,7 +89,7 @@ class PinSolver:
         """
         return pin.computeGeneralizedGravity(self.model, self.data, q)
 
-    def getJac(self, q: np.ndarray) -> np.ndarray:
+    def get_jac(self, q: np.ndarray) -> np.ndarray:
         """ Computing the Jacobian in the joint frame
 
         :param q: joint position
@@ -94,21 +98,13 @@ class PinSolver:
         # return pin.computeJointJacobian(self.model, self.data, q, self.JOINT_NUM)
         return pin.computeJointJacobians(self.model, self.data, q)
 
-    def getJac_pinv(self, q: np.ndarray) -> np.ndarray:
+    def get_jac_pinv(self, q: np.ndarray) -> np.ndarray:
         """ Computing the Jacobian_pinv in the joint frame
 
         :param q: joint position
         :return: Jacobian_pinv
         """
-        return np.linalg.pinv(self.getJac(q))
-
-    def getJacQuaternion(self, q) -> np.ndarray:
-        """ Computing the Jacobian in the joint frame
-
-        :param q: joint position
-        :return: Jacobian
-        """
-        return J_quat(q)
+        return np.linalg.pinv(self.get_jac(q))
 
     def get_jac_dot(self, q: np.ndarray, v: np.ndarray) -> np.ndarray:
         """ Computing the Jacobian_dot in the joint frame

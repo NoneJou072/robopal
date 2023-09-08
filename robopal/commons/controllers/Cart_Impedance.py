@@ -32,11 +32,11 @@ class Cart_Impedance(object):
     # desired_pos:期望的位置  desired_ori:期望的姿态  tau_last：传入一个力矩
     def torque_cartesian(self, coriolis_gravity, q_curr, qd_curr, x_pos: np.array, x_ori: np.array, desired_pos,
                          desired_ori):
-        J = self.kdl_solver.getJac(q_curr)
-        J_inv = self.kdl_solver.getJac_pinv(q_curr)
+        J = self.kdl_solver.get_jac(q_curr)
+        J_inv = self.kdl_solver.get_jac_pinv(q_curr)
         Jd = self.kdl_solver.get_jac_dot(q_curr, qd_curr)  # 雅各比矩阵的微分
 
-        M = self.kdl_solver.getInertiaMat(q_curr)
+        M = self.kdl_solver.get_inertia_mat(q_curr)
         Md = np.dot(J_inv.T, np.dot(M, J_inv))  # 目标质量矩阵
 
         # 获取末端的位置/姿态/速度/

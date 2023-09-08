@@ -19,10 +19,10 @@ class PosCtrlEnv(SingleArmEnv):
             control_freq=control_freq,
             is_interpolate=is_interpolate
         )
-        self.p_cart = 0.6
-        self.d_cart = 0.05
-        self.p_quat = 0.65
-        self.d_quat = 0.05
+        self.p_cart = 0.2
+        self.d_cart = 0.01
+        self.p_quat = 0.02
+        self.d_quat = 0.005
         self.is_pd = is_pd
         self._vel_des = np.zeros(3)
 
@@ -32,8 +32,8 @@ class PosCtrlEnv(SingleArmEnv):
     @property
     def vel_cur(self):
         """ Current velocity, consist of 3*1 cartesian and 4*1 quaternion """
-        jac_quat = self.kdl_solver.getJacQuaternion(self.robot.single_arm.arm_qpos)
-        vel_cur = np.dot(jac_quat, self.robot.single_arm.arm_qvel)
+        j = self.kdl_solver.get_jac(self.robot.single_arm.arm_qpos)
+        vel_cur = np.dot(j, self.robot.single_arm.arm_qvel)
         return vel_cur
 
     @property
@@ -47,7 +47,7 @@ class PosCtrlEnv(SingleArmEnv):
 
     def PDControl(self, p_goal, p_cur, r_goal, r_cur, vel_goal=np.zeros(3)):
         pos_incre = self.p_cart * (p_goal - p_cur) + self.d_cart * (vel_goal - self.vel_cur[:3])
-        quat_incre = self.p_quat * (r_goal - r_cur) - self.d_quat * self.vel_cur[3:]
+        quat_incre = self.p_quat * (r_goal - r_cur)
         return pos_incre, quat_incre
 
     def step(self, action):
@@ -60,11 +60,10 @@ class PosCtrlEnv(SingleArmEnv):
             p_cur, r_cur_m = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
             r_cur = T.mat_2_quat(r_cur_m)
             r_target = self.init_rot_quat if len(action) == 3 else action[3:]
-            p_incre, r_incre = self.PDControl(p_goal=action[:3], p_cur=p_cur,
-                                              r_goal=r_target, r_cur=r_cur, vel_goal=self.vel_des)
+            p_incre, _ = self.PDControl(p_goal=action[:3], p_cur=p_cur,
+                                        r_goal=r_target, r_cur=r_cur, vel_goal=self.vel_des)
             p_goal = p_incre + p_cur
-            r_goal = T.quat_2_mat(r_incre + r_cur)
-            # r_goal = T.quat2Mat(r_target)
+            r_goal = T.quat_2_mat(r_target)
 
         action = self.kdl_solver.ik(p_goal, r_goal, q_init=self.robot.single_arm.arm_qpos)
         return super().step(action)
@@ -78,12 +77,12 @@ if __name__ == "__main__":
         renderer='viewer',
         is_render=True,
         control_freq=200,
-        is_interpolate=True,
+        is_interpolate=False,
         is_pd=True
     )
     env.reset()
     for t in range(int(1e6)):
-        action = np.array([0.33116, -0.39768533, 0.66947228])
+        action = np.array([0.33116, -0.09768533, 0.26947228, 1, 0, 0, 0])
         env.step(action)
         if env.is_render:
             env.render()
