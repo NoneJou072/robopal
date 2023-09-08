@@ -21,8 +21,8 @@ class PosCtrlEnv(SingleArmEnv):
         )
         self.p_cart = 0.2
         self.d_cart = 0.01
-        self.p_quat = 0.02
-        self.d_quat = 0.005
+        self.p_quat = 0.2
+        self.d_quat = 0.01
         self.is_pd = is_pd
         self._vel_des = np.zeros(3)
 
@@ -60,10 +60,10 @@ class PosCtrlEnv(SingleArmEnv):
             p_cur, r_cur_m = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
             r_cur = T.mat_2_quat(r_cur_m)
             r_target = self.init_rot_quat if len(action) == 3 else action[3:]
-            p_incre, _ = self.PDControl(p_goal=action[:3], p_cur=p_cur,
+            p_incre, r_incre = self.PDControl(p_goal=action[:3], p_cur=p_cur,
                                         r_goal=r_target, r_cur=r_cur, vel_goal=self.vel_des)
             p_goal = p_incre + p_cur
-            r_goal = T.quat_2_mat(r_target)
+            r_goal = T.quat_2_mat(r_cur + r_incre)
 
         action = self.kdl_solver.ik(p_goal, r_goal, q_init=self.robot.single_arm.arm_qpos)
         return super().step(action)

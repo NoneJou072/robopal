@@ -56,7 +56,7 @@ class PinSolver:
                 break
             if i >= IT_MAX:
                 break
-            J = self.get_jac(q)
+            J = self.get_joint_jac(q)
             J = -np.dot(pin.Jlog6(iMd.inverse()), J)
             v = - J.T.dot(np.linalg.solve(J.dot(J.T) + damp * np.eye(6), err))
             q = pin.integrate(self.model, q, v * DT)
@@ -90,13 +90,20 @@ class PinSolver:
         return pin.computeGeneralizedGravity(self.model, self.data, q)
 
     def get_jac(self, q: np.ndarray) -> np.ndarray:
-        """ Computing the Jacobian in the joint frame
+        """ Computes the full model Jacobian, expressed in the coordinate world frame.
 
         :param q: joint position
         :return: Jacobian
         """
-        # return pin.computeJointJacobian(self.model, self.data, q, self.JOINT_NUM)
         return pin.computeJointJacobians(self.model, self.data, q)
+
+    def get_joint_jac(self, q: np.ndarray) -> np.ndarray:
+        """ Computes the Jacobian of a specific joint frame expressed in the local frame.
+
+        :param q: joint position
+        :return: Jacobian
+        """
+        return pin.computeJointJacobian(self.model, self.data, q, self.JOINT_NUM)
 
     def get_jac_pinv(self, q: np.ndarray) -> np.ndarray:
         """ Computing the Jacobian_pinv in the joint frame

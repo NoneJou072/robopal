@@ -78,13 +78,9 @@ if __name__ == "__main__":
     env.gripper_ctrl('open')
     env.move(env.can_pos['blue_block'], env.can_quat['blue_block'])
     env.gripper_ctrl('close')
-    print(1)
-
     env.move(env.can_pos['blue_block'] + np.array([0, 0, 0.1]), env.can_quat['blue_block'])
-    print(1)
 
     for t in range(int(1e6)):
-        print(111)
         env.step(env.action)
         print(env.action)
         if env.is_render:
