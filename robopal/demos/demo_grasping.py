@@ -82,6 +82,6 @@ if __name__ == "__main__":
 
     for t in range(int(1e6)):
         env.step(env.action)
-        print(env.action)
+        print(env.robot.single_arm.arm_qpos)
         if env.is_render:
             env.render()

@@ -26,9 +26,9 @@ class PinSolver:
         """
         pin.forwardKinematics(self.model, self.data, q)
         if rot_format == 'matrix':
-            return self.data.oMi[-1].translation, self.data.oMi[-1].rotation
+            return self.data.oMi[-1].translation.copy(), self.data.oMi[-1].rotation.copy()
         elif rot_format == 'quat':
-            return self.data.oMi[-1].translation, trans.mat_2_quat(self.data.oMi[-1].rotation)
+            return self.data.oMi[-1].translation.copy(), trans.mat_2_quat(self.data.oMi[-1].rotation.copy())
 
     def ik(self, pos: np.ndarray, rot: np.ndarray, q_init: np.ndarray) -> np.ndarray:
         """ Position the end effector of a manipulator robot to a given pose (position and orientation)

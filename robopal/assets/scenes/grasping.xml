@@ -33,29 +33,26 @@
 
       <body pos="0.8 0.2 0.46" name="red_block">
         <joint name="object0:joint" type="free" />
-        <geom name= 'red_block' size="0.02 0.02 " rgba="1 0 0 1" type="box" solimp="0.998 0.998 0.001" friction="0.5 0.9 0.9" group="1" condim="4" />
+        <geom name= 'red_block' size="0.02 0.02 " rgba="1 0 0 1" type="box" solimp="0.998 0.998 0.001" friction="0.5 0.9 0.9" group="1" condim="4" mass="0.001"/>
         <site name="red_block" pos="0 0 0" quat='-0.707 0 0.707 0' size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
         <site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="can_bottom_site"/>
         <site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="can_top_site"/>
-        <site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="can_horizontal_radius_site"/>
     </body>
 
     <body pos="0.8  0.0 0.46" name="blue_block">
         <joint name="object1:joint" type="free"/>
-        <geom name="blue_block" size="0.02 0.02 " rgba="0 0 1 1" type="box" solimp="0.998 0.998 0.001" friction="0.5 0.3 0.1" group="1" condim="4"/>
+        <geom name="blue_block" size="0.02 0.02 " rgba="0 0 1 1" type="box" friction="0.5 0.3 0.1" group="1" condim="4" mass="0.001"/>
         <site name="blue_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
         <site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="ceramic_bottom_site"/>
         <site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="ceramic_top_site"/>
-        <site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="ceramic_horizontal_radius_site"/>
     </body>
 
     <body pos="0.8 -0.2 0.46" name="green_block">
         <joint name="object2:joint" type="free" damping="0.01" />
-        <geom name="green_block" size="0.02 0.02 " rgba="0 1 0 1" type="box" solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.5 0.3 0.1" group="1" condim="4"/>
+        <geom name="green_block" size="0.02 0.02 " rgba="0 1 0 1" type="box" friction="0.5 0.3 0.1" group="1" condim="4" mass="0.001"/>
         <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
         <site rgba="0 0 0 0" size="0.005" pos="0 0 -0.06" name="glass_bottom_site"/>
         <site rgba="0 0 0 0" size="0.005" pos="0 0 0.04" name="glass_top_site"/>
-        <site rgba="0 0 0 0" size="0.005" pos="0.025 0.025 0" name="glass_horizontal_radius_site"/>
     </body>
   
   </worldbody>
