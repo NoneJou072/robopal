@@ -1,5 +1,5 @@
 import numpy as np
-from robopal.envs.task_ctrl_env import PosCtrlEnv
+from robopal.envs.task_pd_ctrl_env import PosCtrlEnv
 import robopal.commons.transform as T
 
 

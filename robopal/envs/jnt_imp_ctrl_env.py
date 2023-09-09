@@ -1,6 +1,5 @@
 import numpy as np
 from robopal.envs.base import MujocoEnv
-from robopal.commons.pin_utils import PinSolver
 
 
 class SingleArmEnv(MujocoEnv):
@@ -37,10 +36,8 @@ class SingleArmEnv(MujocoEnv):
             cam_mode=cam_mode
         )
 
-        self.kdl_solver = PinSolver(robot.urdf_path)
-
         if jnt_controller == 'IMPEDANCE':
-            from robopal.commons.controllers import Jnt_Impedance
+            from robopal.controllers import Jnt_Impedance
             self.jnt_controller = Jnt_Impedance(self.robot)
         else:
             raise ValueError('Invalid controller name.')
@@ -49,23 +46,21 @@ class SingleArmEnv(MujocoEnv):
         if is_interpolate:
             self._init_interpolator(self.robot.single_arm)
 
+    @property
+    def kdl_solver(self):
+        return self.jnt_controller.kdl_solver
+
     def preStep(self, action):
         if self.interpolator is None:
             q_target, qdot_target = action, np.zeros(self.robot_dof)
         else:
             q_target, qdot_target = self.interpolator.updateState()
 
-        m = self.kdl_solver.get_inertia_mat(self.robot.single_arm.arm_qpos)
-        c = self.kdl_solver.get_coriolis_mat(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)
-        g = self.kdl_solver.get_gravity_mat(self.robot.single_arm.arm_qpos)
-
         torque = self.jnt_controller.compute_jnt_torque(
             q_des=q_target,
             v_des=qdot_target,
             q_cur=self.robot.single_arm.arm_qpos,
             v_cur=self.robot.single_arm.arm_qvel,
-            coriolis_gravity=c[-1] + g,
-            M=m
         )
         # Send torque to simulation
         for i in range(7):

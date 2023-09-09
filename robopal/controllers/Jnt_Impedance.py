@@ -1,8 +1,11 @@
 import numpy as np
+from robopal.commons.pin_utils import PinSolver
 
 
 class Jnt_Impedance(object):
     def __init__(self, robot):
+        self.kdl_solver = PinSolver(robot.urdf_path)
+
         # hyper-parameters of impedance
         self.Mj = np.zeros(7)
         self.Bj = np.zeros(7)
@@ -26,21 +29,22 @@ class Jnt_Impedance(object):
             v_des: np.ndarray,
             q_cur: np.ndarray,
             v_cur: np.array,
-            *args,
-            **kwargs
     ):
         """ robot的关节空间控制的计算公式
             Compute desired torque with robot dynamics modeling:
             > M(q)qdd + C(q, qd)qd + G(q) + tau_F(qd) = tau_ctrl + tau_env
 
         :param q_des: desired joint position
-        :param v_des:
-        :param q_cur:
-        :param v_cur:
-        :param args:
-        :param kwargs:
-        :return:
+        :param v_des: desired joint velocity
+        :param q_cur: current joint position
+        :param v_cur: current joint velocity
+        :return: desired joint torque
         """
+        M = self.kdl_solver.get_inertia_mat(q_cur)
+        C = self.kdl_solver.get_coriolis_mat(q_cur, v_cur)
+        g = self.kdl_solver.get_gravity_mat(q_cur)
+        coriolis_gravity = C[-1] + g
+
         acc_desire = self.kj * (q_des - q_cur) + self.Bj * (v_des - v_cur)
-        tau = np.dot(kwargs['M'], acc_desire) + kwargs['coriolis_gravity']
+        tau = np.dot(M, acc_desire) + coriolis_gravity
         return tau

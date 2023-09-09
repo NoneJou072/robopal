@@ -70,7 +70,7 @@ class PinSolver:
         :param q: joint position
         :return: inertia matrix
         """
-        return pin.crba(self.model, self.data, q)
+        return pin.crba(self.model, self.data, q).copy()
 
     def get_coriolis_mat(self, q: np.ndarray, qdot: np.ndarray) -> np.ndarray:
         """ Computing the Coriolis matrix in the joint frame
@@ -79,7 +79,7 @@ class PinSolver:
         :param qdot: joint velocity
         :return:
         """
-        return pin.computeCoriolisMatrix(self.model, self.data, q, qdot)
+        return pin.computeCoriolisMatrix(self.model, self.data, q, qdot).copy()
 
     def get_gravity_mat(self, q: np.ndarray) -> np.ndarray:
         """ Computing the gravity matrix in the joint frame
@@ -87,15 +87,15 @@ class PinSolver:
         :param q: joint position
         :return: gravity matrix
         """
-        return pin.computeGeneralizedGravity(self.model, self.data, q)
+        return pin.computeGeneralizedGravity(self.model, self.data, q).copy()
 
-    def get_jac(self, q: np.ndarray) -> np.ndarray:
+    def get_full_jac(self, q: np.ndarray) -> np.ndarray:
         """ Computes the full model Jacobian, expressed in the coordinate world frame.
 
         :param q: joint position
         :return: Jacobian
         """
-        return pin.computeJointJacobians(self.model, self.data, q)
+        return pin.computeJointJacobians(self.model, self.data, q).copy()
 
     def get_joint_jac(self, q: np.ndarray) -> np.ndarray:
         """ Computes the Jacobian of a specific joint frame expressed in the local frame.
@@ -103,15 +103,23 @@ class PinSolver:
         :param q: joint position
         :return: Jacobian
         """
-        return pin.computeJointJacobian(self.model, self.data, q, self.JOINT_NUM)
+        return pin.computeJointJacobian(self.model, self.data, q, self.JOINT_NUM).copy()
 
-    def get_jac_pinv(self, q: np.ndarray) -> np.ndarray:
+    def get_joint_jac_pinv(self, q: np.ndarray) -> np.ndarray:
+        """ Computes the full model Jacobian_pinv of a specific joint frame expressed in the local frame.
+
+        :param q: joint position
+        :return: Jacobian_pinv
+        """
+        return np.linalg.pinv(self.get_joint_jac(q)).copy()
+
+    def get_full_jac_pinv(self, q: np.ndarray) -> np.ndarray:
         """ Computes the full model Jacobian_pinv expressed in the coordinate world frame.
 
         :param q: joint position
         :return: Jacobian_pinv
         """
-        return np.linalg.pinv(self.get_jac(q))
+        return np.linalg.pinv(self.get_full_jac(q)).copy()
 
     def get_jac_dot(self, q: np.ndarray, v: np.ndarray) -> np.ndarray:
         """ Computing the Jacobian_dot in the joint frame
@@ -122,5 +130,5 @@ class PinSolver:
         """
         pin.forwardKinematics(self.model, self.data, q)
         pin.computeAllTerms(self.model, self.data, q, v)
-        return self.data.dJ
+        return self.data.dJ.copy()
 

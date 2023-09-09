@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from robopal.envs.jnt_ctrl_env import SingleArmEnv
+from robopal.envs.jnt_imp_ctrl_env import SingleArmEnv
 import robopal.commons.transform as trans
 from scipy.spatial.transform import Rotation as RR
 
@@ -105,7 +105,7 @@ class VisualServo(SingleArmEnv):
         else:
             V_camera = np.zeros(6)
 
-        jac_pinv = self.kdl_solver.get_jac_pinv(self.robot.single_arm.arm_qpos)
+        jac_pinv = self.kdl_solver.get_full_jac_pinv(self.robot.single_arm.arm_qpos)
         V_dian = np.dot(jac_pinv, V_camera).reshape(-1)
         action = gain * V_dian + self.robot.single_arm.arm_qpos
         return super().step(action)
