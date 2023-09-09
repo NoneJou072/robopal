@@ -106,7 +106,7 @@ class PinSolver:
         return pin.computeJointJacobian(self.model, self.data, q, self.JOINT_NUM)
 
     def get_jac_pinv(self, q: np.ndarray) -> np.ndarray:
-        """ Computing the Jacobian_pinv in the joint frame
+        """ Computes the full model Jacobian_pinv expressed in the coordinate world frame.
 
         :param q: joint position
         :return: Jacobian_pinv
@@ -123,3 +123,4 @@ class PinSolver:
         pin.forwardKinematics(self.model, self.data, q)
         pin.computeAllTerms(self.model, self.data, q, v)
         return self.data.dJ
+

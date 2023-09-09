@@ -30,15 +30,15 @@ class ImpedGymEnv(MujocoEnv):
 
     def preStep(self, action):
         # 根据阻抗控制获取末端输入力矩
-        x_pos, x_ori = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
+        current_pos, current_ori = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
         tor = self.Cart_imped.torque_cartesian(
             self.mj_data.qfrc_bias[self.robot.single_arm.get_Arm_id()[0]:],
             self.robot.single_arm.arm_qpos,
             self.robot.single_arm.arm_qvel,
-            x_pos,
-            x_ori,
+            current_pos,
+            current_ori,
             desired_pos=np.array([0.686, 0.005, 0.369]),
-            desired_ori=np.array([0, 0, 1, 0, 1, 0, -1, 0, 0]))
+            desired_ori=np.array([1, 0, 0, 0, 1, 0, 0, 0, 1]))
 
         for i in range(7):
             self.mj_data.actuator(self.robot.single_arm.actuator_index[i]).ctrl = tor[i]

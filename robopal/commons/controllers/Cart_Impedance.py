@@ -30,7 +30,7 @@ class Cart_Impedance(object):
         self.Kc = k
 
     # desired_pos:期望的位置  desired_ori:期望的姿态  tau_last：传入一个力矩
-    def torque_cartesian(self, coriolis_gravity, q_curr, qd_curr, x_pos: np.array, x_ori: np.array, desired_pos,
+    def torque_cartesian(self, coriolis_gravity, q_curr, qd_curr, current_pos: np.array, current_ori: np.array, desired_pos,
                          desired_ori):
         J = self.kdl_solver.get_jac(q_curr)
         J_inv = self.kdl_solver.get_jac_pinv(q_curr)
@@ -40,14 +40,15 @@ class Cart_Impedance(object):
         Md = np.dot(J_inv.T, np.dot(M, J_inv))  # 目标质量矩阵
 
         # 获取末端的位置/姿态/速度/
-        pos_error = desired_pos - x_pos  # 位置偏差
-        ori_error = self.orientation_error(desired_ori.reshape([3, 3]), x_ori)  # 姿态偏差
+        pos_error = desired_pos - current_pos  # 位置偏差
+        ori_error = self.orientation_error(desired_ori.reshape([3, 3]), current_ori)  # 姿态偏差
         x_error = np.concatenate([pos_error, ori_error])  # 两者拼接
         v_error = -np.dot(J, qd_curr)
 
         sum = self.Kc * x_error - np.dot(np.dot(Md, Jd), qd_curr) + self.Bc * v_error
         inertial = np.dot(M, J_inv)  # the inertial matrix in the end-effector frame
         tau = np.dot(inertial, sum) + coriolis_gravity
+        # print(tau)
         return tau
 
     def orientation_error(self, desired: np.ndarray, current: np.ndarray) -> np.ndarray:
@@ -71,5 +72,4 @@ class Cart_Impedance(object):
             w1, w2, w3 = 0.9, 0.5, 0.3
 
         error = w1 * np.cross(rc1, rd1) + w2 * np.cross(rc2, rd2) + w3 * np.cross(rc3, rd3)
-
         return error
