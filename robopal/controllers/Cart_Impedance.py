@@ -5,6 +5,7 @@ from robopal.commons.pin_utils import PinSolver
 class Cart_Impedance:
     def __init__(self, robot):
         self.kdl_solver = PinSolver(robot.urdf_path)
+
         # hyper-parameters of impedance
         self.Bc = np.zeros(6)
         self.Kc = np.zeros(6)
@@ -14,16 +15,15 @@ class Cart_Impedance:
             k=np.array([300, 300, 300, 300, 300, 300], dtype=np.float32)
         )
 
-        print("Cart_Impedance Initialized!")
-
     def set_cart_params(self, b: np.ndarray, k: np.ndarray):
         """set the parameters of the impedance controller in the cartesian space """
         self.Bc = b
         self.Kc = k
 
-    # desired_pos:期望的位置  desired_ori:期望的姿态  tau_last：传入一个力矩
     def step_controller(self, q_curr, qd_curr, desired_pos, desired_ori):
-        """compute the torque in the joint space from the impedance controller in the cartesian space """
+        """compute the torque in the joint space from the impedance controller in the cartesian space
+        desired_pos:期望的位置  desired_ori:期望的姿态  tau_last：传入一个力矩
+        """
 
         current_pos, current_ori = self.kdl_solver.fk(q_curr)
 
@@ -34,7 +34,6 @@ class Cart_Impedance:
         M = self.kdl_solver.get_inertia_mat(q_curr)
         Md = np.dot(J_inv.T, np.dot(M, J_inv))  # 目标质量矩阵
 
-        # 获取末端的位置/姿态/速度
         pos_error = desired_pos - current_pos  # 位置偏差
         ori_error = orientation_error(desired_ori, current_ori)  # 姿态偏差
         x_error = np.concatenate([pos_error, ori_error])  # 两者拼接

@@ -21,13 +21,13 @@ class PinSolver:
         """ Perform the forward kinematics over the kinematic tree
 
         :param q: joint position
-        :param rot_format: 'matrix' or 'quat'
+        :param rot_format: 'matrix' or 'quaternion'
         :return: end's translation, rotation
         """
         pin.forwardKinematics(self.model, self.data, q)
         if rot_format == 'matrix':
             return self.data.oMi[-1].translation.copy(), self.data.oMi[-1].rotation.copy()
-        elif rot_format == 'quat':
+        elif rot_format == 'quaternion':
             return self.data.oMi[-1].translation.copy(), trans.mat_2_quat(self.data.oMi[-1].rotation.copy())
 
     def ik(self, pos: np.ndarray, rot: np.ndarray, q_init: np.ndarray) -> np.ndarray:

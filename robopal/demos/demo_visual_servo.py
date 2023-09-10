@@ -1,11 +1,11 @@
 import cv2
 import numpy as np
-from robopal.envs.jnt_imp_ctrl_env import SingleArmEnv
+from robopal.envs.jnt_imp_ctrl_env import JntCtrlEnv
 import robopal.commons.transform as trans
 from scipy.spatial.transform import Rotation as RR
 
 
-class VisualServo(SingleArmEnv):
+class VisualServo(JntCtrlEnv):
     def __init__(self,
                  robot=None,
                  is_render=False,

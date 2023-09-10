@@ -9,9 +9,9 @@ if __name__ == "__main__":
 
     if args.env == 'JSC':
         from robopal.assets.robots.diana_med import DianaMed
-        from robopal.envs import SingleArmEnv
+        from robopal.envs import JntCtrlEnv
 
-        env = SingleArmEnv(
+        env = JntCtrlEnv(
             robot=DianaMed(),
             renderer='viewer',
             is_render=True,

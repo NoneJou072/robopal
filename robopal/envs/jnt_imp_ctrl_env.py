@@ -2,7 +2,7 @@ import numpy as np
 from robopal.envs.base import MujocoEnv
 
 
-class SingleArmEnv(MujocoEnv):
+class JntCtrlEnv(MujocoEnv):
     """ Single arm environment.
 
     :param robot(str): Robot configuration.
@@ -14,6 +14,7 @@ class SingleArmEnv(MujocoEnv):
             Note that high frequency will cause high time-lag.
     :param is_interpolate: Use interpolator while stepping.
     :param is_camera_used: Use camera or not.
+    :param cam_mode: Camera mode, "rgb" or "depth".
     """
 
     def __init__(self,
@@ -97,7 +98,7 @@ class SingleArmEnv(MujocoEnv):
 if __name__ == "__main__":
     from robopal.assets.robots.diana_med import DianaMed
 
-    env = SingleArmEnv(
+    env = JntCtrlEnv(
         robot=DianaMed(),
         renderer='viewer',
         is_render=True,

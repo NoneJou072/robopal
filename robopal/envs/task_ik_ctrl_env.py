@@ -1,9 +1,9 @@
 import numpy as np
-from robopal.envs.jnt_imp_ctrl_env import SingleArmEnv
+from robopal.envs.jnt_imp_ctrl_env import JntCtrlEnv
 import robopal.commons.transform as T
 
 
-class PosCtrlEnv(SingleArmEnv):
+class PosCtrlEnv(JntCtrlEnv):
     def __init__(self,
                  robot=None,
                  is_render=True,
@@ -24,10 +24,9 @@ class PosCtrlEnv(SingleArmEnv):
         self.p_quat = 0.2
         self.d_quat = 0.01
         self.is_pd = is_pd
-        self._vel_des = np.zeros(3)
+        self.vel_des = np.zeros(3)
 
-        _, r_init_m = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
-        self.init_rot_quat = T.mat_2_quat(r_init_m)
+        _, self.init_rot_quat = self.kdl_solver.fk(self.robot.single_arm.arm_qpos, rot_format='quaternion')
 
     @property
     def vel_cur(self):
@@ -36,37 +35,33 @@ class PosCtrlEnv(SingleArmEnv):
         vel_cur = np.dot(j, self.robot.single_arm.arm_qvel)
         return vel_cur
 
-    @property
-    def vel_des(self):
-        """ Desired velocity of 3*1 cartesian position"""
-        return self._vel_des
-
-    @vel_des.setter
-    def vel_des(self, value):
-        self._vel_des = value
-
-    def compute_pd_increment(self, p_goal, p_cur, r_goal, r_cur, vel_goal=np.zeros(3)):
-        pos_incre = self.p_cart * (p_goal - p_cur) + self.d_cart * (vel_goal - self.vel_cur[:3])
+    def compute_pd_increment(self, p_goal: np.ndarray,
+                             p_cur: np.ndarray,
+                             r_goal: np.ndarray,
+                             r_cur: np.ndarray,
+                             pd_goal: np.ndarray = np.zeros(3),
+                             pd_cur: np.ndarray = np.zeros(3)):
+        pos_incre = self.p_cart * (p_goal - p_cur) + self.d_cart * (pd_goal - pd_cur)
         quat_incre = self.p_quat * (r_goal - r_cur)
         return pos_incre, quat_incre
 
     def step_controller(self, action):
         if len(action) != 3 and len(action) != 7:
-            raise ValueError("Fault action length.")
+            raise ValueError("Invalid action length.")
         if self.is_pd is False:
             p_goal = action[:3]
             r_goal = T.quat_2_mat(self.init_rot_quat if len(action) == 3 else action[3:])
         else:
-            p_cur, r_cur_m = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
-            r_cur = T.mat_2_quat(r_cur_m)
+            p_cur, r_cur = self.kdl_solver.fk(self.robot.single_arm.arm_qpos, rot_format='quaternion')
+
             r_target = self.init_rot_quat if len(action) == 3 else action[3:]
             p_incre, r_incre = self.compute_pd_increment(p_goal=action[:3], p_cur=p_cur,
-                                                         r_goal=r_target, r_cur=r_cur, vel_goal=self.vel_des)
+                                                         r_goal=r_target, r_cur=r_cur,
+                                                         pd_goal=self.vel_des, pd_cur=self.vel_cur[:3])
             p_goal = p_incre + p_cur
             r_goal = T.quat_2_mat(r_cur + r_incre)
 
-        action = self.kdl_solver.ik(p_goal, r_goal, q_init=self.robot.single_arm.arm_qpos)
-        return action
+        return self.kdl_solver.ik(p_goal, r_goal, q_init=self.robot.single_arm.arm_qpos)
 
     def step(self, action):
         action = self.step_controller(action)

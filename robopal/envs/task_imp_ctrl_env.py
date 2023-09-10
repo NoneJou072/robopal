@@ -3,15 +3,15 @@ from robopal.envs import MujocoEnv
 from robopal.controllers import Cart_Impedance
 
 
-class ImpedGymEnv(MujocoEnv):
+class PosCtrlEnv(MujocoEnv):
 
     def __init__(self,
                  robot=None,
                  is_render=True,
-                 renderer="mujoco_viewer",
+                 renderer="viewer",
                  control_freq=50,
                  ) -> None:
-        super(ImpedGymEnv, self).__init__(
+        super(PosCtrlEnv, self).__init__(
             robot=robot,
             is_render=is_render,
             renderer=renderer,
@@ -26,7 +26,7 @@ class ImpedGymEnv(MujocoEnv):
             self.robot.single_arm.arm_qpos,
             self.robot.single_arm.arm_qvel,
             desired_pos=action,
-            desired_ori=np.array([[0, 0, -1], [0, 1, 0], [1, 0, 0]])
+            desired_ori=np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         )
 
         for i in range(7):
@@ -42,7 +42,6 @@ if __name__ == "__main__":
         renderer="viewer",
         control_freq=200,
     )
-
     for i in range(int(1e6)):
         action = np.array([0.686, 0.005, 0.369])
         env.step(action)
