@@ -55,7 +55,7 @@ class JntCtrlEnv(MujocoEnv):
         if self.interpolator is None:
             q_target, qdot_target = action, np.zeros(self.robot_dof)
         else:
-            q_target, qdot_target = self.interpolator.updateState()
+            q_target, qdot_target = self.interpolator.update_state()
 
         torque = self.jnt_controller.compute_jnt_torque(
             q_des=q_target,
@@ -69,7 +69,7 @@ class JntCtrlEnv(MujocoEnv):
 
     def step(self, action):
         if self.interpolator is not None:
-            self.interpolator.updateInput(action)
+            self.interpolator.update_input(action)
 
         for i in range(int(self.control_timestep / self.model_timestep)):
             if int(self.control_timestep / self.model_timestep) == 0:
@@ -86,13 +86,13 @@ class JntCtrlEnv(MujocoEnv):
             max_acceleration=0.1,
             max_jerk=0.2
         )
-        self.interpolator.setOTGParam(Arm.arm_qpos, Arm.arm_qvel)
+        self.interpolator.set_params(Arm.arm_qpos, Arm.arm_qvel)
 
     def reset(self):
         super().reset()
         if self.interpolator is not None:
-            self.interpolator.setOTGParam(self.robot.single_arm.arm_qpos,
-                                          np.zeros(self.robot_dof))
+            self.interpolator.set_params(self.robot.single_arm.arm_qpos,
+                                         np.zeros(self.robot_dof))
 
 
 if __name__ == "__main__":

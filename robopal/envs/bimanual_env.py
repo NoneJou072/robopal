@@ -70,8 +70,8 @@ class DoubleArmEnv(MujocoEnv):
         q_target_r, qdot_target_r = action[8:14], np.zeros(len(self.robot.right_arm.get_Arm_index()))
 
         if self.left_arm.interpolator and self.right_arm.interpolator is not None:
-            q_target_l, qdot_target_l = self.left_arm.interpolator.updateState()
-            q_target_r, qdot_target_r = self.right_arm.interpolator.updateState()
+            q_target_l, qdot_target_l = self.left_arm.interpolator.update_state()
+            q_target_r, qdot_target_r = self.right_arm.interpolator.update_state()
 
         self.actuate_J(q_target_l, qdot_target_l, self.left_arm)
         self.actuate_J(q_target_r, qdot_target_r, self.right_arm)
@@ -82,8 +82,8 @@ class DoubleArmEnv(MujocoEnv):
 
     def step(self, action):
         if self.left_arm.interpolator and self.right_arm.interpolator is not None:
-            self.left_arm.interpolator.updateInput(action[1:7])
-            self.right_arm.interpolator.updateInput(action[8:14])
+            self.left_arm.interpolator.update_input(action[1:7])
+            self.right_arm.interpolator.update_input(action[8:14])
 
         ctrl_cur_time = time.time()
         for i in range(int(self.control_timestep / self.model_timestep)):
@@ -102,7 +102,7 @@ class DoubleArmEnv(MujocoEnv):
             max_acceleration=0.1,
             max_jerk=0.2
         )
-        Arm.interpolator.setOTGParam(Arm.arm_qpos, Arm.arm_qvel)
+        Arm.interpolator.set_params(Arm.arm_qpos, Arm.arm_qvel)
 
 
 if __name__ == "__main__":

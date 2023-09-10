@@ -9,6 +9,7 @@ class OTG:
                  max_velocity=0.0,
                  max_acceleration=0.0,
                  max_jerk=0.0):
+
         self.OTG_Dof = OTG_Dof
         self.control_cycle = control_cycle
         self.otg = Ruckig(self.OTG_Dof, self.control_cycle)
@@ -20,7 +21,7 @@ class OTG:
         self.max_acceleration = max_acceleration
         self.max_jerk = max_jerk
 
-    def setOTGParam(self, qpos, qvel):
+    def set_params(self, qpos, qvel):
         self.inp.current_position = qpos
         self.inp.current_velocity = qvel
         self.inp.current_acceleration = np.zeros(7)
@@ -33,12 +34,12 @@ class OTG:
         self.inp.max_acceleration = self.max_acceleration * np.ones(7)
         self.inp.max_jerk = self.max_jerk * np.ones(7)
 
-    def updateInput(self, action):
+    def update_input(self, action):
         self.inp.target_position = action
 
-    def updateState(self):
+    def update_state(self):
         self.otg.update(self.inp, self.out)
         q_target = self.out.new_position
-        vel_target = self.out.new_velocity
+        qd_target = self.out.new_velocity
         self.out.pass_to_input(self.inp)
-        return q_target, vel_target
+        return q_target, qd_target

@@ -31,8 +31,8 @@ class PosCtrlEnv(JntCtrlEnv):
     @property
     def vel_cur(self):
         """ Current velocity, consist of 3*1 cartesian and 4*1 quaternion """
-        j = self.kdl_solver.get_full_jac(self.robot.single_arm.arm_qpos)
-        vel_cur = np.dot(j, self.robot.single_arm.arm_qvel)
+        J = self.kdl_solver.get_full_jac(self.robot.single_arm.arm_qpos)
+        vel_cur = np.dot(J, self.robot.single_arm.arm_qvel)
         return vel_cur
 
     def compute_pd_increment(self, p_goal: np.ndarray,

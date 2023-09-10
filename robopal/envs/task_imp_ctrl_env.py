@@ -7,18 +7,28 @@ class PosCtrlEnv(MujocoEnv):
 
     def __init__(self,
                  robot=None,
-                 is_render=True,
+                 is_render=False,
                  renderer="viewer",
-                 control_freq=50,
+                 jnt_controller='IMPEDANCE',
+                 control_freq=200,
+                 is_interpolate=False,
+                 is_camera_used=False,
+                 cam_mode='rgb'
                  ) -> None:
         super(PosCtrlEnv, self).__init__(
             robot=robot,
             is_render=is_render,
             renderer=renderer,
             control_freq=control_freq,
+            is_camera_used=is_camera_used,
+            cam_mode=cam_mode
         )
 
         self.Cart_imped = Cart_Impedance(self.robot)
+
+        # self.interpolator = None
+        # if is_interpolate:
+        #     self._init_interpolator(self.robot.single_arm)
 
     def preStep(self, action):
         # 根据阻抗控制获取末端输入力矩
@@ -26,22 +36,30 @@ class PosCtrlEnv(MujocoEnv):
             self.robot.single_arm.arm_qpos,
             self.robot.single_arm.arm_qvel,
             desired_pos=action,
-            desired_ori=np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+            desired_ori=np.array([[0, 0, -1], [0, 1, 0], [1, 0, 0]])
         )
 
         for i in range(7):
             self.mj_data.actuator(self.robot.single_arm.actuator_index[i]).ctrl = tor[i]
 
+    def step(self, action):
+        for i in range(int(self.control_timestep / self.model_timestep)):
+            if int(self.control_timestep / self.model_timestep) == 0:
+                raise ValueError("Control frequency is too low. Checkout you are not in renderer mode."
+                                 "Current Model-Timestep:{}".format(self.model_timestep))
+            super().step(action)
+
 
 if __name__ == "__main__":
     from robopal.assets.robots.diana_med import DianaMed
 
-    env = ImpedGymEnv(
+    env = PosCtrlEnv(
         robot=DianaMed(),
         is_render=True,
         renderer="viewer",
         control_freq=200,
     )
+
     for i in range(int(1e6)):
         action = np.array([0.686, 0.005, 0.369])
         env.step(action)

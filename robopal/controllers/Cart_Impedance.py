@@ -11,8 +11,8 @@ class Cart_Impedance:
         self.Kc = np.zeros(6)
 
         self.set_cart_params(
-            b=np.array([120, 120, 120, 70, 70, 70], dtype=np.float32),
-            k=np.array([300, 300, 300, 300, 300, 300], dtype=np.float32)
+            b=np.array([100, 800, 800, 800, 800, 800], dtype=np.float32),
+            k=np.array([100, 100, 100, 100, 100, 100], dtype=np.float32)
         )
 
     def set_cart_params(self, b: np.ndarray, k: np.ndarray):
@@ -27,9 +27,9 @@ class Cart_Impedance:
 
         current_pos, current_ori = self.kdl_solver.fk(q_curr)
 
-        J = self.kdl_solver.get_joint_jac(q_curr)
-        J_inv = self.kdl_solver.get_joint_jac_pinv(q_curr)
-        Jd = self.kdl_solver.get_jac_dot(q_curr, qd_curr)
+        J = self.kdl_solver.get_full_jac(q_curr)
+        J_inv = self.kdl_solver.get_full_jac_pinv(q_curr)
+        Jd = self.kdl_solver.get_jac_dot(q_curr, qd_curr)  # TODO: check the correctness of Jd
 
         M = self.kdl_solver.get_inertia_mat(q_curr)
         Md = np.dot(J_inv.T, np.dot(M, J_inv))  # 目标质量矩阵
