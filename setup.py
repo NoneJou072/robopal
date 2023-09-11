@@ -13,7 +13,9 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/NoneJou072/robopal",
-    python_requires=">=3.9",
+    python_requires=">=3.8",
+    eager_resources=["*"],
+    include_package_data=True,
     install_requires=[
         "numpy>=1.24.0",
         'mujoco>=2.3.7',
