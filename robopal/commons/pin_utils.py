@@ -132,3 +132,11 @@ class PinSolver:
         pin.computeAllTerms(self.model, self.data, q, v)
         return self.data.dJ.copy()
 
+    def get_end_vel(self, q: np.ndarray, qd: np.ndarray) -> np.ndarray:
+        """ Computing the end effector velocity
+
+        :param q: joint position
+        :param qd: joint velocity
+        :return: end effector velocity, 6*1, [v, w]
+        """
+        return np.dot(self.get_full_jac(q), qd)

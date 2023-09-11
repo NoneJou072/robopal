@@ -3,6 +3,7 @@ import os
 
 
 class DianaMedBase(ArmBase):
+    """ DianaMed robot base class. """
     def __init__(self,
                  scene='default',
                  gripper=None,
@@ -32,12 +33,14 @@ class DianaMedBase(ArmBase):
 
 
 class DianaMed(DianaMedBase):
+    """ DianaMed robot class. """
     def __init__(self):
         super().__init__(scene='default',
                          gripper=None, )
 
 
 class DianaAruco(DianaMedBase):
+    """ DianaMed robot class. """
     def __init__(self):
         super().__init__(scene='visual_imped',
                          gripper='Swab_gripper', )
@@ -55,6 +58,7 @@ class DianaAruco(DianaMedBase):
 
 
 class DianaGrasp(DianaMedBase):
+    """ DianaMed robot class. """
     def __init__(self):
         super().__init__(scene='grasping',
                          gripper='rethink_gripper',

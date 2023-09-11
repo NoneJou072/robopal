@@ -3,6 +3,7 @@ from robopal.commons.pin_utils import PinSolver
 
 
 class Cart_Impedance:
+    """ Cartesian Impedance Controller in the end-effector frame """
     def __init__(self, robot):
         self.kdl_solver = PinSolver(robot.urdf_path)
 
@@ -20,7 +21,7 @@ class Cart_Impedance:
         self.Bc = b
         self.Kc = k
 
-    def step_controller(self, q_curr, qd_curr, desired_pos, desired_ori):
+    def step_controller(self, desired_pos, desired_ori, q_curr, qd_curr):
         """compute the torque in the joint space from the impedance controller in the cartesian space
         desired_pos:期望的位置  desired_ori:期望的姿态  tau_last：传入一个力矩
         """

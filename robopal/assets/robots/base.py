@@ -3,7 +3,7 @@ import numpy as np
 from robopal.commons import RobotGenerator
 
 
-class ArmBase(object):
+class ArmBase:
     def __init__(self,
                  name: str = None,
                  scene: str = 'default',

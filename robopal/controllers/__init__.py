@@ -1,2 +1,2 @@
-from .Jnt_Impedance import Jnt_Impedance
-from .Cart_Impedance import Cart_Impedance
+from .jnt_imp_controller import Jnt_Impedance
+from .task_imp_controller import Cart_Impedance

@@ -28,13 +28,6 @@ class PosCtrlEnv(JntCtrlEnv):
 
         _, self.init_rot_quat = self.kdl_solver.fk(self.robot.single_arm.arm_qpos, rot_format='quaternion')
 
-    @property
-    def vel_cur(self):
-        """ Current velocity, consist of 3*1 cartesian and 4*1 quaternion """
-        J = self.kdl_solver.get_full_jac(self.robot.single_arm.arm_qpos)
-        vel_cur = np.dot(J, self.robot.single_arm.arm_qvel)
-        return vel_cur
-
     def compute_pd_increment(self, p_goal: np.ndarray,
                              p_cur: np.ndarray,
                              r_goal: np.ndarray,
@@ -55,9 +48,10 @@ class PosCtrlEnv(JntCtrlEnv):
             p_cur, r_cur = self.kdl_solver.fk(self.robot.single_arm.arm_qpos, rot_format='quaternion')
 
             r_target = self.init_rot_quat if len(action) == 3 else action[3:]
+            pd_cur = self.kdl_solver.get_end_vel(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)
             p_incre, r_incre = self.compute_pd_increment(p_goal=action[:3], p_cur=p_cur,
                                                          r_goal=r_target, r_cur=r_cur,
-                                                         pd_goal=self.vel_des, pd_cur=self.vel_cur[:3])
+                                                         pd_goal=self.vel_des, pd_cur=pd_cur[:3])
             p_goal = p_incre + p_cur
             r_goal = T.quat_2_mat(r_cur + r_incre)
 

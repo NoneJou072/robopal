@@ -33,10 +33,10 @@ class PosCtrlEnv(MujocoEnv):
     def preStep(self, action):
         # 根据阻抗控制获取末端输入力矩
         tor = self.Cart_imped.step_controller(
-            self.robot.single_arm.arm_qpos,
-            self.robot.single_arm.arm_qvel,
-            desired_pos=action,
-            desired_ori=np.array([[0, 0, -1], [0, 1, 0], [1, 0, 0]])
+            action,
+            np.array([[0, 0, -1], [0, 1, 0], [1, 0, 0]]),
+            q_curr=self.robot.single_arm.arm_qpos,
+            qd_curr=self.robot.single_arm.arm_qvel,
         )
 
         for i in range(7):
