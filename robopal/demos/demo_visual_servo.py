@@ -12,7 +12,7 @@ class VisualServo(JntCtrlEnv):
                  renderer="viewer",
                  control_freq=200,
                  is_interpolate=False,
-                 is_camera_used=True,
+                 enable_camera_viewer=True,
                  cam_mode='rgb'
                  ):
         super().__init__(
@@ -21,7 +21,7 @@ class VisualServo(JntCtrlEnv):
             renderer=renderer,
             control_freq=control_freq,
             is_interpolate=is_interpolate,
-            is_camera_used=is_camera_used,
+            enable_camera_viewer=enable_camera_viewer,
             cam_mode=cam_mode
         )
 
@@ -32,7 +32,7 @@ class VisualServo(JntCtrlEnv):
         self.detector = cv2.aruco.ArucoDetector(aruco_dictionary, aruco_parameters)
 
     def aruco_detection(self, marker_size):
-        cv_image = self.renderer.get_pixels_from_renderer()
+        cv_image = self.renderer.render_pixels_from_camera(cam='0_cam', enable_depth=False)
 
         if cv_image is not None:
             corners, marker_ids, _ = self.detector.detectMarkers(cv_image)
@@ -120,7 +120,7 @@ if __name__ == "__main__":
         control_freq=200,
         is_interpolate=False,
         renderer='viewer',
-        is_camera_used=True,
+        enable_camera_viewer=False,
         cam_mode='rgb'
     )
     env.reset()

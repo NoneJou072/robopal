@@ -12,7 +12,7 @@ class PosCtrlEnv(MujocoEnv):
                  jnt_controller='IMPEDANCE',
                  control_freq=200,
                  is_interpolate=False,
-                 is_camera_used=False,
+                 enable_camera_viewer=False,
                  cam_mode='rgb'
                  ) -> None:
         super(PosCtrlEnv, self).__init__(
@@ -20,7 +20,7 @@ class PosCtrlEnv(MujocoEnv):
             is_render=is_render,
             renderer=renderer,
             control_freq=control_freq,
-            is_camera_used=is_camera_used,
+            enable_camera_viewer=enable_camera_viewer,
             cam_mode=cam_mode
         )
 

@@ -1,3 +1,5 @@
+import time
+
 import mujoco
 from collections import deque
 import sys
@@ -8,15 +10,18 @@ import cv2
 
 
 class MjRenderer:
-    def __init__(self, mj_model, mj_data, renderer, is_camera_used=False, cam_mode='rgb'):
+    def __init__(self, mj_model, mj_data, is_render, renderer, enable_camera_viewer=False, cam_mode='rgb'):
         self.mj_model = mj_model
         self.mj_data = mj_data
 
         self.renderer = renderer
-        self.enable_camera_viewer = is_camera_used
+        self.enable_camera_viewer = enable_camera_viewer
         self.cam_mode = cam_mode
+
+        # Set up mujoco viewer
         self.viewer = None
-        self._renderer_init()
+        if is_render:
+            self._init_renderer()
 
         self.traj = deque(maxlen=200)
 
@@ -29,7 +34,7 @@ class MjRenderer:
 
         self.image_renderer = mujoco.Renderer(self.mj_model)
 
-    def _renderer_init(self):
+    def _init_renderer(self):
         """ Initialize renderer, choose official renderer with "viewer"(joined from version 2.3.3),
             another renderer with "mujoco_viewer"
         """
@@ -41,12 +46,13 @@ class MjRenderer:
                 self.exit_flag = not self.exit_flag
 
         if self.renderer == "unity":
-            # TODO: support unity renderer
+            # TODO: Support unity renderer.
             raise ValueError("Unity renderer not supported now.")
         elif self.renderer == "viewer":
             from mujoco import viewer
             # This function does not block, allowing user code to continue execution.
             self.viewer = viewer.launch_passive(self.mj_model, self.mj_data, key_callback=key_callback)
+
             if self.enable_camera_viewer:
                 cv2.namedWindow('RGB Image', cv2.WINDOW_NORMAL)
         else:
@@ -55,13 +61,11 @@ class MjRenderer:
     def render(self):
         """ render mujoco """
         if self.viewer is not None and self.render_paused is True and self.renderer == "viewer":
-            if self.viewer.is_running():
+            if self.viewer.is_running() and self.exit_flag is False:
                 self.viewer.sync()
             else:
                 self.close()
-            if self.exit_flag is True:
-                self.close()
-            # self.image_queue.put(self.render_pixels_from_camera())
+
             if self.enable_camera_viewer:
                 enable_depth = True if self.cam_mode == 'depth' else False
                 rgb = self.render_pixels_from_camera('0_cam', enable_depth=enable_depth)
@@ -120,6 +124,3 @@ class MjRenderer:
             image = org[:, :, ::-1]
         self._image = image
         return image
-
-    def get_pixels_from_renderer(self):
-        return self._image

@@ -4,7 +4,7 @@ import mujoco
 from robopal.commons.renderers import MjRenderer
 
 
-class MujocoEnv(object):
+class MujocoEnv:
     """ This environment is the base class.
 
      :param xml_path(str): Load xml file from xml_path to build the mujoco model.
@@ -20,7 +20,7 @@ class MujocoEnv(object):
                  is_render=False,
                  renderer="viewer",
                  control_freq=1000,
-                 is_camera_used=False,
+                 enable_camera_viewer=False,
                  cam_mode='rgb'):
 
         self.robot = robot
@@ -37,8 +37,8 @@ class MujocoEnv(object):
         self.robot_dof = self.robot.jnt_num
 
         self.renderer = None
-        if is_render:
-            self.renderer = MjRenderer(self.mj_model, self.mj_data, renderer, is_camera_used, cam_mode)
+
+        self.renderer = MjRenderer(self.mj_model, self.mj_data, self.is_render, renderer, enable_camera_viewer, cam_mode)
 
         self._initialize_time()
         self._set_init_pose()
@@ -96,9 +96,7 @@ class MujocoEnv(object):
         self.control_timestep = 1.0 / self.control_freq
 
     def _set_init_pose(self):
-        """ Set or reset init joint position when called env reset func.
-
-        """
+        """ Set or reset init joint position when called env reset func. """
         for i in range(len(self.robot.arm)):
             for j in range(len(self.robot.arm[i].joint_index)):
                 self.mj_data.joint(self.robot.arm[i].joint_index[j]).qpos = self.robot.arm[i].init_pose[j]

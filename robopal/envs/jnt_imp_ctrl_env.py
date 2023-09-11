@@ -13,7 +13,7 @@ class JntCtrlEnv(MujocoEnv):
     :param control_freq: Upper-layer control frequency.
             Note that high frequency will cause high time-lag.
     :param is_interpolate: Use interpolator while stepping.
-    :param is_camera_used: Use camera or not.
+    :param enable_camera_viewer: Use camera or not.
     :param cam_mode: Camera mode, "rgb" or "depth".
     """
 
@@ -24,7 +24,7 @@ class JntCtrlEnv(MujocoEnv):
                  jnt_controller='IMPEDANCE',
                  control_freq=200,
                  is_interpolate=False,
-                 is_camera_used=False,
+                 enable_camera_viewer=False,
                  cam_mode='rgb'
                  ):
 
@@ -33,7 +33,7 @@ class JntCtrlEnv(MujocoEnv):
             is_render=is_render,
             renderer=renderer,
             control_freq=control_freq,
-            is_camera_used=is_camera_used,
+            enable_camera_viewer=enable_camera_viewer,
             cam_mode=cam_mode
         )
 
