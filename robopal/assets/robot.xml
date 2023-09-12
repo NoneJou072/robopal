@@ -157,7 +157,7 @@
             </body>
         </body>
     </body>
-    <body pos="0.6279662354340992 0.1586315751134159 0.46" name="green_block">
+    <body pos="0.6863861197413856 0.12904046031677496 0.46" name="green_block">
             <joint name="object2:joint" type="free" damping="0.01" />
             <geom name="green_block" size="0.02 0.02 " rgba="0 1 0 1" type="box" friction="0.5 0.3 0.1" group="1" condim="4" mass="0.001" />
             <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
