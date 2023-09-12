@@ -3,7 +3,7 @@ import os
 from robopal.commons import RobotGenerator
 
 
-class BiDianaMed(ArmBase):
+class BiDianaMed(BaseArm):
     def __init__(self):
         robot = RobotGenerator(
             name='robot',
@@ -19,9 +19,9 @@ class BiDianaMed(ArmBase):
             xml_path=robot.xml,
             gripper=None
         )
-        self.left_arm = self.Arm(self, 'left')
-        self.right_arm = self.Arm(self, 'right')
-        self.arm_base = self.Arm(self, 'single')
+        self.left_arm = self.PartArm(self, 'left')
+        self.right_arm = self.PartArm(self, 'right')
+        self.arm_base = self.PartArm(self, 'single')
         self.left_arm.joint_index = ['0_left_j1', '0_left_j2', '0_left_j3', '0_left_j4', '0_left_j5', '0_left_j6', '0_left_j7']
         self.left_arm.actuator_index = ['0_left_m1', '0_left_m2', '0_left_m3', '0_left_m4', '0_left_m5', '0_left_m6', '0_left_m7']
         self.right_arm.joint_index = ['0_right_j1', '0_right_j2', '0_right_j3', '0_right_j4', '0_right_j5', '0_right_j6', '0_right_j7']

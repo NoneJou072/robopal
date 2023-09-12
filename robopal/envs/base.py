@@ -36,8 +36,6 @@ class MujocoEnv:
         self.control_timestep = 0
         self.robot_dof = self.robot.jnt_num
 
-        self.renderer = None
-
         self.renderer = MjRenderer(self.mj_model, self.mj_data, self.is_render, renderer, enable_camera_viewer, cam_mode)
 
         self._initialize_time()
@@ -65,9 +63,7 @@ class MujocoEnv:
         raise NotImplementedError
 
     def reset(self):
-        """ Reset the simulate environment, in order to execute next episode.
-
-        """
+        """ Reset the simulate environment, in order to execute next episode. """
         mujoco.mj_resetData(self.mj_model, self.mj_data)
         self._set_init_pose()
         mujoco.mj_step(self.mj_model, self.mj_data)

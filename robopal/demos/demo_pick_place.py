@@ -23,7 +23,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
 
         self.action = None
 
-        can_list = ['red_block', 'blue_block', 'green_block']
+        can_list = ['green_block']
         self.can_pos, self.can_quat, self.can_rotm = self.getObjPose(can_list)
 
     def getObjPose(self, name_list):
@@ -42,7 +42,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
             current_pos, current_mat = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
             current_quat = T.mat_2_quat(current_mat)
             error = np.sum(np.abs(state[:3] - current_pos)) + np.sum(np.abs(state[3:] - current_quat))
-            print(error)
+            # print(error)
             if error <= 0.01:
                 return True
             return False
@@ -75,13 +75,22 @@ if __name__ == "__main__":
     )
     env.reset()
 
-    env.gripper_ctrl('open')
-    env.move(env.can_pos['blue_block'], env.can_quat['blue_block'])
-    env.gripper_ctrl('close')
-    env.move(env.can_pos['blue_block'] + np.array([0, 0, 0.1]), env.can_quat['blue_block'])
+    env.move(env.can_pos['green_block'] + np.array([0, 0, 0.1]), env.can_quat['green_block'])
+    # env.gripper_ctrl('open')
+    # env.move(env.can_pos['green_block'], env.can_quat['green_block'])
+    # env.gripper_ctrl('close')
+    # env.move(env.can_pos['green_block'] + np.array([0, 0, 0.1]), env.can_quat['green_block'])
 
     for t in range(int(1e6)):
+        # print(t)
         env.step(env.action)
-        print(env.robot.single_arm.arm_qpos)
         if env.is_render:
             env.render()
+        if t % 1000 == 0:
+            print('new episode')
+            env.robot.construct_mjcf_data()
+            print(env.robot.robot_model)
+            env.mj_model = env.robot.robot_model
+            print(env.mj_model)
+            env.mj_data = env.robot.robot_data
+            env.reset()

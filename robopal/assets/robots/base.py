@@ -1,9 +1,24 @@
+import abc
+
 import mujoco
 import numpy as np
 from robopal.commons import RobotGenerator
 
 
-class ArmBase:
+class BaseArm:
+    """ Base class for generating Data struct of the arm.
+
+    :param name(str): robot name
+    :param scene(str):
+    :param chassis(str):
+    :param manipulator(str):
+    :param gripper(str):
+    :param g2m_body(str):
+    :param urdf_path(str):
+    :param xml_path(str): If you have specified the xml path of your local robot,
+    it'll not automatically construct the xml file with input assets.
+    """
+
     def __init__(self,
                  name: str = None,
                  scene: str = 'default',
@@ -12,40 +27,49 @@ class ArmBase:
                  gripper: str = None,
                  g2m_body: list = None,
                  urdf_path: str = None,
-                 xml_path: str = None,
                  ):
         self.name = name
-        self.robot = RobotGenerator(
-            scene=scene,
-            chassis=chassis,
-            manipulator=manipulator,
-            gripper=gripper,
-            g2m_body=g2m_body
-        )
-        self.add_assets()
+        self.scene = scene
+        self.chassis = chassis
+        self.manipulator = manipulator
+        self.gripper = gripper
+        self.g2m_body = g2m_body
 
-        self.urdf_path = urdf_path
-        if isinstance(xml_path, str):
-            self.xml_path =xml_path
-        else:
-            self.xml_path = self.robot.xml
+        self.urdf_path = urdf_path  # urdf file used for pinocchio lib
 
-        self.robot_model = mujoco.MjModel.from_xml_path(filename=self.xml_path, assets=None)
-        self.robot_data = mujoco.MjData(self.robot_model)
+        self.mjcf_generator: RobotGenerator
+        self.robot_model = None
+        self.robot_data = None
+        self.construct_mjcf_data()
+
         self.arm = []
 
+    def construct_mjcf_data(self):
+        self.mjcf_generator = RobotGenerator(
+            scene=self.scene,
+            chassis=self.chassis,
+            manipulator=self.manipulator,
+            gripper=self.gripper,
+            g2m_body=self.g2m_body
+        )
+        self.add_assets()
+        xml_path = self.mjcf_generator.save_and_load_xml()
+        self.robot_model = mujoco.MjModel.from_xml_path(filename=xml_path, assets=None)
+        self.robot_data = mujoco.MjData(self.robot_model)
+
+    @abc.abstractmethod
     def add_assets(self):
+        """ Add objects into the xml file. """
         pass
 
-    class Arm:
+    class PartArm:
         """
-        internal class
-        using for precise arm state, double (left and right) or single
+        internal class, using for precise arm state, double (left and right) or single
         """
 
-        def __init__(self, ArmBase, state):
-            self.robot_model = ArmBase.robot_model
-            self.robot_data = ArmBase.robot_data
+        def __init__(self, base, state):
+            self.robot_model = base.robot_model
+            self.robot_data = base.robot_data
             self.state = state
 
             self.joint_index = []

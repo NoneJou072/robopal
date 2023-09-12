@@ -227,8 +227,7 @@ class XMLSplicer:
         """ Save xml file with identity path"""
         self.tree.write(path.join(output_path, f"{self.xml_name}.xml"))
 
-    @property
-    def xml(self, output_path=path.join(path.dirname(__file__), '../assets')):
+    def save_and_load_xml(self, output_path=path.join(path.dirname(__file__), '../assets')):
         """ Save xml file and get its path"""
         self.save_xml(output_path)
         return path.abspath(path.join(output_path, f"{self.xml_name}.xml"))
