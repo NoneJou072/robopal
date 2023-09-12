@@ -64,6 +64,8 @@ class MujocoEnv:
 
     def reset(self):
         """ Reset the simulate environment, in order to execute next episode. """
+        self.robot.construct_mjcf_data()
+        self.mj_model = self.robot.robot_model
         mujoco.mj_resetData(self.mj_model, self.mj_data)
         self._set_init_pose()
         mujoco.mj_step(self.mj_model, self.mj_data)

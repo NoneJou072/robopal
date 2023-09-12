@@ -21,8 +21,6 @@ class PickAndPlaceEnv(PosCtrlEnv):
             is_pd=is_pd
         )
 
-        self.action = None
-
         can_list = ['green_block']
         self.can_pos, self.can_quat, self.can_rotm = self.getObjPose(can_list)
 
@@ -37,29 +35,11 @@ class PickAndPlaceEnv(PosCtrlEnv):
             mat[name] = self.mj_data.body(name).xmat.copy()
         return pos, quat, mat
 
-    def move(self, pos, quat):
-        def checkArriveState(state):
-            current_pos, current_mat = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
-            current_quat = T.mat_2_quat(current_mat)
-            error = np.sum(np.abs(state[:3] - current_pos)) + np.sum(np.abs(state[3:] - current_quat))
-            # print(error)
-            if error <= 0.01:
-                return True
-            return False
+    def step(self, action):
+        super().step(action)
 
-        while True:
-            self.action = np.concatenate((pos, quat), axis=0)
-            self.step(self.action)
-            if self.is_render:
-                self.render()
-            if checkArriveState(self.action):
-                break
-
-    def gripper_ctrl(self, cmd: str):
-        if cmd == "open":
-            self.mj_data.actuator("0_gripper_l_finger_joint").ctrl = 20
-        elif cmd == "close":
-            self.mj_data.actuator("0_gripper_l_finger_joint").ctrl = -20
+    def gripper_ctrl(self, cmd: int):
+        self.mj_data.actuator("0_gripper_l_finger_joint").ctrl = -20 if cmd == 0 else 20
 
 
 if __name__ == "__main__":
@@ -75,22 +55,10 @@ if __name__ == "__main__":
     )
     env.reset()
 
-    env.move(env.can_pos['green_block'] + np.array([0, 0, 0.1]), env.can_quat['green_block'])
-    # env.gripper_ctrl('open')
-    # env.move(env.can_pos['green_block'], env.can_quat['green_block'])
-    # env.gripper_ctrl('close')
-    # env.move(env.can_pos['green_block'] + np.array([0, 0, 0.1]), env.can_quat['green_block'])
-
     for t in range(int(1e6)):
-        # print(t)
-        env.step(env.action)
+        action = np.array([0.4, 0.0, 0.6, 1.0, 0.0, 0.0, 0.0])
+        env.step(action)
         if env.is_render:
             env.render()
         if t % 1000 == 0:
-            print('new episode')
-            env.robot.construct_mjcf_data()
-            print(env.robot.robot_model)
-            env.mj_model = env.robot.robot_model
-            print(env.mj_model)
-            env.mj_data = env.robot.robot_data
             env.reset()

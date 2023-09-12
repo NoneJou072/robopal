@@ -4,16 +4,23 @@
       <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable"/>
   </option>
 
+    <visual>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="120" elevation="-20"/>
+  </visual>
+
   <asset>
     <mesh name="complete_table" file="../objects/table/complete_table.STL" scale="1.0 1.0 0.66"/>
-    <texture builtin="gradient" height="256" rgb1=".9 .9 1." rgb2=".2 .3 .4" type="skybox" width="256"/>
-    <texture file="../textures/wood-tiles.png" type="2d" name="texplane"/>
-    <material name="floorplane" reflectance="0.01" shininess="0.0" specular="0.0" texrepeat="2 2" texture="texplane" texuniform="true"/>
+
+      <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture name="groundplane" type="2d" builtin="checker" mark="edge"  rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+      markrgb="0.8 0.8 0.8" width="300" height="300"/>
+    <material name="groundplane" reflectance="0.2" shininess="0.0" specular="0.0" texrepeat="5 5" texture="groundplane" texuniform="true"/>
   </asset>
 
   <worldbody>
     <!-- Floor -->
-    <geom condim="3" material="floorplane" name="floor" pos="0 0 0" size="3 3 .125" type="plane"/>
+    <geom condim="3" material="groundplane" name="floor" pos="0 0 0" size="3 3 .125" type="plane"/>
     <light diffuse=".8 .8 .8" dir="0 -.15 -1" directional="false" pos="1 1 8.0" specular="0.3 0.3 0.3" castshadow="false"/>
     <light diffuse=".8 .8 .8" dir="0 -.15 -1" directional="false" pos="-3. -3. 8.0" specular="0.3 0.3 0.3" castshadow="false"/>
     <!-- front view -->

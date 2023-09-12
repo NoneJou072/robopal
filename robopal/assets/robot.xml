@@ -4,28 +4,34 @@
       <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable" />
   </option>
 
+    <visual>
+    <rgba haze="0.15 0.25 0.35 1" />
+    <global azimuth="120" elevation="-20" />
+  </visual>
+
   <asset>
-    <mesh name="complete_table" file="/home/ubuntu/zhr/robopal/robopal/assets/scenes/../objects/table/complete_table.STL" scale="1.0 1.0 0.66" />
-    <texture builtin="gradient" height="256" rgb1=".9 .9 1." rgb2=".2 .3 .4" type="skybox" width="256" />
-    <texture file="/home/ubuntu/zhr/robopal/robopal/assets/textures/wood-tiles.png" type="2d" name="texplane" />
-    <material name="floorplane" reflectance="0.01" shininess="0.0" specular="0.0" texrepeat="2 2" texture="texplane" texuniform="true" />
-  <mesh name="0_base_link" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/base_link.STL" />
-        <mesh name="0_link1" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link1.STL" />
-        <mesh name="0_link2" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link2.STL" />
-        <mesh name="0_link3" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link3.STL" />
-        <mesh name="0_link4" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link4.STL" />
-        <mesh name="0_link5" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link5.STL" />
-        <mesh name="0_link6" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link6.STL" />
-        <mesh name="0_link7" file="/home/ubuntu/zhr/robopal/robopal/assets/models/manipulators/DianaMed/meshes/link7.STL" />
-    <mesh name="0_electric_gripper_base" file="/home/ubuntu/zhr/robopal/robopal/assets/models/grippers/rethink_gripper/meshes/electric_gripper_base.stl" />
-        <mesh name="0_standard_narrow" file="/home/ubuntu/zhr/robopal/robopal/assets/models/grippers/rethink_gripper/meshes/standard_narrow.stl" />
-        <mesh name="0_half_round_tip" file="/home/ubuntu/zhr/robopal/robopal/assets/models/grippers/rethink_gripper/meshes/half_round_tip.stl" />
-        <mesh name="0_connector_plate" file="/home/ubuntu/zhr/robopal/robopal/assets/models/grippers/rethink_gripper/meshes/connector_plate.stl" />
+    <mesh name="complete_table" file="D:\WorkFiles\robopal\robopal\assets\scenes\../objects/table/complete_table.STL" scale="1.0 1.0 0.66" />
+
+      <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072" />
+    <texture name="groundplane" type="2d" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+    <material name="groundplane" reflectance="0.2" shininess="0.0" specular="0.0" texrepeat="5 5" texture="groundplane" texuniform="true" />
+  <mesh name="0_base_link" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/base_link.STL" />
+        <mesh name="0_link1" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link1.STL" />
+        <mesh name="0_link2" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link2.STL" />
+        <mesh name="0_link3" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link3.STL" />
+        <mesh name="0_link4" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link4.STL" />
+        <mesh name="0_link5" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link5.STL" />
+        <mesh name="0_link6" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link6.STL" />
+        <mesh name="0_link7" file="D:\WorkFiles\robopal\robopal\assets\models\manipulators\DianaMed\meshes/link7.STL" />
+    <mesh name="0_electric_gripper_base" file="D:\WorkFiles\robopal\robopal\assets\models\grippers\rethink_gripper\meshes/electric_gripper_base.stl" />
+        <mesh name="0_standard_narrow" file="D:\WorkFiles\robopal\robopal\assets\models\grippers\rethink_gripper\meshes/standard_narrow.stl" />
+        <mesh name="0_half_round_tip" file="D:\WorkFiles\robopal\robopal\assets\models\grippers\rethink_gripper\meshes/half_round_tip.stl" />
+        <mesh name="0_connector_plate" file="D:\WorkFiles\robopal\robopal\assets\models\grippers\rethink_gripper\meshes/connector_plate.stl" />
     </asset>
 
   <worldbody>
     
-    <geom condim="3" material="floorplane" name="floor" pos="0 0 0" size="3 3 .125" type="plane" />
+    <geom condim="3" material="groundplane" name="floor" pos="0 0 0" size="3 3 .125" type="plane" />
     <light diffuse=".8 .8 .8" dir="0 -.15 -1" directional="false" pos="1 1 8.0" specular="0.3 0.3 0.3" castshadow="false" />
     <light diffuse=".8 .8 .8" dir="0 -.15 -1" directional="false" pos="-3. -3. 8.0" specular="0.3 0.3 0.3" castshadow="false" />
     
@@ -151,7 +157,7 @@
             </body>
         </body>
     </body>
-    <body pos="0.7727191665747468 0.1974110058163961 0.46" name="green_block">
+    <body pos="0.6279662354340992 0.1586315751134159 0.46" name="green_block">
             <joint name="object2:joint" type="free" damping="0.01" />
             <geom name="green_block" size="0.02 0.02 " rgba="0 1 0 1" type="box" friction="0.5 0.3 0.1" group="1" condim="4" mass="0.001" />
             <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
