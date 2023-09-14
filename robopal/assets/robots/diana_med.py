@@ -77,6 +77,13 @@ class DianaGrasp(DianaMedBase, ABC):
         </body>"""
         self.mjcf_generator.add_node_from_str('worldbody', block)
 
+        random_goal_x_pos = np.random.uniform(0.5, 0.8)
+        random_goal_y_pos = np.random.uniform(-0.2, 0.2)
+        goal_site = f"""<body pos="{random_goal_x_pos} {random_goal_y_pos} {0.46}" name="goal_site">
+                    <site name="goal_site" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+                </body>"""
+        self.mjcf_generator.add_node_from_str('worldbody', goal_site)
+
     @property
     def init_qpos(self):
         """ Robot's init joint position. """

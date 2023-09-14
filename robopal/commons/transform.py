@@ -32,36 +32,33 @@ def euler_2_quat(rpy, degrees: bool = False):
 
 def euler_2_mat(euler):
     """
-    Converts euler angles into rotation matrix form
+    Converts euler angles(format in xyz) into rotation matrix form.
 
-    Args:
-        euler (np.array): (r,p,y) angles
-        rad args
-
-    Returns:
-        np.array: 3x3 rotation matrix
-
+    :param euler: 1*3 euler angles
+    :return: 3*3 rotation matrix
     """
-    euler = np.asarray(euler, dtype=np.float64)
-    assert euler.shape[-1] == 3, "Invalid shaped euler {}".format(euler)
-
-    ai, aj, ak = -euler[..., 2], -euler[..., 1], -euler[..., 0]
-    si, sj, sk = np.sin(ai), np.sin(aj), np.sin(ak)
-    ci, cj, ck = np.cos(ai), np.cos(aj), np.cos(ak)
-    cc, cs = ci * ck, ci * sk
-    sc, ss = si * ck, si * sk
-
-    mat = np.empty(euler.shape[:-1] + (3, 3), dtype=np.float64)
-    mat[..., 2, 2] = cj * ck
-    mat[..., 2, 1] = sj * sc - cs
-    mat[..., 2, 0] = sj * cc + ss
-    mat[..., 1, 2] = cj * sk
-    mat[..., 1, 1] = sj * ss + cc
-    mat[..., 1, 0] = sj * cs - sc
-    mat[..., 0, 2] = -sj
-    mat[..., 0, 1] = cj * si
-    mat[..., 0, 0] = cj * ci
-    return mat
+    roll = euler[0]
+    pitch = euler[1]
+    yaw = euler[2]
+    cr = cos(roll)
+    sr = sin(roll)
+    cp = cos(pitch)
+    sp = sin(pitch)
+    cy = cos(yaw)
+    sy = sin(yaw)
+    r11 = cy * cp
+    r12 = cy * sp * sr - sy * cr
+    r13 = cy * sp * cr + sy * sr
+    r21 = sy * cp
+    r22 = sy * sp * sr + cy * cr
+    r23 = sy * sp * cr - cy * sr
+    r31 = -sp
+    r32 = cp * sr
+    r33 = cp * cr
+    rotation_matrix = np.array([[r11, r12, r13],
+                                [r21, r22, r23],
+                                [r31, r32, r33]])
+    return rotation_matrix
 
 
 def quat_2_mat(quaternion):
@@ -124,28 +121,20 @@ def vec2_mat(vec):
 
 def mat_2_vec(mat):
     """
-    The rotation vector modulus is the angle
-    Not using the Rodriguez formula
+    Converts rotation matrix into rotation vector form.
 
-    When calculating the rotation matrix,
-    it is necessary to normalize the rotation vector into a unit vector,
-    calculate the four components of the quaternion according to the formula,
-    and then convert the quaternion into a rotation matrix.
+    :param mat: 3*3 rotation matrix
+    :return: 1*3 rotation vector
     """
-    a = mat[0][0]
-    b = mat[0][1]
-    c = mat[0][2]
-    d = mat[1][0]
-    e = mat[1][1]
-    f = mat[1][2]
-    g = mat[2][0]
-    h = mat[2][1]
-    i = mat[2][2]
-    theta = np.arccos((a + e + i - 1) / 2)
-    x = (h - f) / (2 * np.sin(theta))
-    y = (g - c) / (2 * np.sin(theta))
-    z = (d - b) / (2 * np.sin(theta))
-    return np.array([x, y, z])
+    theta = np.arccos((np.trace(mat) - 1) / 2)
+    if theta == 0:
+        return np.zeros(3)
+    else:
+        k = 1 / (2 * np.sin(theta))
+        x = k * (mat[2, 1] - mat[1, 2]) * theta
+        y = k * (mat[0, 2] - mat[2, 0]) * theta
+        z = k * (mat[1, 0] - mat[0, 1]) * theta
+        return np.array([x, y, z])
 
 
 def mat_2_quat(mat):

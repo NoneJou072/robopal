@@ -101,4 +101,43 @@ class MujocoEnv:
         mujoco.mj_forward(self.mj_model, self.mj_data)
 
     def get_body_id(self, name: str):
+        """ Get body id from body name.
+        :param name: body name
+        :return: body id
+        """
         return mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_BODY, name)
+
+    def get_body_pos(self, name: str):
+        """ Get body position from body name.
+        :param name: body name
+        :return: body position
+        """
+        return self.mj_data.body(name).xpos.copy()
+
+    def get_body_quat(self, name: str):
+        """ Get body quaternion from body name.
+        :param name: body name
+        :return: body quaternion
+        """
+        return self.mj_data.body(name).xquat.copy()
+
+    def get_body_rotm(self, name: str):
+        """ Get body rotation matrix from body name.
+        :param name: body name
+        :return: body rotation matrix
+        """
+        return self.mj_data.body(name).xmat.copy()
+
+    def get_body_vel(self, name: str):
+        """ Get body velocity from body name.
+        :param name: body name
+        :return: body velocity
+        """
+        return self.mj_data.body_xvelp[self.get_body_id(name)]
+
+    def get_body_avel(self, name: str):
+        """ Get body angular velocity from body name.
+        :param name: body name
+        :return: body angular velocity
+        """
+        return self.mj_data.body_xvelr[self.get_body_id(name)]

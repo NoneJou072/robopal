@@ -12,7 +12,7 @@ class Cart_Impedance:
         self.Kc = np.zeros(6)
 
         self.set_cart_params(
-            b=np.array([100, 800, 800, 800, 800, 800], dtype=np.float32),
+            b=np.array([200, 800, 800, 800, 800, 800], dtype=np.float32),
             k=np.array([100, 100, 100, 100, 100, 100], dtype=np.float32)
         )
 

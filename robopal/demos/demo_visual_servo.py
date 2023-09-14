@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 from robopal.envs.jnt_imp_ctrl_env import JntCtrlEnv
 import robopal.commons.transform as trans
-from scipy.spatial.transform import Rotation as RR
 
 
 class VisualServo(JntCtrlEnv):
@@ -49,12 +48,13 @@ class VisualServo(JntCtrlEnv):
         gain = 0.2
 
         desire_p = np.array([0.0, 0., 0.2]).reshape(3, 1)
-        desire_r = np.array([0.70575314, -0.70673064, 0.0, 0.0])
+        desire_r = np.array([0.0, 0.70575314, -0.70673064, 0.0])
 
         hand2cam_p = np.array([0.0, 0.00, 0.007])
         hand2cam_r = np.array([-3.14, 0, 1.57])
-        # hand2cam_M = trans.euler_2_mat(hand2cam_r)
-        hand2cam_M = RR.from_euler('xyz', hand2cam_r).as_matrix()
+
+        hand2cam_M = trans.euler_2_mat(hand2cam_r)
+
         kdl_hand2cam_f = trans.make_transform(hand2cam_p, hand2cam_M)
 
         base2hand_p, base2hand_r = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
@@ -70,9 +70,6 @@ class VisualServo(JntCtrlEnv):
 
             T_acd = desire_p
             R_acd = trans.quat_2_mat(desire_r)
-            # print(R_acd)
-            R_acd = RR.from_quat(desire_r).as_matrix()
-            # print(R_acd)
 
             R_c_cd = R_ca @ R_acd
             T_c_cd = R_ca @ T_acd + T_ca
@@ -80,9 +77,6 @@ class VisualServo(JntCtrlEnv):
             R_cd_c = R_c_cd.T
             T_cd_c = -np.matmul(R_cd_c, T_c_cd)
             error_R = trans.mat_2_vec(R_cd_c).reshape(3, 1)
-            # print(error_R)
-            error_R = RR.from_matrix(R_cd_c).as_rotvec().reshape(3, 1)
-            # print(error_R)
 
             error = np.concatenate([T_cd_c, error_R], axis=0)
             print(np.linalg.norm(error))
@@ -120,7 +114,7 @@ if __name__ == "__main__":
         control_freq=200,
         is_interpolate=False,
         renderer='viewer',
-        enable_camera_viewer=False,
+        enable_camera_viewer=True,
         cam_mode='rgb'
     )
     env.reset()

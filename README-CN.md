@@ -41,7 +41,7 @@
    ```commandline
    $ git clone https://github.com/NoneJou072/robopal
    $ cd robopal
-   $ pip install -e .
+   $ pip install -r requirements.txt
    ```
 
 ## 模块
