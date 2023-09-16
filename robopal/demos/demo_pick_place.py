@@ -1,5 +1,6 @@
 import numpy as np
 from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
+import robopal.commons.transform as trans
 
 TRAIN_MODE = False
 
@@ -26,7 +27,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
             is_interpolate=is_interpolate,
             is_pd=is_pd
         )
-        self.obs_dim = 13
+        self.obs_dim = 16
         self.action_dim = 4
         self.max_action = 1.0
         self.min_action = -1.0
@@ -37,7 +38,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
     def step(self, action):
         self._timestep += 1
         # Map to target action space bounds
-        actual_min_action = np.array([0.1, -0.5, 0.05, 0.0])
+        actual_min_action = np.array([0.1, -0.5, 0.15, 0.0])
         actual_max_action = np.array([0.6, 0.5, 0.5, 1.0])
         mapped_action = (action + 1) * (actual_max_action - actual_min_action) / 2 + actual_min_action
 
@@ -55,8 +56,8 @@ class PickAndPlaceEnv(PosCtrlEnv):
 
         return obs, reward, terminated, truncated, info
 
-    def gripper_ctrl(self, actuator_name: str = None, gripper_action: int = 1):
-        self.mj_data.actuator(actuator_name).ctrl = -40 if gripper_action == 0 else 40
+    def inner_step(self, action):
+        super().inner_step(action)
 
     def compute_rewards(self) -> float | int:
         """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
@@ -79,6 +80,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         obs[6:9] = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0]
         obs[9:12] = obs[6:9] - obs[:3]
         obs[12] = self.mj_data.actuator("0_gripper_l_finger_joint").ctrl[0]
+        obs[13:16] = trans.mat_2_euler(self.get_body_rotm('green_block'))
         return obs
 
     def get_info(self) -> dict:

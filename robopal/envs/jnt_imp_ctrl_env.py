@@ -51,7 +51,7 @@ class JntCtrlEnv(MujocoEnv):
     def kdl_solver(self):
         return self.jnt_controller.kdl_solver
 
-    def preStep(self, action):
+    def inner_step(self, action):
         if self.interpolator is None:
             q_target, qdot_target = action, np.zeros(self.robot_dof)
         else:
@@ -64,12 +64,20 @@ class JntCtrlEnv(MujocoEnv):
             v_cur=self.robot.single_arm.arm_qvel,
         )
         # Send torque to simulation
-        for i in range(7):
+        for i in range(self.robot.jnt_num):
             self.mj_data.actuator(self.robot.single_arm.actuator_index[i]).ctrl = torque[i]
+
+    def gripper_ctrl(self, actuator_name: str = None, gripper_action: int = 1):
+        """ Gripper control.
+
+        :param actuator_name: Gripper actuator name.
+        :param gripper_action: Gripper action, 0 for close, 1 for open.
+        """
+        self.mj_data.actuator(actuator_name).ctrl = -40 if gripper_action == 0 else 40
 
     def step(self, action):
         if self.interpolator is not None:
-            self.interpolator.update_input(action)
+            self.interpolator.update_target_position(action)
 
         for i in range(int(self.control_timestep / self.model_timestep)):
             if int(self.control_timestep / self.model_timestep) == 0:
@@ -80,7 +88,7 @@ class JntCtrlEnv(MujocoEnv):
     def _init_interpolator(self, Arm):
         from robopal.commons.interpolators import OTG
         self.interpolator = OTG(
-            OTG_Dof=self.robot_dof,
+            OTG_dim=self.robot_dof,
             control_cycle=self.control_timestep,
             max_velocity=0.05,
             max_acceleration=0.1,
@@ -103,7 +111,7 @@ if __name__ == "__main__":
         renderer='viewer',
         is_render=True,
         control_freq=200,
-        is_interpolate=False,
+        is_interpolate=True,
     )
     env.reset()
     for t in range(int(1e6)):

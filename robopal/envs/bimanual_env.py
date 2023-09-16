@@ -65,7 +65,7 @@ class DoubleArmEnv(MujocoEnv):
         for i in range(len(Arm.actuator_index)):
             self.mj_data.actuator(Arm.actuator_index[i]).ctrl = tau_target[i]
 
-    def preStep(self, action):
+    def inner_step(self, action):
         q_target_l, qdot_target_l = action[1:7], np.zeros(len(self.robot.left_arm.get_Arm_index()))
         q_target_r, qdot_target_r = action[8:14], np.zeros(len(self.robot.right_arm.get_Arm_index()))
 
@@ -82,8 +82,8 @@ class DoubleArmEnv(MujocoEnv):
 
     def step(self, action):
         if self.left_arm.interpolator and self.right_arm.interpolator is not None:
-            self.left_arm.interpolator.update_input(action[1:7])
-            self.right_arm.interpolator.update_input(action[8:14])
+            self.left_arm.interpolator.update_target_position(action[1:7])
+            self.right_arm.interpolator.update_target_position(action[8:14])
 
         ctrl_cur_time = time.time()
         for i in range(int(self.control_timestep / self.model_timestep)):
@@ -96,7 +96,7 @@ class DoubleArmEnv(MujocoEnv):
 
     def _initInterpolator(self, Arm):
         Arm.interpolator = OTG(
-            OTG_Dof=7,
+            OTG_dim=7,
             control_cycle=0.0005,
             max_velocity=0.05,
             max_acceleration=0.1,

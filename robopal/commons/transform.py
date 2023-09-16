@@ -175,6 +175,44 @@ def mat_2_quat(mat):
     return quaternion
 
 
+def quat_2_euler(quaternion):
+    """
+    Converts quaternion into euler angles(format in xyz).
+
+    :param quaternion: 1*4 quaternion
+    :return: 1*3 euler angles
+    """
+    w, x, y, z = quaternion
+    roll = np.arctan2(2 * (w * x + y * z), 1 - 2 * (x ** 2 + y ** 2))
+    pitch = np.arcsin(2 * (w * y - z * x))
+    yaw = np.arctan2(2 * (w * z + x * y), 1 - 2 * (y ** 2 + z ** 2))
+    euler = np.array([roll, pitch, yaw])
+    return euler
+
+
+def vec_2_euler(vec):
+    """
+    Converts rotation vector into euler angles(format in xyz).
+
+    :param vec: 1*3 rotation vector
+    :return: 1*3 euler angles
+    """
+    mat = vec2_mat(vec)
+    euler = mat_2_euler(mat)
+    return euler
+
+
+def mat_2_euler(mat):
+    """
+    Converts rotation matrix into euler angles(format in xyz).
+
+    :param mat: 3*3 rotation matrix
+    :return: 1*3 euler angles
+    """
+    euler = quat_2_euler(mat_2_quat(mat))
+    return euler
+
+
 def make_transform(pos=None, rot=None) -> np.ndarray:
     """ concatenate both 1*3 or 3*1 position array and 3*3 rotation matrix
         to a 4*4 transform matrix

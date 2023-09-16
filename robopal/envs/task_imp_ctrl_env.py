@@ -30,7 +30,7 @@ class PosCtrlEnv(MujocoEnv):
         # if is_interpolate:
         #     self._init_interpolator(self.robot.single_arm)
 
-    def preStep(self, action):
+    def inner_step(self, action):
         # 根据阻抗控制获取末端输入力矩
         tor = self.Cart_imped.step_controller(
             action,

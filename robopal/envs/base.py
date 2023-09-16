@@ -50,12 +50,13 @@ class MujocoEnv:
         if self.renderer is not None and self.renderer.render_paused:
             self.cur_time += 1
             mujoco.mj_forward(self.mj_model, self.mj_data)
-            self.preStep(action)
+            self.inner_step(action)
             mujoco.mj_step(self.mj_model, self.mj_data)
 
     @abc.abstractmethod
-    def preStep(self, action):
-        """ Writes your own codes between mujoco forward and step you want to control.
+    def inner_step(self, action):
+        """  This method will be called with one-step in mujoco, before mujoco step.
+        For example, you can use this method to update the robot's joint position.
 
         :param action: input actions
         :return: None
@@ -126,7 +127,7 @@ class MujocoEnv:
         :param name: body name
         :return: body rotation matrix
         """
-        return self.mj_data.body(name).xmat.copy()
+        return self.mj_data.body(name).xmat.copy().reshape(3, 3)
 
     def get_body_vel(self, name: str):
         """ Get body velocity from body name.
