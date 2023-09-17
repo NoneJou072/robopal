@@ -16,7 +16,7 @@ setup(
     python_requires=">=3.8",
     include_package_data=True,
     install_requires=[
-        "numpy>=1.24.0",
+        "numpy>=1.23.5",
         'mujoco>=2.3.7',
         'pin'
     ],

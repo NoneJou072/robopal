@@ -38,13 +38,17 @@ class PickAndPlaceEnv(PosCtrlEnv):
     def step(self, action):
         self._timestep += 1
         # Map to target action space bounds
-        actual_min_action = np.array([0.1, -0.5, 0.15, 0.0])
-        actual_max_action = np.array([0.6, 0.5, 0.5, 1.0])
+        actual_min_action = np.array([0.1, -0.5, 0.15, -0.020833])
+        actual_max_action = np.array([0.6, 0.5, 0.5, 0.0115])
         mapped_action = (action + 1) * (actual_max_action - actual_min_action) / 2 + actual_min_action
 
         # take one step
-        self.gripper_ctrl('0_gripper_l_finger_joint', int(mapped_action[3]))
+        # self.gripper_ctrl('0_gripper_l_finger_joint', int(mapped_action[3]))
+        self.mj_data.joint('0_r_finger_joint').qpos[0] = mapped_action[3]
+
+        print('des_pos:', mapped_action[:3])
         super().step(mapped_action[:3])
+        print('cur_pos:', self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0])
 
         obs = self.get_observations()
         reward = self.compute_rewards()
@@ -98,8 +102,8 @@ if __name__ == "__main__":
         robot=DianaGrasp(),
         renderer="viewer",
         is_render=True,
-        control_freq=25,
-        is_interpolate=False,
+        control_freq=20,
+        is_interpolate=True,
         is_pd=False
     )
     env.reset()
