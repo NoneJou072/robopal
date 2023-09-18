@@ -1,54 +1,67 @@
 import numpy as np
+import logging
+
 from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
 import robopal.commons.transform as trans
 
-TRAIN_MODE = False
+logging.basicConfig(level=logging.DEBUG)
 
 
 class PickAndPlaceEnv(PosCtrlEnv):
     """ Reference: https://robotics.farama.org/envs/fetch/pick_and_place/#
-    The control frequency of the robot is of f = 25 Hz. This is achieved by applying the same action
-    in 40 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
+    The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
+    in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
     """
 
     def __init__(self,
                  robot=None,
                  is_render=True,
                  renderer="viewer",
-                 control_freq=20,
-                 is_interpolate=True,
-                 is_pd=True,
+                 control_freq=200,
+                 enable_camera_viewer=False,
+                 cam_mode='rgb',
+                 jnt_controller='IMPEDANCE',
+                 is_interpolate=False,
+                 is_pd=False,
                  ):
         super().__init__(
             robot=robot,
             is_render=is_render,
             renderer=renderer,
             control_freq=control_freq,
+            enable_camera_viewer=enable_camera_viewer,
+            cam_mode=cam_mode,
+            jnt_controller=jnt_controller,
             is_interpolate=is_interpolate,
-            is_pd=is_pd
+            is_pd=is_pd,
         )
         self.obs_dim = 16
         self.action_dim = 4
         self.max_action = 1.0
         self.min_action = -1.0
-        self.max_episode_steps = 50
+        self.max_episode_steps = 150
 
         self._timestep = 0
 
     def step(self, action):
         self._timestep += 1
         # Map to target action space bounds
-        actual_min_action = np.array([0.1, -0.5, 0.15, -0.020833])
-        actual_max_action = np.array([0.6, 0.5, 0.5, 0.0115])
-        mapped_action = (action + 1) * (actual_max_action - actual_min_action) / 2 + actual_min_action
+        pos_ctrl = (action[3] + 1) * (0.0115 - (-0.015)) / 2 + (-0.015)
+
+        pos_offset = 0.05 * action[:3]
+        actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
+
+        pos_max_bound = np.array([0.6, 0.2, 0.4])
+        pos_min_bound = np.array([0.3, -0.2, 0.14])
+        actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
 
         # take one step
-        # self.gripper_ctrl('0_gripper_l_finger_joint', int(mapped_action[3]))
-        self.mj_data.joint('0_r_finger_joint').qpos[0] = mapped_action[3]
+        # self.gripper_ctrl('0_gripper_l_finger_joint', int(actual_action[3]))
+        self.mj_data.joint('0_r_finger_joint').qpos[0] = pos_ctrl
 
-        print('des_pos:', mapped_action[:3])
-        super().step(mapped_action[:3])
-        print('cur_pos:', self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0])
+        logging.debug(f'des_pos:{actual_pos_action[:3]}')
+        super().step(actual_pos_action[:3])
+        logging.debug(f'cur_pos:{self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0]}')
 
         obs = self.get_observations()
         reward = self.compute_rewards()
@@ -102,22 +115,16 @@ if __name__ == "__main__":
         robot=DianaGrasp(),
         renderer="viewer",
         is_render=True,
-        control_freq=20,
-        is_interpolate=True,
-        is_pd=False
+        control_freq=10,
+        is_interpolate=False,
+        is_pd=False,
+        jnt_controller='IMPEDANCE',
     )
     env.reset()
 
-    if TRAIN_MODE is False:
-        for t in range(int(1e6)):
-            action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
-            s_, r, terminated, truncated, _ = env.step(action)
-            if env.is_render:
-                env.render()
-            if truncated:
-                env.reset()
-
-    else:
-        from robopal.commons.gym_wrapper import GymWrapper
-        env = GymWrapper(env)
-        del env
+    for t in range(int(1e6)):
+        action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
+        s_, r, terminated, truncated, _ = env.step(action)
+        if truncated:
+            env.reset()
+        env.render()

@@ -7,12 +7,15 @@ from robopal.commons.renderers import MjRenderer
 class MujocoEnv:
     """ This environment is the base class.
 
-     :param xml_path(str): Load xml file from xml_path to build the mujoco model.
-     :param is_render(bool): Choose if use the renderer to render the scene or not.
-     :param renderer(str): choose official renderer with "viewer",
-            another renderer with "mujoco_viewer"
-     :param control_freq(int): Upper-layer control frequency.
-            Note that high frequency will cause high time-lag.
+    :param xml_path(str): Load xml file from xml_path to build the mujoco model.
+    :param is_render(bool): Choose if use the renderer to render the scene or not.
+    :param renderer(str): choose official renderer with "viewer",
+    another renderer with "mujoco_viewer"
+    :param control_freq(int): Upper-layer control frequency.
+    Note that high frequency will cause high time-lag.
+    :param enable_camera_viewer(bool): Use camera or not.
+    :param cam_mode(str): Camera mode, "rgb" or "depth".
+    :param enable_dynamics(bool): Enable dynamics or not.
     """
 
     def __init__(self,
@@ -21,11 +24,13 @@ class MujocoEnv:
                  renderer="viewer",
                  control_freq=1000,
                  enable_camera_viewer=False,
-                 cam_mode='rgb'):
+                 cam_mode='rgb',
+                 enable_dynamics=True):
 
         self.robot = robot
         self.is_render = is_render
         self.control_freq = control_freq
+        self.enable_dynamics = enable_dynamics
 
         self.mj_model = self.robot.robot_model
         self.mj_data = self.robot.robot_data
@@ -49,9 +54,10 @@ class MujocoEnv:
         """
         if self.renderer is not None and self.renderer.render_paused:
             self.cur_time += 1
-            mujoco.mj_forward(self.mj_model, self.mj_data)
             self.inner_step(action)
-            mujoco.mj_step(self.mj_model, self.mj_data)
+            mujoco.mj_forward(self.mj_model, self.mj_data)
+            if self.enable_dynamics:
+                mujoco.mj_step(self.mj_model, self.mj_data)
 
     @abc.abstractmethod
     def inner_step(self, action):

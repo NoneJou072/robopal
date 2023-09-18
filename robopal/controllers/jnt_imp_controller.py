@@ -6,20 +6,17 @@ class Jnt_Impedance(object):
     def __init__(self, robot):
         self.kdl_solver = PinSolver(robot.urdf_path)
 
-        # hyper-parameters of impedance
-        self.Mj = np.zeros(7)
+        # hyper-parameters of impedance controller
         self.Bj = np.zeros(7)
         self.kj = np.zeros(7)
 
         self.set_jnt_params(
-            m=0.1 * np.diag(np.ones(6)),
-            b=30.0 * np.ones(7),
-            k=100.0 * np.ones(7),
+            b=47.0 * np.ones(7),
+            k=200.0 * np.ones(7),
         )
         print("Jnt_Impedance Initialized!")
 
-    def set_jnt_params(self, m: np.ndarray, b: np.ndarray, k: np.ndarray):
-        self.Mj = m
+    def set_jnt_params(self, b: np.ndarray, k: np.ndarray):
         self.Bj = b
         self.kj = k
 

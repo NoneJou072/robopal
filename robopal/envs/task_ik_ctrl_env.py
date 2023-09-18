@@ -9,7 +9,10 @@ class PosCtrlEnv(JntCtrlEnv):
                  is_render=True,
                  renderer="viewer",
                  control_freq=200,
-                 is_interpolate=True,
+                 enable_camera_viewer=False,
+                 cam_mode='rgb',
+                 jnt_controller='IMPEDANCE',
+                 is_interpolate=False,
                  is_pd=False,
                  ):
         super().__init__(
@@ -17,7 +20,10 @@ class PosCtrlEnv(JntCtrlEnv):
             is_render=is_render,
             renderer=renderer,
             control_freq=control_freq,
-            is_interpolate=is_interpolate
+            enable_camera_viewer=enable_camera_viewer,
+            cam_mode=cam_mode,
+            jnt_controller=jnt_controller,
+            is_interpolate=is_interpolate,
         )
         self.p_cart = 0.2
         self.d_cart = 0.01
@@ -69,9 +75,10 @@ if __name__ == "__main__":
         robot=DianaMed(),
         renderer='viewer',
         is_render=True,
-        control_freq=200,
+        control_freq=20,
         is_interpolate=False,
-        is_pd=True
+        is_pd=False,
+        jnt_controller='IMPEDANCE'
     )
     env.reset()
     for t in range(int(1e6)):
