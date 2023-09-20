@@ -46,7 +46,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         self.max_action = 1.0
         self.min_action = -1.0
 
-        self.max_episode_steps = 100
+        self.max_episode_steps = 50
         self._timestep = 0
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
@@ -102,11 +102,9 @@ class PickAndPlaceEnv(PosCtrlEnv):
         target position, and 0 if the block is in the final target position (the block is considered to have
         reached the goal if the Euclidean distance between both is lower than 0.05 m).
         """
-        reward = -1
-        dist = np.linalg.norm(achieved_goal - desired_goal)
-        if dist < 0.05:
-            reward = 0
-        return np.array([reward]).astype(np.float32)
+        assert achieved_goal.shape == desired_goal.shape
+        dist = np.linalg.norm(achieved_goal - desired_goal, axis=-1)
+        return -(dist > 0.05).astype(np.floating)
 
     def _get_obs(self) -> np.ndarray:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
