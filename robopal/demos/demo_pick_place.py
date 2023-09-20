@@ -12,7 +12,6 @@ class PickAndPlaceEnv(PosCtrlEnv):
     The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
     in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
     """
-
     def __init__(self,
                  robot=None,
                  is_render=True,
@@ -35,8 +34,10 @@ class PickAndPlaceEnv(PosCtrlEnv):
             is_interpolate=is_interpolate,
             is_pd=is_pd,
         )
-        self.obs_dim = 16
-        self.action_dim = 4
+        self.name = 'PickAndPlace-v1'
+
+        self.obs_dim = (16,)
+        self.action_dim = (4,)
         self.max_action = 1.0
         self.min_action = -1.0
         self.max_episode_steps = 150
@@ -69,7 +70,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         truncated = False
         if self._timestep >= self.max_episode_steps:
             truncated = True
-        info = self.get_info()
+        info = self._get_info()
 
         return obs, reward, terminated, truncated, info
 
@@ -82,7 +83,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         reached the goal if the Euclidean distance between both is lower than 0.05 m).
         """
         reward = -1
-        obs = self.get_observations()
+        obs = self._get_obs()
         obj_pos = obs[:3]
         goal_pos = obs[3:6]
         dist = np.linalg.norm(obj_pos - goal_pos)
@@ -90,7 +91,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
             reward = 0
         return reward
 
-    def get_observations(self) -> np.ndarray:
+    def _get_obs(self) -> np.ndarray:
         obs = np.zeros(self.obs_dim)
         obs[:3] = self.get_body_pos('green_block')
         obs[3:6] = self.get_body_pos('goal_site')
@@ -98,14 +99,18 @@ class PickAndPlaceEnv(PosCtrlEnv):
         obs[9:12] = obs[6:9] - obs[:3]
         obs[12] = self.mj_data.actuator("0_gripper_l_finger_joint").ctrl[0]
         obs[13:16] = trans.mat_2_euler(self.get_body_rotm('green_block'))
-        return obs
+        return {'observations': obs}
 
-    def get_info(self) -> dict:
+    def _get_info(self) -> dict:
         return {}
 
-    def reset(self):
-        self._timestep = 0
+    def reset(self, seed=None):
         super().reset()
+        self._timestep = 0
+
+        obs = self._get_obs()
+        info = self._get_info()
+        return obs, info
 
 
 if __name__ == "__main__":
