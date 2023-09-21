@@ -63,8 +63,6 @@ class PickAndPlaceEnv(PosCtrlEnv):
         :return: obs, reward, terminated, truncated, info
         """
         self._timestep += 1
-        # Map to target action space bounds
-        pos_ctrl = (action[3] + 1) * (0.0115 - (-0.015)) / 2 + (-0.015)
 
         pos_offset = 0.05 * action[:3]
         actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
@@ -73,9 +71,11 @@ class PickAndPlaceEnv(PosCtrlEnv):
         pos_min_bound = np.array([0.3, -0.2, 0.14])
         actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
 
+        # Map to target action space bounds
+        gripper_ctrl = (action[3] + 1) * (0.0115 - (-0.01)) / 2 + (-0.01)
         # take one step
-        # self.gripper_ctrl('0_gripper_l_finger_joint', int(actual_action[3]))
-        self.mj_data.joint('0_r_finger_joint').qpos[0] = pos_ctrl
+        self.mj_data.joint('0_r_finger_joint').qpos[0] = gripper_ctrl
+        self.mj_data.joint('0_l_finger_joint').qpos[0] = gripper_ctrl
 
         logging.debug(f'des_pos:{actual_pos_action[:3]}')
         super().step(actual_pos_action[:3])

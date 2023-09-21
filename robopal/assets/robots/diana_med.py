@@ -71,8 +71,8 @@ class DianaGrasp(DianaMedBase, ABC):
         random_x_pos = np.random.uniform(0.4, 0.6)
         random_y_pos = np.random.uniform(-0.2, 0.2)
         block = f"""<body pos="{random_x_pos} {random_y_pos} {0.46}" name="green_block">
-            <joint name="object2:joint" type="free" damping="0.01" />
-            <geom name="green_block" size="0.02 0.02 " rgba="0 1 0 1" type="box" friction="0.5 0.3 0.1" group="1" condim="4" mass="0.001"/>
+            <joint name="object2:joint" type="free"/>
+            <geom name="green_block" size="0.02 0.02 " rgba="0 1 0 1" type="box" group="1" condim="4" mass="0.001"/>
             <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
         </body>"""
         self.mjcf_generator.add_node_from_str('worldbody', block)
