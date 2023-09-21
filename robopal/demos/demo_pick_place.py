@@ -39,7 +39,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         )
         self.name = 'PickAndPlace-v1'
 
-        self.obs_dim = (19,)
+        self.obs_dim = (22,)
         self.goal_dim = (3,)
         self.action_dim = (4,)
 
@@ -48,6 +48,8 @@ class PickAndPlaceEnv(PosCtrlEnv):
 
         self.max_episode_steps = 50
         self._timestep = 0
+
+        self.goal_pos = None
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
@@ -97,7 +99,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
     def inner_step(self, action):
         super().inner_step(action)
 
-    def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, info: dict=None):
+    def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, info: dict = None):
         """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
         target position, and 0 if the block is in the final target position (the block is considered to have
         reached the goal if the Euclidean distance between both is lower than 0.05 m).
@@ -106,7 +108,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         dist = np.linalg.norm(achieved_goal - desired_goal, axis=-1)
         return -(dist > 0.05).astype(np.floating)
 
-    def _get_obs(self) -> np.ndarray:
+    def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
         of the block, the next 3 dimensions corresponding to the position of the goal, the next 3 dimensions
         corresponding to the position of the gripper, the next 3 dimensions corresponding to the vector
@@ -114,18 +116,30 @@ class PickAndPlaceEnv(PosCtrlEnv):
         """
         obs = np.zeros(self.obs_dim)
 
-        obs[:3] = self.get_body_pos('green_block')
-        obs[3:6] = self.get_body_pos('goal_site')
-        obs[6:9] = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0]
-        obs[9:12] = obs[6:9] - obs[:3]  # vector between the block and the gripper
-        obs[12] = self.mj_data.actuator("0_gripper_l_finger_joint").ctrl[0]
-        obs[13:16] = trans.mat_2_euler(self.get_body_rotm('green_block'))
-        obs[16:19] = self.kdl_solver.get_end_vel(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)[:3]
+        obs[:3] = (  # position of the block
+            object_pos := self.get_body_pos('green_block')
+        )
+        obs[3:6] = (  # position of the end
+            end_pos := self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0]
+        )
+        obs[6:9] = end_pos - object_pos  # distance between the block and the end
+        obs[9:12] = trans.mat_2_euler(self.get_body_rotm('green_block'))
+        obs[12:15] = (  # End effector linear velocity
+            end_vel := self.kdl_solver.get_end_vel(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)[:3]
+        )
+        # velocity with respect to the gripper
+        dt = 0.0005
+        object_velp = self.get_body_xvelp('green_block')
+        object2end_velp = object_velp - end_vel
+        obs[15:18] = object2end_velp
+
+        obs[18:21] = self.get_body_xvelr('green_block')
+        obs[21] = self.mj_data.joint('0_r_finger_joint').qpos[0]
 
         return {
             'observation': obs.copy(),
-            'achieved_goal': obs[:3].copy(),  # the current state of the block
-            'desired_goal': obs[3:6].copy()
+            'achieved_goal': object_pos.copy(),  # the current state of the block
+            'desired_goal': self.goal_pos.copy()
         }
 
     def _get_info(self) -> dict:
@@ -134,6 +148,8 @@ class PickAndPlaceEnv(PosCtrlEnv):
     def reset(self, seed=None):
         super().reset()
         self._timestep = 0
+        # set new goal
+        self.goal_pos = self.get_body_pos('goal_site')
 
         obs = self._get_obs()
         info = self._get_info()
