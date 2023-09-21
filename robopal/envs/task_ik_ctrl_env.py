@@ -1,5 +1,5 @@
 import numpy as np
-from robopal.envs.jnt_imp_ctrl_env import JntCtrlEnv
+from robopal.envs.jnt_ctrl_env import JntCtrlEnv
 import robopal.commons.transform as T
 
 
