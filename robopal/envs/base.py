@@ -1,6 +1,8 @@
 import abc
 
 import mujoco
+import numpy as np
+
 from robopal.commons.renderers import MjRenderer
 
 
@@ -109,13 +111,37 @@ class MujocoEnv:
 
     def get_body_id(self, name: str):
         """ Get body id from body name.
+
         :param name: body name
         :return: body id
         """
         return mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_BODY, name)
 
+    def get_body_jacp(self, name):
+        """ Query the position jacobian of a mujoco body using a name string.
+
+        :param name: The name of a mujoco body
+        :return: The jacp value of the mujoco body
+        """
+        bid = self.get_body_id(name)
+        jacp = np.zeros((3, self.mj_model.nv))
+        mujoco.mj_jacBody(self.mj_model, self.mj_data, jacp, None, bid)
+        return jacp
+
+    def get_body_jacr(self, name):
+        """ Query the rotation jacobian of a mujoco body using a name string.
+
+        :param name: The name of a mujoco body
+        :return: The jacr value of the mujoco body
+        """
+        bid = self.get_body_id(name)
+        jacr = np.zeros((3, self.mj_model.nv))
+        mujoco.mj_jacBody(self.mj_model, self.mj_data, None, jacr, bid)
+        return jacr
+
     def get_body_pos(self, name: str):
         """ Get body position from body name.
+
         :param name: body name
         :return: body position
         """
@@ -123,6 +149,7 @@ class MujocoEnv:
 
     def get_body_quat(self, name: str):
         """ Get body quaternion from body name.
+
         :param name: body name
         :return: body quaternion
         """
@@ -130,21 +157,28 @@ class MujocoEnv:
 
     def get_body_rotm(self, name: str):
         """ Get body rotation matrix from body name.
+
         :param name: body name
         :return: body rotation matrix
         """
         return self.mj_data.body(name).xmat.copy().reshape(3, 3)
 
-    def get_body_vel(self, name: str):
+    def get_body_xvelp(self, name: str) -> np.ndarray:
         """ Get body velocity from body name.
-        :param name: body name
-        :return: body velocity
-        """
-        return self.mj_data.body_xvelp[self.get_body_id(name)]
 
-    def get_body_avel(self, name: str):
-        """ Get body angular velocity from body name.
         :param name: body name
-        :return: body angular velocity
+        :return: translational velocity of the body
         """
-        return self.mj_data.body_xvelr[self.get_body_id(name)]
+        jacp = self.get_body_jacp(name)
+        xvelp = np.dot(jacp, self.mj_data.qvel)
+        return xvelp.copy()
+
+    def get_body_xvelr(self, name: str) -> np.ndarray:
+        """ Get body rotational velocity from body name.
+
+        :param name: body name
+        :return: rotational velocity of the body
+        """
+        jacr = self.get_body_jacr(name)
+        xvelr = np.dot(jacr, self.mj_data.qvel)
+        return xvelr.copy()
