@@ -22,7 +22,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
                  control_freq=200,
                  enable_camera_viewer=False,
                  cam_mode='rgb',
-                 jnt_controller='IMPEDANCE',
+                 jnt_controller='JNTIMP',
                  is_interpolate=False,
                  is_pd=False,
                  ):
@@ -170,7 +170,7 @@ if __name__ == "__main__":
         control_freq=10,
         is_interpolate=False,
         is_pd=False,
-        jnt_controller='IMPEDANCE',
+        jnt_controller='JNTIMP',
     )
     env.reset()
 

@@ -24,7 +24,7 @@ class JntCtrlEnv(MujocoEnv):
                  control_freq=200,
                  enable_camera_viewer=False,
                  cam_mode='rgb',
-                 jnt_controller='IMPEDANCE',
+                 jnt_controller='JNTIMP',
                  is_interpolate=False,
                  ):
 
@@ -37,26 +37,38 @@ class JntCtrlEnv(MujocoEnv):
             cam_mode=cam_mode,
             enable_dynamics=jnt_controller is not None
         )
-
+        # choose controller
         self.jnt_controller = None
-        self.kdl_solver = None
-        if jnt_controller == 'IMPEDANCE':
-            from robopal.controllers import Jnt_Impedance
-            self.jnt_controller = Jnt_Impedance(self.robot)
+        if jnt_controller is not None:
+            if jnt_controller == 'JNTIMP':
+                from robopal.controllers import Jnt_Impedance
+                self.jnt_controller = Jnt_Impedance(self.robot)
+            elif jnt_controller == 'JNTVEL':
+                from robopal.controllers import JntVelController
+                self.jnt_controller = JntVelController(self.robot)
             self.kdl_solver = self.jnt_controller.kdl_solver
-        if jnt_controller is None:
+        else:
             from robopal.commons.pin_utils import PinSolver
             self.kdl_solver = PinSolver(robot.urdf_path)
 
+        # choose interpolator
         self.interpolator = None
         if is_interpolate:
             self._init_interpolator(self.robot.single_arm)
 
     def inner_step(self, action):
         if self.interpolator is None:
-            q_target, qdot_target = action, np.zeros(self.robot_dof)
+            if self.jnt_controller is None or self.jnt_controller.name == 'JNTIMP':
+                q_target, qdot_target = action, np.zeros(self.robot_dof)
+            elif self.jnt_controller.name == 'JNTVEL':
+                q_target, qdot_target = np.zeros(self.robot_dof), action
+            else:
+                q_target, qdot_target = np.zeros(self.robot_dof), np.zeros(self.robot_dof)
         else:
-            q_target, qdot_target = self.interpolator.update_state()
+            if self.jnt_controller is None or self.jnt_controller.name == 'JNTIMP':
+                q_target, qdot_target = self.interpolator.update_state()
+            else:
+                raise ValueError("The controller is not supported now.")
 
         if self.jnt_controller is None:
             for i in range(self.robot.jnt_num):
@@ -116,11 +128,12 @@ if __name__ == "__main__":
         renderer='viewer',
         is_render=True,
         control_freq=20,
-        is_interpolate=True,
+        is_interpolate=False,
+        jnt_controller='JNTIMP'
     )
     env.reset()
     for t in range(int(1e6)):
-        action = np.array([0.33116, -0.39768533, 0.96947228, 0.33116, -0.39768533, 0.66947228, 0])
+        action = np.array([0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         env.step(action)
         if env.is_render:
             env.render()

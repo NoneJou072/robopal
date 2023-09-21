@@ -1,25 +1,30 @@
 import numpy as np
 from robopal.commons.pin_utils import PinSolver
+from collections import deque
 
 
-class Jnt_Impedance(object):
+class JntVelController:
     def __init__(self, robot):
-        self.name = 'JNTIMP'
+        self.name = 'JNTVEL'
         self.kdl_solver = PinSolver(robot.urdf_path)
 
-        # hyper-parameters of impedance controller
-        self.Bj = np.zeros(7)
-        self.kj = np.zeros(7)
+        # hyperparameters of impedance controller
+        self.k_p = np.zeros(7)
+        self.k_d = np.zeros(7)
 
         self.set_jnt_params(
-            b=47.0 * np.ones(7),
-            k=200.0 * np.ones(7),
+            p=3.0 * np.ones(7),
+            d=0.003 * np.ones(7),
         )
+
+        self.last_err = np.zeros(robot.single_arm.jnt_num)
+        self.err_buffer = deque(maxlen=5)
+
         print("Jnt_Impedance Initialized!")
 
-    def set_jnt_params(self, b: np.ndarray, k: np.ndarray):
-        self.Bj = b
-        self.kj = k
+    def set_jnt_params(self, p: np.ndarray, d: np.ndarray):
+        self.k_p = p
+        self.k_d = d
 
     def compute_jnt_torque(
             self,
@@ -30,7 +35,7 @@ class Jnt_Impedance(object):
     ):
         """ robot的关节空间控制的计算公式
             Compute desired torque with robot dynamics modeling:
-            > M(q)qdd + C(q, qd)qd + G(q) + tau_F(qd) = tau_ctrl + tau_env
+            > k_p * (vd - v) = tau
 
         :param q_des: desired joint position
         :param v_des: desired joint velocity
@@ -38,11 +43,14 @@ class Jnt_Impedance(object):
         :param v_cur: current joint velocity
         :return: desired joint torque
         """
-        M = self.kdl_solver.get_inertia_mat(q_cur)
         C = self.kdl_solver.get_coriolis_mat(q_cur, v_cur)
         g = self.kdl_solver.get_gravity_mat(q_cur)
         coriolis_gravity = C[-1] + g
 
-        acc_desire = self.kj * (q_des - q_cur) + self.Bj * (v_des - v_cur)
-        tau = np.dot(M, acc_desire) + coriolis_gravity
+        err = v_des - v_cur
+        derr = err - self.last_err
+        self.last_err = err
+        self.err_buffer.append(derr)
+        tau = self.k_p * err - self.k_d * np.asarray(self.err_buffer).flatten().mean() + coriolis_gravity
+
         return tau

@@ -5,7 +5,7 @@ from robopal.assets.robots.base import *
 import numpy as np
 
 
-class DianaMedBase(BaseArm):
+class DianaMedBase(BaseArm, ABC):
     """ DianaMed robot base class. """
     def __init__(self,
                  scene='default',
