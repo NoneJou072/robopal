@@ -106,7 +106,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         """
         assert achieved_goal.shape == desired_goal.shape
         dist = np.linalg.norm(achieved_goal - desired_goal, axis=-1)
-        return -(dist > 0.05).astype(np.floating)
+        return -(dist > 0.05).astype(np.float64)
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
