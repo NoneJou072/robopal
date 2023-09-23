@@ -186,11 +186,13 @@ class XMLSplicer:
         material_element.set('texuniform', texuniform)
         parent_element.append(material_element)
 
-    def add_mesh(self, name: str, file: str):
+    def add_mesh(self, name: str, file: str, **kwargs):
         parent_element = self.root.find("asset")
         mesh_element = ET.Element('mesh')
         mesh_element.set('name', name)
         mesh_element.set('file', file)
+        for key in kwargs:
+            mesh_element.set(key, kwargs[key])
         parent_element.append(mesh_element)
 
     def add_geom(self, node: str, **kwargs):

@@ -98,3 +98,53 @@ class DianaGrasp(DianaMedBase, ABC):
     def init_qpos(self):
         """ Robot's init joint position. """
         return np.array([0.00985161, -0.71512797,  0.00479528,  1.59160709, -0.00473849, -0.83985286, -0.00324085])
+
+
+class DianaPull(DianaMedBase, ABC):
+    """ DianaMed robot class. """
+    def __init__(self):
+        super().__init__(scene='grasping',
+                         gripper='rethink_gripper',
+                         mount='top_point')
+
+    def add_assets(self):
+        self.mjcf_generator.add_mesh('cupboard', 'objects\\cupboard\\cupboard.stl', scale='0.001 0.001 0.001')
+        self.mjcf_generator.add_mesh('drawer_up', 'objects\\cupboard\\drawer_up.stl', scale='0.001 0.001 0.001')
+        self.mjcf_generator.add_mesh('drawer_down', 'objects\\cupboard\\drawer_down.stl', scale='0.001 0.001 0.001')
+        cupboard_x_pos = 0.66
+        cupboard_y_pos = 0.0
+        block = f"""<body pos="{cupboard_x_pos} {cupboard_y_pos} {0.42}" quat="1 0 0 -1" name="cupboard">
+            <geom name="cupboard" rgba="0 1 1 1" type="mesh" mesh="cupboard" group="1" contype="0" conaffinity="0" condim="1" mass="1.0"/>contype="0" conaffinity="0"
+            <body name="drawer_up">
+                <joint name="drawer_up:joint" type="slide" damping="0.1" axis='0 -1 0' limited="true" range="0.0 0.12"/>
+                <geom name="drawer_up" rgba="0 1 1 1" type="mesh" mesh="drawer_up" group="1" contype="0" conaffinity="0" condim="4" mass="1.0"/>
+            </body>
+            <body name="drawer_down">
+                <joint name="drawer_down:joint" type="slide" damping="0.1" axis='0 -1 0' limited="true" range="0.0 0.12"/>
+                <geom name="drawer_down" rgba="0 1 1 1" type="mesh" mesh="drawer_down" group="1" contype="0" conaffinity="0" condim="4" mass="1.0"/>
+            </body>
+            <site name="cupboard" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+        </body>"""
+        self.mjcf_generator.add_node_from_str('worldbody', block)
+
+        random_goal_x_pos = np.random.uniform(0.4, 0.6)
+        random_goal_y_pos = np.random.uniform(-0.2, 0.2)
+        random_goal_z_pos = np.random.uniform(0.45, 0.66)
+
+        cupboard_pos = np.array([cupboard_x_pos, cupboard_y_pos, 0.46])
+        goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
+        while np.linalg.norm(cupboard_pos - goal_pos) <= 0.1:
+            random_goal_x_pos = np.random.uniform(0.4, 0.6)
+            random_goal_y_pos = np.random.uniform(-0.2, 0.2)
+            random_goal_z_pos = np.random.uniform(0.45, 0.66)
+            goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
+
+        goal_site = f"""<body pos="{random_goal_x_pos} {random_goal_y_pos} {random_goal_z_pos}" name="goal_site">
+                    <site name="goal_site" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+                </body>"""
+        self.mjcf_generator.add_node_from_str('worldbody', goal_site)
+
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return np.array([0.00985161, -0.71512797,  0.00479528,  1.59160709, -0.00473849, -0.83985286, -0.00324085])

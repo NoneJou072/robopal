@@ -1,5 +1,5 @@
 <mujoco model="empty_floor">
-    <compiler angle="radian"/>
+    <compiler inertiafromgeom='auto' angle="radian" convexhull="true"/>
   <option timestep="0.0005" gravity="0 0 -9.81">
       <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable"/>
   </option>
@@ -35,7 +35,6 @@
     <body name="table" pos="1.0 0.3 0.0" euler = "0 0 0">
         <geom pos="-0.6 -0.3 0.411" euler = "0 0 1.57" type="box" rgba="0.792157 0.819608 0.933333 1" size="0.3 0.6 0.01" />
         <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.792157 0.819608 0.933333 1" mesh="complete_table" friction="0.95 0.9 0.9"/>
-        <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="complete_table"/>
     </body>
 
   </worldbody>
