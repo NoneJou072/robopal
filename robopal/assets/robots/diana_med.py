@@ -113,18 +113,52 @@ class DianaPull(DianaMedBase, ABC):
         self.mjcf_generator.add_mesh('drawer_down', 'objects\\cupboard\\drawer_down.stl', scale='0.001 0.001 0.001')
         cupboard_x_pos = 0.66
         cupboard_y_pos = 0.0
-        block = f"""<body pos="{cupboard_x_pos} {cupboard_y_pos} {0.42}" quat="1 0 0 -1" name="cupboard">
-            <geom name="cupboard" rgba="0 1 1 1" type="mesh" mesh="cupboard" group="1" contype="0" conaffinity="0" condim="1" mass="1.0"/>contype="0" conaffinity="0"
+        cupboard = f"""<body pos="{cupboard_x_pos} {cupboard_y_pos} {0.42}" quat="1 0 0 -1" name="cupboard">
+            <geom name="cupboard" rgba="0 1 1 1" type="mesh" mesh="cupboard" group="1" contype="0" conaffinity="0" mass="1.0"/>
+            
+            <geom type="box" pos="0 0.09 0.19" size="0.12 0.09 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
+            <geom type="box" pos="0 0.09 0.10" size="0.12 0.09 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
+            <geom type="box" pos="0 0.09 0.01" size="0.12 0.09 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
+            <geom type="box" pos="0.115 0.09 0.10" size="0.01 0.09 0.1" conaffinity="1" condim="3" contype="0" group="4"/>
+            <geom type="box" pos="-0.115 0.09 0.10" size="0.01 0.09 0.1" conaffinity="1" condim="3" contype="0" group="4"/>
+            <geom type="box" pos="0 0.17 0.10" size="0.12 0.01 0.1" conaffinity="1" condim="3" contype="0" group="4"/>
+
             <body name="drawer_up">
-                <joint name="drawer_up:joint" type="slide" damping="0.1" axis='0 -1 0' limited="true" range="0.0 0.12"/>
-                <geom name="drawer_up" rgba="0 1 1 1" type="mesh" mesh="drawer_up" group="1" contype="0" conaffinity="0" condim="4" mass="1.0"/>
+                <joint name="drawer_up:joint" type="slide" armature="0.001" damping="4" frictionloss="2" axis='0 -1 0' limited="true" range="0.0 0.12"/>
+                <geom name="drawer_up" rgba="0 1 1 1" type="mesh" mesh="drawer_up" group="1" contype="0" conaffinity="0" mass="1.0"/>
+                
+                <geom type="box" pos="0 0.07 0.12" size="0.1 0.08 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="box" pos="0 0.0 0.14" size="0.1 0.01 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="box" pos="0.09 0.07 0.14" size="0.01 0.08 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="box" pos="-0.09 0.07 0.14" size="0.01 0.08 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="cylinder" pos="0 -0.035 0.135" quat="1 0 1 0" size="0.006 0.04" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="cylinder" pos="0.035 -0.02 0.135" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="cylinder" pos="-0.035 -0.02 0.135" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
             </body>
             <body name="drawer_down">
-                <joint name="drawer_down:joint" type="slide" damping="0.1" axis='0 -1 0' limited="true" range="0.0 0.12"/>
-                <geom name="drawer_down" rgba="0 1 1 1" type="mesh" mesh="drawer_down" group="1" contype="0" conaffinity="0" condim="4" mass="1.0"/>
+                <joint name="drawer_down:joint" type="slide" armature="0.001" damping="4" frictionloss="2" axis='0 -1 0' limited="true" range="0.0 0.12"/>
+                <geom name="drawer_down" rgba="0 1 1 1" type="mesh" mesh="drawer_down" group="1" contype="0" conaffinity="0" mass="1.0"/>
+                
+                <geom type="box" pos="0 0.07 0.035" size="0.1 0.08 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="box" pos="0 0.0 0.055" size="0.1 0.01 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="box" pos="0.09 0.07 0.055" size="0.01 0.08 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="box" pos="-0.09 0.07 0.05" size="0.01 0.08 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="cylinder" pos="0 -0.035 0.05" quat="1 0 1 0" size="0.006 0.04" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="cylinder" pos="0.035 -0.02 0.05" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="cylinder" pos="-0.035 -0.02 0.05" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
             </body>
             <site name="cupboard" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
         </body>"""
+        self.mjcf_generator.add_node_from_str('worldbody', cupboard)
+
+        random_x_pos = np.random.uniform(0.4, 0.6)
+        random_y_pos = np.random.uniform(-0.2, 0.2)
+        block = f"""<body pos="{random_x_pos} {random_y_pos} {0.46}" name="green_block">
+                    <joint name="object2:joint" type="free" damping="0.001" />
+                    <geom name="green_block" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="0" contype="0" group="1" mass="0.01"/>
+                    <geom name="green_block_collision" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="1" condim="4" contype="1" group="4" mass="0.01"/>
+                    <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+                </body>"""
         self.mjcf_generator.add_node_from_str('worldbody', block)
 
         random_goal_x_pos = np.random.uniform(0.4, 0.6)
