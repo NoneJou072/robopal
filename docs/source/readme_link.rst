@@ -1,0 +1,1 @@
+.. mdinclude:: ../../README-CN.md
