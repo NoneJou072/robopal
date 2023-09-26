@@ -184,7 +184,11 @@ def quat_2_euler(quaternion):
     """
     w, x, y, z = quaternion
     roll = np.arctan2(2 * (w * x + y * z), 1 - 2 * (x ** 2 + y ** 2))
-    pitch = np.arcsin(2 * (w * y - z * x))
+
+    input_value = 2 * (w * y - z * x)
+    input_value = np.clip(input_value, -1, 1)  # 将输入值限制在 [-1, 1] 范围内
+    pitch = np.arcsin(input_value)
+
     yaw = np.arctan2(2 * (w * z + x * y), 1 - 2 * (y ** 2 + z ** 2))
     euler = np.array([roll, pitch, yaw])
     return euler

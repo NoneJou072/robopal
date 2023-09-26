@@ -71,7 +71,7 @@ class DianaGrasp(DianaMedBase, ABC):
         random_x_pos = np.random.uniform(0.4, 0.6)
         random_y_pos = np.random.uniform(-0.2, 0.2)
         block = f"""<body pos="{random_x_pos} {random_y_pos} {0.46}" name="green_block">
-            <joint name="object2:joint" type="free" damping="0.001"/>
+            <joint name="object2:joint" type="free" damping="0.1"/>
             <geom name="green_block" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" solimp="0.998 0.998 0.001" group="1" condim="4" mass="0.01"/>
             <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
         </body>"""
@@ -154,8 +154,8 @@ class DianaPull(DianaMedBase, ABC):
         random_x_pos = np.random.uniform(0.4, 0.6)
         random_y_pos = np.random.uniform(-0.2, 0.2)
         block = f"""<body pos="{random_x_pos} {random_y_pos} {0.46}" name="green_block">
-                    <joint name="object2:joint" type="free" damping="0.001" />
-                    <geom name="green_block" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="0" contype="0" group="1" mass="0.01"/>
+                    <joint name="object2:joint" type="free" damping="0.001" frictionloss="0.001"/>
+                    <geom name="green_block" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="0" contype="0" group="1" mass="0.1"/>
                     <geom name="green_block_collision" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="1" condim="4" contype="1" group="4" mass="0.01"/>
                     <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
                 </body>"""
@@ -181,4 +181,4 @@ class DianaPull(DianaMedBase, ABC):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return np.array([0.00985161, -0.71512797,  0.00479528,  1.59160709, -0.00473849, -0.83985286, -0.00324085])
+        return np.array([-6.04886299e-01, -3.95403466e-01, -6.30041490e-01, 2.16857024e+00, 3.65813627e-01, -6.86444384e-01, -2.76880621e-01])
