@@ -1,7 +1,7 @@
 <!-- Author: Haoran Zhou-->
 <!-- date: 04.01.2023 -->
 > [English](README.md) | 中文文档
----
+
 <p>
   <a href="https://codeup.teambition.com/62219d81e4c44077bd46bffe/RoboIMI/tree/master" alt="GitHub">
     <img src="https://img.shields.io/github/actions/workflow/status/deepmind/mujoco/build.yml?branch=main">
@@ -14,6 +14,7 @@
   </a>
 </p>
 
+## 简介
 **robopal** 是一个基于 [MuJoCo](http://mujoco.org/) 动力学引擎与 [pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 机器人动力学库搭建的多平台开源机器人仿真框架，主要用于机械臂的深度强化学习训练与控制算法验证。框架内提供了多种控制方案与底层环境，
 并具有：
 * 更高的控制精度，方便 sim2real
@@ -63,3 +64,15 @@
 - [ ] 双协作臂多智能体强化学习环境 
 - [ ] 大语言模型接口
 - [ ] 丰富资源库
+
+## Citation
+```bibtex
+@misc{robopal2023,
+    author = {Haoran Zhou},
+    title = {robopal: A Modular Robotic Simulation Framework for Reinforcement Learning},
+    year = {2023},
+    publisher = {GitHub},
+    journal = {GitHub repository},
+    howpublished = {\url{https://github.com/NoneJou072/robopal}},
+}
+```
