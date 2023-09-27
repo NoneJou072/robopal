@@ -100,7 +100,7 @@ class DianaGrasp(DianaMedBase, ABC):
         return np.array([0.00985161, -0.71512797,  0.00479528,  1.59160709, -0.00473849, -0.83985286, -0.00324085])
 
 
-class DianaPull(DianaMedBase, ABC):
+class DianaDrawer(DianaMedBase, ABC):
     """ DianaMed robot class. """
     def __init__(self):
         super().__init__(scene='grasping',
@@ -108,59 +108,52 @@ class DianaPull(DianaMedBase, ABC):
                          mount='top_point')
 
     def add_assets(self):
-        self.mjcf_generator.add_mesh('cupboard', 'objects\\cupboard\\cupboard.stl', scale='0.001 0.001 0.001')
-        self.mjcf_generator.add_mesh('drawer_up', 'objects\\cupboard\\drawer_up.stl', scale='0.001 0.001 0.001')
-        self.mjcf_generator.add_mesh('drawer_down', 'objects\\cupboard\\drawer_down.stl', scale='0.001 0.001 0.001')
+        # add cupboard with fixed position
+        self.mjcf_generator.add_mesh('cupboard', 'objects/cupboard/cupboard.stl', scale='0.001 0.001 0.001')
+        self.mjcf_generator.add_mesh('drawer_up', 'objects/cupboard/drawer_up.stl', scale='0.001 0.001 0.001')
+        self.mjcf_generator.add_mesh('drawer_down', 'objects/cupboard/drawer_down.stl', scale='0.001 0.001 0.001')
         cupboard_x_pos = 0.66
         cupboard_y_pos = 0.0
-        cupboard = f"""<body pos="{cupboard_x_pos} {cupboard_y_pos} {0.42}" quat="1 0 0 -1" name="cupboard">
-            <geom name="cupboard" rgba="0 1 1 1" type="mesh" mesh="cupboard" group="1" contype="0" conaffinity="0" mass="1.0"/>
-            
-            <geom type="box" pos="0 0.09 0.19" size="0.12 0.09 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
-            <geom type="box" pos="0 0.09 0.10" size="0.12 0.09 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
-            <geom type="box" pos="0 0.09 0.01" size="0.12 0.09 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
-            <geom type="box" pos="0.115 0.09 0.10" size="0.01 0.09 0.1" conaffinity="1" condim="3" contype="0" group="4"/>
-            <geom type="box" pos="-0.115 0.09 0.10" size="0.01 0.09 0.1" conaffinity="1" condim="3" contype="0" group="4"/>
-            <geom type="box" pos="0 0.17 0.10" size="0.12 0.01 0.1" conaffinity="1" condim="3" contype="0" group="4"/>
+        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cupboard/cupboard.xml')
+        self.mjcf_generator.set_node_attrib('cupboard', {'pos': f'{cupboard_x_pos} {cupboard_y_pos} {0.42}'})
 
-            <body name="drawer_up">
-                <joint name="drawer_up:joint" type="slide" armature="0.001" damping="4" frictionloss="2" axis='0 -1 0' limited="true" range="0.0 0.12"/>
-                <geom name="drawer_up" rgba="0 1 1 1" type="mesh" mesh="drawer_up" group="1" contype="0" conaffinity="0" mass="1.0"/>
-                
-                <geom type="box" pos="0 0.07 0.12" size="0.1 0.08 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="box" pos="0 0.0 0.14" size="0.1 0.01 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="box" pos="0.09 0.07 0.14" size="0.01 0.08 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="box" pos="-0.09 0.07 0.14" size="0.01 0.08 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="cylinder" pos="0 -0.035 0.135" quat="1 0 1 0" size="0.006 0.04" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="cylinder" pos="0.035 -0.02 0.135" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="cylinder" pos="-0.035 -0.02 0.135" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
-            </body>
-            <body name="drawer_down">
-                <joint name="drawer_down:joint" type="slide" armature="0.001" damping="4" frictionloss="2" axis='0 -1 0' limited="true" range="0.0 0.12"/>
-                <geom name="drawer_down" rgba="0 1 1 1" type="mesh" mesh="drawer_down" group="1" contype="0" conaffinity="0" mass="1.0"/>
-                
-                <geom type="box" pos="0 0.07 0.035" size="0.1 0.08 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="box" pos="0 0.0 0.055" size="0.1 0.01 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="box" pos="0.09 0.07 0.055" size="0.01 0.08 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="box" pos="-0.09 0.07 0.05" size="0.01 0.08 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="cylinder" pos="0 -0.035 0.05" quat="1 0 1 0" size="0.006 0.04" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="cylinder" pos="0.035 -0.02 0.05" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="cylinder" pos="-0.035 -0.02 0.05" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
-            </body>
-            <site name="cupboard" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
-        </body>"""
-        self.mjcf_generator.add_node_from_str('worldbody', cupboard)
+        # add goal site with random position
+        random_goal_x_pos = np.random.uniform(0.4, 0.6)
+        random_goal_z_pos = np.random.uniform(0.45, 0.66)
+        goal_site = f"""<body pos="{0.5} {0.0} {0.5}" name="goal_site">
+                    <site name="goal_site" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+                </body>"""
+        self.mjcf_generator.add_node_from_str('worldbody', goal_site)
 
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return np.array([-6.04886299e-01, -3.95403466e-01, -6.30041490e-01, 2.16857024e+00, 3.65813627e-01, -6.86444384e-01, -2.76880621e-01])
+
+
+class DianaDrawerCube(DianaMedBase, ABC):
+    """ DianaMed robot class. """
+    def __init__(self):
+        super().__init__(scene='grasping',
+                         gripper='rethink_gripper',
+                         mount='top_point')
+
+    def add_assets(self):
+        self.mjcf_generator.add_mesh('cupboard', 'objects/cupboard/cupboard.stl', scale='0.001 0.001 0.001')
+        self.mjcf_generator.add_mesh('drawer_up', 'objects/cupboard/drawer_up.stl', scale='0.001 0.001 0.001')
+        self.mjcf_generator.add_mesh('drawer_down', 'objects/cupboard/drawer_down.stl', scale='0.001 0.001 0.001')
+        cupboard_x_pos = 0.66
+        cupboard_y_pos = 0.0
+        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cupboard/cupboard.xml')
+        self.mjcf_generator.set_node_attrib('cupboard', {'pos': f'{cupboard_x_pos} {cupboard_y_pos} {0.42}'})
+
+        # add cube with random position
         random_x_pos = np.random.uniform(0.4, 0.6)
         random_y_pos = np.random.uniform(-0.2, 0.2)
-        block = f"""<body pos="{random_x_pos} {random_y_pos} {0.46}" name="green_block">
-                    <joint name="object2:joint" type="free" damping="0.001" frictionloss="0.001"/>
-                    <geom name="green_block" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="0" contype="0" group="1" mass="0.1"/>
-                    <geom name="green_block_collision" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="1" condim="4" contype="1" group="4" mass="0.01"/>
-                    <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
-                </body>"""
-        self.mjcf_generator.add_node_from_str('worldbody', block)
+        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cube/cube.xml')
+        self.mjcf_generator.set_node_attrib('green_block', {'pos': f'{random_x_pos} {random_y_pos} {0.46}'})
 
+        # add goal site with random position
         random_goal_x_pos = np.random.uniform(0.4, 0.6)
         random_goal_y_pos = np.random.uniform(-0.2, 0.2)
         random_goal_z_pos = np.random.uniform(0.45, 0.66)

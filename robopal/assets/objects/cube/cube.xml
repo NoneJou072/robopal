@@ -1,0 +1,10 @@
+<mujoco>
+    <worldbody>
+        <body name="green_block" pos="{random_x_pos} {random_y_pos} {0.46}">
+            <joint name="object2:joint" type="free" damping="0.001" frictionloss="0.001"/>
+            <geom name="green_block" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="0" contype="0" group="1" mass="0.1"/>
+            <geom name="green_block_collision" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="1" condim="4" contype="1" group="4" mass="0.01"/>
+            <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+        </body>
+    </worldbody>
+</mujoco>

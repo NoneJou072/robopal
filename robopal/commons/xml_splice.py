@@ -156,13 +156,29 @@ class XMLSplicer:
         for actuator in node.findall('.//actuator/*[@name]'):
             actuator.set('name', '{}_{}'.format(id, actuator.attrib['name']))
 
-    def add_node_from_xml(self, xml: str):
-        parent_element = self.root.find('worldbody').find('body')
-
-        new_tree = ET.parse('/assets/models/manipulators/Bimanual/Bimanual.xml')
+    def add_node_from_xml(self, attached_node: str = 'worldbody', xml_path: str = None):
+        """ Add node from xml file. The attached node is the parent node of the new node.
+        :param attached_node: the parent node of the new node
+        :param xml_path: the path of the xml file
+        """
+        if xml_path is None:
+            raise ValueError("Please checkout your xml path.")
+        if attached_node == 'worldbody':
+            parent_element = self.root.find('worldbody')
+        else:
+            parent_element = self.root.find(f'.//body[@name=\'{attached_node}\']')
+        new_tree = ET.parse(xml_path)
         new_node = new_tree.getroot().find('worldbody').find('body')
-
         parent_element.append(new_node)
+
+    def set_node_attrib(self, node: str, attrib: dict):
+        """ Set node attribute.
+        :param node: node name
+        :param attrib: attribute dict
+        """
+        node_element = self.root.find(f'.//body[@name=\'{node}\']')
+        for key in attrib:
+            node_element.set(key, attrib[key])
 
     def add_node_from_str(self, father_node: str, xml_text: str):
         parent_element = self.root.find(father_node)
@@ -267,33 +283,3 @@ class XMLSplicer:
                 for goal_body in enumerate(kwargs['g2m_body']):
                     gripper_path = path.join(GRIPPERS_DIR_PATH, gripper, '{}.xml'.format(gripper))
                     self.add_component_from_xml(gripper_path, goal_body=goal_body)
-
-
-if __name__ == "__main__":
-    BiDianaMed = XMLSplicer(
-        name='Bidiana',
-        scene='default',
-        chassis='Omnidirect',
-        manipulator='Bimanual',
-        gripper='robotiq_gripper',
-        g2m_body=['0_right_link7', '0_left_link7']
-    )
-    DianaMed = XMLSplicer(
-        name='diana_omni',
-        scene='default',
-        chassis='Omnidirect',
-        manipulator='DianaMed',
-        gripper='robotiq_gripper',
-        g2m_body=['0_link7']
-    )
-
-    DianaGrasping = XMLSplicer(
-        name='diana_omni_grasping',
-        scene='grasping',
-        chassis='Omnidirect',
-        manipulator='DianaMed',
-        gripper='robotiq_gripper',
-        g2m_body=['0_link7']
-    )
-    print(BiDianaMed.xml)
-    print(DianaMed.xml)

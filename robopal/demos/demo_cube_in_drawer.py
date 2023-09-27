@@ -161,10 +161,10 @@ class PickAndPlaceEnv(PosCtrlEnv):
 
 
 if __name__ == "__main__":
-    from robopal.assets.robots.diana_med import DianaDrawer
+    from robopal.assets.robots.diana_med import DianaDrawerCube
 
     env = PickAndPlaceEnv(
-        robot=DianaDrawer(),
+        robot=DianaDrawerCube(),
         renderer="viewer",
         is_render=True,
         control_freq=10,
