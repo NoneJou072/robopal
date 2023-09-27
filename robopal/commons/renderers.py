@@ -6,7 +6,10 @@ import sys
 import numpy as np
 from queue import Queue
 # TODO: separate a script
-import cv2
+try:
+    import cv2
+except:
+    print('Could not import cv2, please install it to enable camera viewer.')
 
 
 class MjRenderer:
