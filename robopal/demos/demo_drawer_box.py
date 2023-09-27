@@ -46,7 +46,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         self.max_action = 1.0
         self.min_action = -1.0
 
-        self.max_episode_steps = 5000
+        self.max_episode_steps = 50
         self._timestep = 0
 
         self.goal_pos = None
