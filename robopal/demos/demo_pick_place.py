@@ -68,7 +68,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
 
         pos_max_bound = np.array([0.6, 0.2, 0.4])
-        pos_min_bound = np.array([0.3, -0.2, 0.14])
+        pos_min_bound = np.array([0.3, -0.2, 0.12])
         actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
 
         # Map to target action space bounds

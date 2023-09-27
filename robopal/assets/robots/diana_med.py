@@ -97,7 +97,7 @@ class DianaGrasp(DianaMedBase, ABC):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return np.array([0.00985161, -0.71512797,  0.00479528,  1.59160709, -0.00473849, -0.83985286, -0.00324085])
+        return np.array([0.02167871, -0.16747492, 0.00730963, 2.5573341, -0.00401727, -0.42203728, -0.01099269])
 
 
 class DianaDrawer(DianaMedBase, ABC):
