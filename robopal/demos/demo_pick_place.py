@@ -82,13 +82,9 @@ class PickAndPlaceEnv(PosCtrlEnv):
         logging.debug(f'cur_pos:{self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0]}')
 
         obs = self._get_obs()
-        achieved_goal = obs['achieved_goal']
-        desired_goal = obs['desired_goal']
-        reward = self.compute_rewards(achieved_goal, desired_goal)
+        reward = self.compute_rewards(obs['achieved_goal'], obs['desired_goal'])
         terminated = False
-        truncated = False
-        if self._timestep >= self.max_episode_steps:
-            truncated = True
+        truncated = True if self._timestep >= self.max_episode_steps else False
         info = self._get_info()
 
         if self.render_mode == 'human':
@@ -106,7 +102,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         """
         assert achieved_goal.shape == desired_goal.shape
         dist = np.linalg.norm(achieved_goal - desired_goal, axis=-1)
-        return -(dist > 0.05).astype(np.float64)
+        return -(dist > 0.05).astype(np.float32)
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
