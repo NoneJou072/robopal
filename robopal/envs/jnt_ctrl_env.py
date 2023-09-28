@@ -56,6 +56,11 @@ class JntCtrlEnv(MujocoEnv):
         if is_interpolate:
             self._init_interpolator(self.robot.single_arm)
 
+        self.nsubsteps = int(self.control_timestep / self.model_timestep)
+        if self.nsubsteps == 0:
+            raise ValueError("Control frequency is too low. Checkout you are not in renderer mode."
+                             "Current Model-Timestep:{}".format(self.model_timestep))
+
     def inner_step(self, action):
         if self.interpolator is None:
             if self.jnt_controller is None or self.jnt_controller.name == 'JNTIMP':
@@ -96,10 +101,7 @@ class JntCtrlEnv(MujocoEnv):
         if self.interpolator is not None:
             self.interpolator.update_target_position(action)
 
-        for i in range(int(self.control_timestep / self.model_timestep)):
-            if int(self.control_timestep / self.model_timestep) == 0:
-                raise ValueError("Control frequency is too low. Checkout you are not in renderer mode."
-                                 "Current Model-Timestep:{}".format(self.model_timestep))
+        for i in range(self.nsubsteps):
             super().step(action)
 
     def _init_interpolator(self, Arm):

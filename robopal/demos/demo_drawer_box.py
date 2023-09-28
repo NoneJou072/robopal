@@ -37,7 +37,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
             is_interpolate=is_interpolate,
             is_pd=is_pd,
         )
-        self.name = 'PickAndPlace-v1'
+        self.name = 'DrawerBox-v1'
 
         self.obs_dim = (22,)
         self.goal_dim = (3,)
@@ -128,7 +128,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
             end_vel := self.kdl_solver.get_end_vel(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)[:3]
         )
         # velocity with respect to the gripper
-        dt = 0.0005
+        dt = 0.0005 * self.control_freq
         object_velp = self.get_body_xvelp('cupboard')
         object2end_velp = object_velp - end_vel
         obs[15:18] = object2end_velp

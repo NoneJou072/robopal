@@ -182,3 +182,40 @@ class MujocoEnv:
         jacr = self.get_body_jacr(name)
         xvelr = np.dot(jacr, self.mj_data.qvel)
         return xvelr.copy()
+
+    def get_site_id(self, name: str):
+        """ Get site id from site name.
+
+        :param name: site name
+        :return: site id
+        """
+        return mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_SITE, name)
+
+    def get_site_jacp(self, name):
+        """ Query the position jacobian of a mujoco site using a name string.
+
+        :param name: The name of a mujoco site
+        :return: The jacp value of the mujoco site
+        """
+        sid = self.get_site_id(name)
+        jacp = np.zeros((3, self.mj_model.nv))
+        mujoco.mj_jacSite(self.mj_model, self.mj_data, jacp, None, sid)
+        return jacp
+
+    def get_site_pos(self, name: str):
+        """ Get body position from site name.
+
+        :param name: site name
+        :return: site position
+        """
+        return self.mj_data.site(name).xpos.copy()
+
+    def get_site_xvelp(self, name: str) -> np.ndarray:
+        """ Get site velocity from site name.
+
+        :param name: site name
+        :return: translational velocity of the site
+        """
+        jacp = self.get_site_jacp(name)
+        xvelp = np.dot(jacp, self.mj_data.qvel)
+        return xvelp.copy()

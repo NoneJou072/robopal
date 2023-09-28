@@ -79,7 +79,7 @@ class DianaGrasp(DianaMedBase, ABC):
 
         random_goal_x_pos = np.random.uniform(0.4, 0.6)
         random_goal_y_pos = np.random.uniform(-0.2, 0.2)
-        random_goal_z_pos = np.random.uniform(0.45, 0.66)
+        random_goal_z_pos = np.random.uniform(0.46, 0.66)
 
         block_pos = np.array([random_x_pos, random_y_pos, 0.46])
         goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
