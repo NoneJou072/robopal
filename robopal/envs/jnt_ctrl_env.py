@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 from robopal.envs.base import MujocoEnv
 
@@ -40,19 +42,21 @@ class JntCtrlEnv(MujocoEnv):
         self.is_interpolate = is_interpolate
         # choose controller
         self.jnt_controller = None
-        if jnt_controller is not None:
-            if jnt_controller == 'JNTIMP':
-                from robopal.controllers import JntImpedance
-                self.jnt_controller = JntImpedance(
-                    self.robot,
-                    is_interpolate=is_interpolate,
-                    interpolator_config={'dof': 7, 'control_timestep': self.control_timestep}
-                )
-            elif jnt_controller == 'JNTVEL':
-                from robopal.controllers import JntVelController
-                self.jnt_controller = JntVelController(self.robot)
+
+        if jnt_controller == 'JNTIMP':
+            from robopal.controllers import JntImpedance
+            self.jnt_controller = JntImpedance(
+                self.robot,
+                is_interpolate=is_interpolate,
+                interpolator_config={'dof': self.robot_dof, 'control_timestep': self.control_timestep}
+            )
+            self.kdl_solver = self.jnt_controller.kdl_solver
+        elif jnt_controller == 'JNTVEL':
+            from robopal.controllers import JntVelController
+            self.jnt_controller = JntVelController(self.robot)
             self.kdl_solver = self.jnt_controller.kdl_solver
         else:
+            logging.warning("No joint controller is chosen, or the controller is not supported.")
             from robopal.commons.pin_utils import PinSolver
             self.kdl_solver = PinSolver(robot.urdf_path)
 
@@ -92,7 +96,7 @@ class JntCtrlEnv(MujocoEnv):
         self.mj_data.actuator(actuator_name).ctrl = -40 if gripper_action == 0 else 40
 
     def step(self, action):
-        if self.is_interpolate and self.jnt_controller.name == 'JNTIMP':
+        if self.is_interpolate:
             self.jnt_controller.step_interpolator(action)
         # step into inner loop
         for i in range(self.nsubsteps):
@@ -100,7 +104,7 @@ class JntCtrlEnv(MujocoEnv):
 
     def reset(self):
         super().reset()
-        if self.is_interpolate and self.jnt_controller.name == 'JNTIMP':
+        if self.is_interpolate:
             self.jnt_controller.reset_interpolator(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)
 
 
@@ -112,7 +116,7 @@ if __name__ == "__main__":
         renderer='viewer',
         is_render=True,
         control_freq=20,
-        is_interpolate=True,
+        is_interpolate=False,
         jnt_controller='JNTIMP'
     )
     env.reset()
