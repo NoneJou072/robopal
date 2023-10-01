@@ -2,12 +2,17 @@ import numpy as np
 from robopal.commons.pin_utils import PinSolver
 
 
-class Jnt_Impedance(object):
-    def __init__(self, robot):
+class JntImpedance(object):
+    def __init__(
+            self,
+            robot,
+            is_interpolate=False,
+            interpolator_config: dict = None
+    ):
         self.name = 'JNTIMP'
         self.kdl_solver = PinSolver(robot.urdf_path)
 
-        # hyper-parameters of impedance controller
+        # hyperparameters of impedance controller
         self.Bj = np.zeros(7)
         self.kj = np.zeros(7)
 
@@ -15,9 +20,18 @@ class Jnt_Impedance(object):
             b=47.0 * np.ones(7),
             k=200.0 * np.ones(7),
         )
+
+        # choose interpolator
+        self.interpolator = None
+        if is_interpolate:
+            interpolator_config.setdefault('init_qpos', robot.single_arm.arm_qpos)
+            interpolator_config.setdefault('init_qvel', robot.single_arm.arm_qvel)
+            self._init_interpolator(interpolator_config)
+
         print("Jnt_Impedance Initialized!")
 
     def set_jnt_params(self, b: np.ndarray, k: np.ndarray):
+        """ Used for changing the parameters. """
         self.Bj = b
         self.kj = k
 
@@ -38,6 +52,9 @@ class Jnt_Impedance(object):
         :param v_cur: current joint velocity
         :return: desired joint torque
         """
+        if self.interpolator is not None:
+            q_des, v_des = self.interpolator.update_state()
+
         M = self.kdl_solver.get_inertia_mat(q_cur)
         C = self.kdl_solver.get_coriolis_mat(q_cur, v_cur)
         g = self.kdl_solver.get_gravity_mat(q_cur)
@@ -46,3 +63,20 @@ class Jnt_Impedance(object):
         acc_desire = self.kj * (q_des - q_cur) + self.Bj * (v_des - v_cur)
         tau = np.dot(M, acc_desire) + coriolis_gravity
         return tau
+
+    def _init_interpolator(self, cfg: dict):
+        from robopal.controllers.interpolators import OTG
+        self.interpolator = OTG(
+            OTG_dim=cfg['dof'],
+            control_cycle=cfg['control_timestep'],
+            max_velocity=0.2,
+            max_acceleration=0.4,
+            max_jerk=0.6
+        )
+        self.interpolator.set_params(cfg['init_qpos'], cfg['init_qvel'])
+
+    def step_interpolator(self, action):
+        self.interpolator.update_target_position(action)
+
+    def reset_interpolator(self, arm_qpos, arm_qvel):
+        self.interpolator.set_params(arm_qpos, arm_qvel)

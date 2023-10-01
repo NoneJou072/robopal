@@ -8,11 +8,10 @@ class GymWrapper(gym.Env):
         super(GymWrapper, self).__init__()
         self.env = env
 
-        self.observation_space = spaces.Dict(
-            dict(
-                observation = spaces.Box(low=-np.inf, high=np.inf, shape=self.env.obs_dim, dtype="float64"),
-            )
+        self.observation_space = spaces.Box(
+            low=-np.inf, high=np.inf, shape=self.env.obs_dim, dtype="float64"
         )
+
         self.action_space = spaces.Box(
             low = env.min_action, high = env.max_action, shape = self.env.action_dim, dtype="float64"
         )

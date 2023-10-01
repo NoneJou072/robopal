@@ -2,7 +2,7 @@ import numpy as np
 from robopal.commons.pin_utils import PinSolver
 
 
-class Cart_Impedance:
+class CartImpedance:
     """ Cartesian Impedance Controller in the end-effector frame """
     def __init__(self, robot):
         self.kdl_solver = PinSolver(robot.urdf_path)

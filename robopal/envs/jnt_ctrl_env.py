@@ -37,12 +37,17 @@ class JntCtrlEnv(MujocoEnv):
             cam_mode=cam_mode,
             enable_dynamics=jnt_controller is not None
         )
+        self.is_interpolate = is_interpolate
         # choose controller
         self.jnt_controller = None
         if jnt_controller is not None:
             if jnt_controller == 'JNTIMP':
-                from robopal.controllers import Jnt_Impedance
-                self.jnt_controller = Jnt_Impedance(self.robot)
+                from robopal.controllers import JntImpedance
+                self.jnt_controller = JntImpedance(
+                    self.robot,
+                    is_interpolate=is_interpolate,
+                    interpolator_config={'dof': 7, 'control_timestep': self.control_timestep}
+                )
             elif jnt_controller == 'JNTVEL':
                 from robopal.controllers import JntVelController
                 self.jnt_controller = JntVelController(self.robot)
@@ -51,29 +56,18 @@ class JntCtrlEnv(MujocoEnv):
             from robopal.commons.pin_utils import PinSolver
             self.kdl_solver = PinSolver(robot.urdf_path)
 
-        # choose interpolator
-        self.interpolator = None
-        if is_interpolate:
-            self._init_interpolator(self.robot.single_arm)
-
         self.nsubsteps = int(self.control_timestep / self.model_timestep)
         if self.nsubsteps == 0:
             raise ValueError("Control frequency is too low. Checkout you are not in renderer mode."
                              "Current Model-Timestep:{}".format(self.model_timestep))
 
     def inner_step(self, action):
-        if self.interpolator is None:
-            if self.jnt_controller is None or self.jnt_controller.name == 'JNTIMP':
-                q_target, qdot_target = action, np.zeros(self.robot_dof)
-            elif self.jnt_controller.name == 'JNTVEL':
-                q_target, qdot_target = np.zeros(self.robot_dof), action
-            else:
-                q_target, qdot_target = np.zeros(self.robot_dof), np.zeros(self.robot_dof)
+        if self.jnt_controller is None or self.jnt_controller.name == 'JNTIMP':
+            q_target, qdot_target = action, np.zeros(self.robot_dof)
+        elif self.jnt_controller.name == 'JNTVEL':
+            q_target, qdot_target = np.zeros(self.robot_dof), action
         else:
-            if self.jnt_controller is None or self.jnt_controller.name == 'JNTIMP':
-                q_target, qdot_target = self.interpolator.update_state()
-            else:
-                raise ValueError("The controller is not supported now.")
+            q_target, qdot_target = np.zeros(self.robot_dof), np.zeros(self.robot_dof)
 
         if self.jnt_controller is None:
             for i in range(self.robot.jnt_num):
@@ -98,28 +92,16 @@ class JntCtrlEnv(MujocoEnv):
         self.mj_data.actuator(actuator_name).ctrl = -40 if gripper_action == 0 else 40
 
     def step(self, action):
-        if self.interpolator is not None:
-            self.interpolator.update_target_position(action)
-
+        if self.is_interpolate and self.jnt_controller.name == 'JNTIMP':
+            self.jnt_controller.step_interpolator(action)
+        # step into inner loop
         for i in range(self.nsubsteps):
             super().step(action)
 
-    def _init_interpolator(self, Arm):
-        from robopal.commons.interpolators import OTG
-        self.interpolator = OTG(
-            OTG_dim=self.robot_dof,
-            control_cycle=self.control_timestep,
-            max_velocity=0.2,
-            max_acceleration=0.4,
-            max_jerk=0.6
-        )
-        self.interpolator.set_params(Arm.arm_qpos, Arm.arm_qvel)
-
     def reset(self):
         super().reset()
-        if self.interpolator is not None:
-            self.interpolator.set_params(self.robot.single_arm.arm_qpos,
-                                         np.zeros(self.robot_dof))
+        if self.is_interpolate and self.jnt_controller.name == 'JNTIMP':
+            self.jnt_controller.reset_interpolator(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)
 
 
 if __name__ == "__main__":
@@ -130,7 +112,7 @@ if __name__ == "__main__":
         renderer='viewer',
         is_render=True,
         control_freq=20,
-        is_interpolate=False,
+        is_interpolate=True,
         jnt_controller='JNTIMP'
     )
     env.reset()

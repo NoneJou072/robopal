@@ -1,6 +1,6 @@
 import numpy as np
 from robopal.envs import MujocoEnv
-from robopal.controllers import Cart_Impedance
+from robopal.controllers import CartImpedance
 
 
 class PosCtrlEnv(MujocoEnv):
@@ -24,7 +24,7 @@ class PosCtrlEnv(MujocoEnv):
             cam_mode=cam_mode
         )
 
-        self.Cart_imped = Cart_Impedance(self.robot)
+        self.Cart_imped = CartImpedance(self.robot)
 
         # self.interpolator = None
         # if is_interpolate:

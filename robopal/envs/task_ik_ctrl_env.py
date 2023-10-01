@@ -65,7 +65,7 @@ class PosCtrlEnv(JntCtrlEnv):
 
     def step(self, action):
         action = self.step_controller(action)
-        return super().step(action)
+        super().step(action)
 
 
 if __name__ == "__main__":
