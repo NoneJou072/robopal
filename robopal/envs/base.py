@@ -34,8 +34,8 @@ class MujocoEnv:
         self.control_freq = control_freq
         self.enable_dynamics = enable_dynamics
 
-        self.mj_model = self.robot.robot_model
-        self.mj_data = self.robot.robot_data
+        self.mj_model: mujoco.MjModel = self.robot.robot_model
+        self.mj_data: mujoco.MjData = self.robot.robot_data
 
         self.cur_time = 0
         self.timestep = 0
@@ -43,7 +43,8 @@ class MujocoEnv:
         self.control_timestep = 0
         self.robot_dof = self.robot.jnt_num
 
-        self.renderer = MjRenderer(self.mj_model, self.mj_data, self.is_render, renderer, enable_camera_viewer, cam_mode)
+        self.renderer = MjRenderer(self.mj_model, self.mj_data, self.is_render, renderer, enable_camera_viewer,
+                                   cam_mode)
 
         self._initialize_time()
         self._set_init_pose()
@@ -95,7 +96,7 @@ class MujocoEnv:
         """
         self.cur_time = 0
         self.timestep = 0
-        self.model_timestep = 0.0005
+        self.model_timestep = self.mj_model.opt.timestep
         if self.model_timestep <= 0:
             raise ValueError("Invalid simulation timestep defined!")
         if self.control_freq <= 0:
