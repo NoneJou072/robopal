@@ -10,6 +10,7 @@ class VisualServo(JntCtrlEnv):
                  is_render=False,
                  renderer="viewer",
                  control_freq=200,
+                 jnt_controller='JNTIMP',
                  is_interpolate=False,
                  enable_camera_viewer=True,
                  cam_mode='rgb'
@@ -19,6 +20,7 @@ class VisualServo(JntCtrlEnv):
             is_render=is_render,
             renderer=renderer,
             control_freq=control_freq,
+            jnt_controller=jnt_controller,
             is_interpolate=is_interpolate,
             enable_camera_viewer=enable_camera_viewer,
             cam_mode=cam_mode
@@ -112,6 +114,7 @@ if __name__ == "__main__":
         robot=DianaAruco(),
         is_render=True,
         control_freq=200,
+        jnt_controller='JNTIMP',
         is_interpolate=False,
         renderer='viewer',
         enable_camera_viewer=True,

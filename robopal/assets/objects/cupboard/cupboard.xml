@@ -1,7 +1,7 @@
 <mujoco>
     <worldbody>
         <body pos="{cupboard_x_pos} {cupboard_y_pos} {0.42}" quat="1 0 0 -1" name="cupboard">
-            <geom name="cupboard" rgba="0 1 1 1" type="mesh" mesh="cupboard" group="1" contype="0" conaffinity="0" mass="1.0"/>
+            <geom name="cupboard" rgba="1 1 1 0.8" type="mesh" mesh="cupboard" group="1" contype="0" conaffinity="0" mass="1.0"/>
 
             <geom type="box" pos="0 0.09 0.19" size="0.12 0.09 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
             <geom type="box" pos="0 0.09 0.10" size="0.12 0.09 0.01" conaffinity="1" condim="3" contype="0" group="4"/>

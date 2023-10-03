@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 from robopal.envs.base import MujocoEnv
-
+from robopal.controllers import controllers
 
 class JntCtrlEnv(MujocoEnv):
     """ Single arm environment.
@@ -42,19 +42,16 @@ class JntCtrlEnv(MujocoEnv):
         self.is_interpolate = is_interpolate
         # choose controller
         if jnt_controller == 'JNTIMP':
-            from robopal.controllers import JntImpedance
-            self.jnt_controller = JntImpedance(
+            self.jnt_controller = controllers[jnt_controller](
                 self.robot,
                 is_interpolate=is_interpolate,
                 interpolator_config={'dof': self.robot_dof, 'control_timestep': self.control_timestep}
             )
         elif jnt_controller == 'JNTVEL':
-            from robopal.controllers import JntVelController
-            self.jnt_controller = JntVelController(self.robot)
+            self.jnt_controller = controllers[jnt_controller](self.robot)
         else:
             logging.warning("No joint controller specified, or the controller is not supported. Use the default one.")
-            from robopal.controllers import JntNone
-            self.jnt_controller = JntNone(
+            self.jnt_controller = controllers[jnt_controller](
                 self.robot,
                 is_interpolate=is_interpolate,
                 interpolator_config={'dof': self.robot_dof, 'control_timestep': self.control_timestep}
