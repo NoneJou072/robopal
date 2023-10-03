@@ -1,6 +1,5 @@
 <mujoco model="DianaMed">
     <compiler angle="radian"/>
-    <size memory="100M"/>
     <visual>
             <headlight ambient="0.5 0.5 0.5"/>
     </visual>

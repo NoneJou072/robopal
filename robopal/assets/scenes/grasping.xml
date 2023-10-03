@@ -1,6 +1,7 @@
 <mujoco model="empty_floor">
-    <compiler inertiafromgeom='auto' angle="radian" convexhull="true"/>
-  <option timestep="0.0005" gravity="0 0 -9.81">
+  <compiler angle="radian"/>
+    <size memory="1000M"/>
+  <option timestep="0.001" gravity="0 0 -9.81" integrator="implicitfast">
       <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable"/>
   </option>
 
@@ -32,7 +33,7 @@
     <!-- side view -->
     <camera mode="fixed" name="sideview" pos="-0.05651774593317116 1.2761224129427358 1.4879572214102434" quat="0.009905065491771751 0.006877963156909582 0.5912228352893879 0.806418094001364" />
 
-    <body name="table" pos="1.0 0.3 0.0" euler = "0 0 0">
+    <body name="table" pos="1.0 0.3 0.0" euler="0 0 0">
         <geom pos="-0.6 -0.3 0.411" contype="0" conaffinity="0" group="1" euler = "0 0 1.57" type="box" rgba="0.792157 0.819608 0.933333 1" size="0.3 0.6 0.01" />
         <geom pos="-0.6 -0.3 0.411" conaffinity="1" condim="3" contype="0" group="4" euler = "0 0 1.57" type="box" rgba="0.792157 0.819608 0.933333 1" size="0.3 0.6 0.01" />
         <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.792157 0.819608 0.933333 1" mesh="complete_table" friction="0.95 0.9 0.9"/>

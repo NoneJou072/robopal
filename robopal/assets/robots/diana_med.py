@@ -68,17 +68,17 @@ class DianaGrasp(DianaMedBase, ABC):
                          mount='top_point')
 
     def add_assets(self):
-        random_x_pos = np.random.uniform(0.4, 0.6)
-        random_y_pos = np.random.uniform(-0.2, 0.2)
+        random_x_pos = np.random.uniform(0.35, 0.55)
+        random_y_pos = np.random.uniform(-0.15, 0.15)
         block = f"""<body pos="{random_x_pos} {random_y_pos} {0.46}" name="green_block">
-            <joint name="object2:joint" type="free" damping="0.1"/>
+            <joint name="object2:joint" type="free" damping="0.01"/>
             <geom name="green_block" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" solimp="0.998 0.998 0.001" group="1" condim="4" mass="0.01"/>
             <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
         </body>"""
         self.mjcf_generator.add_node_from_str('worldbody', block)
 
-        random_goal_x_pos = np.random.uniform(0.4, 0.6)
-        random_goal_y_pos = np.random.uniform(-0.2, 0.2)
+        random_goal_x_pos = np.random.uniform(0.35, 0.55)
+        random_goal_y_pos = np.random.uniform(-0.15, 0.15)
         random_goal_z_pos = np.random.uniform(0.46, 0.66)
 
         block_pos = np.array([random_x_pos, random_y_pos, 0.46])

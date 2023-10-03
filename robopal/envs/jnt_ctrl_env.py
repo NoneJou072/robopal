@@ -41,8 +41,6 @@ class JntCtrlEnv(MujocoEnv):
         )
         self.is_interpolate = is_interpolate
         # choose controller
-        self.jnt_controller = None
-
         if jnt_controller == 'JNTIMP':
             from robopal.controllers import JntImpedance
             self.jnt_controller = JntImpedance(
@@ -50,15 +48,19 @@ class JntCtrlEnv(MujocoEnv):
                 is_interpolate=is_interpolate,
                 interpolator_config={'dof': self.robot_dof, 'control_timestep': self.control_timestep}
             )
-            self.kdl_solver = self.jnt_controller.kdl_solver
         elif jnt_controller == 'JNTVEL':
             from robopal.controllers import JntVelController
             self.jnt_controller = JntVelController(self.robot)
-            self.kdl_solver = self.jnt_controller.kdl_solver
         else:
-            logging.warning("No joint controller is chosen, or the controller is not supported.")
-            from robopal.commons.pin_utils import PinSolver
-            self.kdl_solver = PinSolver(robot.urdf_path)
+            logging.warning("No joint controller specified, or the controller is not supported. Use the default one.")
+            from robopal.controllers import JntNone
+            self.jnt_controller = JntNone(
+                self.robot,
+                is_interpolate=is_interpolate,
+                interpolator_config={'dof': self.robot_dof, 'control_timestep': self.control_timestep}
+            )
+
+        self.kdl_solver = self.jnt_controller.kdl_solver
 
         self.nsubsteps = int(self.control_timestep / self.model_timestep)
         if self.nsubsteps == 0:
@@ -66,14 +68,15 @@ class JntCtrlEnv(MujocoEnv):
                              "Current Model-Timestep:{}".format(self.model_timestep))
 
     def inner_step(self, action):
-        if self.jnt_controller is None or self.jnt_controller.name == 'JNTIMP':
+        if self.jnt_controller.name == 'JNTIMP' or self.jnt_controller.name == 'JNTNONE':
             q_target, qdot_target = action, np.zeros(self.robot_dof)
         elif self.jnt_controller.name == 'JNTVEL':
             q_target, qdot_target = np.zeros(self.robot_dof), action
         else:
             q_target, qdot_target = np.zeros(self.robot_dof), np.zeros(self.robot_dof)
 
-        if self.jnt_controller is None:
+        if self.jnt_controller.name == 'JNTNONE':
+            q_target = self.jnt_controller.compute_jnt_pos(q_des=q_target)
             for i in range(self.robot.jnt_num):
                 self.mj_data.joint(self.robot.single_arm.joint_index[i]).qpos = q_target[i]
         else:
@@ -117,7 +120,7 @@ if __name__ == "__main__":
         is_render=True,
         control_freq=20,
         is_interpolate=False,
-        jnt_controller='JNTIMP'
+        jnt_controller='JNTIMP',
     )
     env.reset()
     for t in range(int(1e6)):

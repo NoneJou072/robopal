@@ -9,8 +9,8 @@ logging.basicConfig(level=logging.INFO)
 
 class PickAndPlaceEnv(PosCtrlEnv):
     """ Reference: https://robotics.farama.org/envs/fetch/pick_and_place/#
-    The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
-    in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
+    The control frequency of the robot is of f = 10 Hz. This is achieved by applying the same action
+    in 100 subsequent simulator step (with a time step of dt = 0.001 s) before returning the control to the robot.
     """
     metadata = {"render_modes": ["human", "rgb_array"]}
 
@@ -67,19 +67,19 @@ class PickAndPlaceEnv(PosCtrlEnv):
         pos_offset = 0.05 * action[:3]
         actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
 
-        pos_max_bound = np.array([0.6, 0.2, 0.4])
+        pos_max_bound = np.array([0.6, 0.2, 0.37])
         pos_min_bound = np.array([0.3, -0.2, 0.12])
         actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
 
         # Map to target action space bounds
-        gripper_ctrl = (action[3] + 1) * (0.0115 - (-0.01)) / 2 + (-0.01)
+        grip_max_bound = 0.02
+        grip_min_bound = -0.01
+        gripper_ctrl = (action[3] + 1) * (grip_max_bound - grip_min_bound) / 2 + grip_min_bound
         # take one step
         self.mj_data.joint('0_r_finger_joint').qpos[0] = gripper_ctrl
         self.mj_data.joint('0_l_finger_joint').qpos[0] = gripper_ctrl
 
-        logging.debug(f'des_pos:{actual_pos_action[:3]}')
         super().step(actual_pos_action[:3])
-        logging.debug(f'cur_pos:{self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0]}')
 
         obs = self._get_obs()
         reward = self.compute_rewards(obs['achieved_goal'], obs['desired_goal'])
@@ -91,9 +91,6 @@ class PickAndPlaceEnv(PosCtrlEnv):
             self.render()
 
         return obs, reward, terminated, truncated, info
-
-    def inner_step(self, action):
-        super().inner_step(action)
 
     def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, info: dict = None):
         """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
@@ -133,7 +130,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
             object2end_velp := object_velp - end_vel
         )
 
-        obs[18:21] = self.get_body_xvelr('green_block')
+        obs[18:21] = self.get_body_xvelr('green_block') * dt
         obs[21] = self.mj_data.joint('0_r_finger_joint').qpos[0]
         obs[22] = self.mj_data.joint('0_r_finger_joint').qvel[0] * dt
 
