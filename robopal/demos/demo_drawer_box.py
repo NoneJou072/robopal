@@ -7,7 +7,7 @@ import robopal.commons.transform as trans
 logging.basicConfig(level=logging.INFO)
 
 
-class PickAndPlaceEnv(PosCtrlEnv):
+class DrawerEnv(PosCtrlEnv):
     """ Reference: https://robotics.farama.org/envs/fetch/pick_and_place/#
     The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
     in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
@@ -39,7 +39,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         )
         self.name = 'DrawerBox-v1'
 
-        self.obs_dim = (23,)
+        self.obs_dim = (17,)
         self.goal_dim = (3,)
         self.action_dim = (4,)
 
@@ -67,7 +67,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         pos_offset = 0.05 * action[:3]
         actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
 
-        pos_max_bound = np.array([0.6, 0.2, 0.4])
+        pos_max_bound = np.array([0.65, 0.2, 0.4])
         pos_min_bound = np.array([0.3, -0.2, 0.14])
         actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
 
@@ -117,8 +117,8 @@ class PickAndPlaceEnv(PosCtrlEnv):
         obs = np.zeros(self.obs_dim)
         dt = self.nsubsteps * self.mj_model.opt.timestep
 
-        obs[:3] = (  # block position
-            object_pos := self.get_body_pos('green_block')
+        obs[:3] = (  # drawer position
+            object_pos := self.get_site_pos('drawer')
         )
         obs[3:6] = (  # gripper position
             end_pos := self.get_site_pos('0_grip_site')
@@ -126,20 +126,15 @@ class PickAndPlaceEnv(PosCtrlEnv):
         obs[6:9] = (  # distance between the block and the end
             object_rel_pos := end_pos - object_pos
         )
-        obs[9:12] = (  # block rotation
-            trans.mat_2_euler(self.get_body_rotm('green_block'))
-        )
-        obs[12:15] = (  # gripper linear velocity
+        obs[9:12] = (  # gripper linear velocity
             end_vel := self.get_site_xvelp('0_grip_site') * dt
         )
-        object_velp = self.get_body_xvelp('green_block') * dt
-        obs[15:18] = (  # velocity with respect to the gripper
+        object_velp = self.get_site_xvelp('drawer') * dt
+        obs[12:15] = (  # velocity with respect to the gripper
             object2end_velp := object_velp - end_vel
         )
-
-        obs[18:21] = self.get_body_xvelr('green_block') * dt
-        obs[21] = self.mj_data.joint('0_r_finger_joint').qpos[0]
-        obs[22] = self.mj_data.joint('0_r_finger_joint').qvel[0] * dt
+        obs[15] = self.mj_data.joint('0_r_finger_joint').qpos[0]
+        obs[16] = self.mj_data.joint('0_r_finger_joint').qvel[0] * dt
 
         return {
             'observation': obs.copy(),

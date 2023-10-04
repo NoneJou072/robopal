@@ -110,18 +110,14 @@ class DianaDrawer(DianaMedBase, ABC):
     def add_assets(self):
         # add cupboard with fixed position
         self.mjcf_generator.add_mesh('cupboard', 'objects/cupboard/cupboard.stl', scale='0.001 0.001 0.001')
-        self.mjcf_generator.add_mesh('drawer_up', 'objects/cupboard/drawer_up.stl', scale='0.001 0.001 0.001')
-        self.mjcf_generator.add_mesh('drawer_down', 'objects/cupboard/drawer_down.stl', scale='0.001 0.001 0.001')
-        cupboard_x_pos = 0.66
-        cupboard_y_pos = 0.0
+        self.mjcf_generator.add_mesh('drawer', 'objects/cupboard/drawer.stl', scale='0.001 0.001 0.001')
         self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cupboard/cupboard.xml')
-        self.mjcf_generator.set_node_attrib('cupboard', {'pos': f'{cupboard_x_pos} {cupboard_y_pos} {0.42}'})
+        self.mjcf_generator.set_node_attrib('cupboard', {'pos': f'{0.66} {0.0} {0.42}'})
 
         # add goal site with random position
-        random_goal_x_pos = np.random.uniform(0.4, 0.6)
-        random_goal_z_pos = np.random.uniform(0.45, 0.66)
-        goal_site = f"""<body pos="{0.5} {0.0} {0.5}" name="goal_site">
-                    <site name="goal_site" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
+        random_goal_x_pos = np.random.uniform(0.48, 0.58)
+        goal_site = f"""<body pos="{random_goal_x_pos} {0.0} {0.478}" name="goal_site">
+                    <site name="goal_site" pos="0 0 0" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />
                 </body>"""
         self.mjcf_generator.add_node_from_str('worldbody', goal_site)
 
