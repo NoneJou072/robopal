@@ -21,9 +21,10 @@
                 <geom type="cylinder" pos="0 -0.035 0.135" quat="1 0 1 0" size="0.006 0.04" conaffinity="1" condim="3" contype="0" group="4"/>
                 <geom type="cylinder" pos="0.035 -0.02 0.135" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
                 <geom type="cylinder" pos="-0.035 -0.02 0.135" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
-                <site name="drawer_up" pos="0 -0.035 0.135" size="0.01 0.01 0.01" rgba="0 1 0 1" type="sphere" />
+
+                <site name="drawer_up" pos="-0.06 -0.06 0.135" size="0.01 0.01 0.01" rgba="0 1 0 1" type="sphere" />
             </body>
-            <body name="drawer_down">
+            <body name="drawer_down" pos="0.0 0.0 -0.085">
                 <joint name="drawer_down:joint" type="slide" armature="0.001" damping="4" frictionloss="2" axis='0 -1 0' limited="true" range="0.0 0.12"/>
                 <geom name="drawer_down" rgba="0 1 1 1" type="mesh" mesh="drawer_down" group="1" contype="0" conaffinity="0" mass="1.0"/>
 
@@ -35,7 +36,7 @@
                 <geom type="cylinder" pos="0.035 -0.02 0.05" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
                 <geom type="cylinder" pos="-0.035 -0.02 0.05" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
 
-                <site name="drawer_down" pos="0 -0.035 0.05" size="0.01 0.01 0.01" rgba="0 0 1 1" type="sphere" />
+                <site name="drawer_down" pos="0.06 -0.06 0.135" size="0.01 0.01 0.01" rgba="0 0 1 1" type="sphere" />
             </body>
         </body>
     </worldbody>
