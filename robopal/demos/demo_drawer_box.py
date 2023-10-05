@@ -72,7 +72,9 @@ class DrawerEnv(PosCtrlEnv):
         actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
 
         # Map to target action space bounds
-        gripper_ctrl = (action[3] + 1) * (0.0115 - (-0.01)) / 2 + (-0.01)
+        grip_max_bound = 0.02
+        grip_min_bound = -0.02
+        gripper_ctrl = (action[3] + 1) * (grip_max_bound - grip_min_bound) / 2 + grip_min_bound
         # take one step
         self.mj_data.joint('0_r_finger_joint').qpos[0] = gripper_ctrl
         self.mj_data.joint('0_l_finger_joint').qpos[0] = gripper_ctrl
@@ -106,7 +108,7 @@ class DrawerEnv(PosCtrlEnv):
         """
         assert achieved_goal.shape == desired_goal.shape
         dist = np.linalg.norm(achieved_goal - desired_goal, axis=-1)
-        return -(dist > 0.05).astype(np.float64)
+        return -(dist > 0.02).astype(np.float64)
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -163,7 +165,7 @@ class DrawerEnv(PosCtrlEnv):
 if __name__ == "__main__":
     from robopal.assets.robots.diana_med import DianaDrawer
 
-    env = PickAndPlaceEnv(
+    env = DrawerEnv(
         robot=DianaDrawer(),
         renderer="viewer",
         is_render=True,

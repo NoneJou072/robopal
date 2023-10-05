@@ -115,7 +115,7 @@ class DianaDrawer(DianaMedBase, ABC):
         self.mjcf_generator.set_node_attrib('cupboard', {'pos': f'{0.66} {0.0} {0.42}'})
 
         # add goal site with random position
-        random_goal_x_pos = np.random.uniform(0.48, 0.58)
+        random_goal_x_pos = np.random.uniform(0.48, 0.56)
         goal_site = f"""<body pos="{random_goal_x_pos} {0.0} {0.478}" name="goal_site">
                     <site name="goal_site" pos="0 0 0" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />
                 </body>"""
@@ -124,7 +124,7 @@ class DianaDrawer(DianaMedBase, ABC):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return np.array([-6.04886299e-01, -3.95403466e-01, -6.30041490e-01, 2.16857024e+00, 3.65813627e-01, -6.86444384e-01, -2.76880621e-01])
+        return np.array([-0.51198529, -0.44737435, -0.50879166, 2.3063219, 0.46514545, -0.48916244, -0.37233289])
 
 
 class DianaDrawerCube(DianaMedBase, ABC):

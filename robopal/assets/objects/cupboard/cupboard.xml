@@ -14,13 +14,12 @@
                 <joint name="drawer:joint" type="slide" armature="0.001" damping="4" frictionloss="2" axis='0 -1 0' limited="true" range="0.0 0.12"/>
                 <geom name="drawer" rgba="0 1 1 1" type="mesh" mesh="drawer" group="1" contype="0" conaffinity="0" mass="1.0"/>
 
-                <geom type="box" pos="0 0.07 0.035" size="0.1 0.08 0.01" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="box" pos="0 0.0 0.055" size="0.1 0.01 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="box" pos="0.09 0.07 0.055" size="0.01 0.08 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="box" pos="-0.09 0.07 0.05" size="0.01 0.08 0.03" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="cylinder" pos="0 -0.035 0.05" quat="1 0 1 0" size="0.006 0.04" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="cylinder" pos="0.035 -0.02 0.05" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
-                <geom type="cylinder" pos="-0.035 -0.02 0.05" quat="1 1 0 0" size="0.006 0.016" conaffinity="1" condim="3" contype="0" group="4"/>
+                <geom type="box" pos="0 0.07 0.04" size="0.1 0.08 0.01" conaffinity="1" condim="4" contype="1" group="4"/>
+                <geom type="box" pos="0 0.0 0.06" size="0.1 0.01 0.03" conaffinity="1" condim="4" contype="1" group="4"/>
+                <geom type="box" pos="0.09 0.07 0.06" size="0.01 0.08 0.03" conaffinity="1" condim="4" contype="1" group="4"/>
+                <geom type="box" pos="-0.09 0.07 0.06" size="0.01 0.08 0.03" conaffinity="1" condim="4" contype="1" group="4"/>
+                <geom type="box" pos="0 -0.035 0.06" size="0.01 0.04 0.01" conaffinity="1" condim="4" contype="1" group="4"/>
+<!--                <geom type="cylinder" pos="0 -0.035 0.06" quat="1 1 0 0" size="0.008 0.04" conaffinity="1" condim="4" contype="1" group="4"/>-->
 
                 <site name="drawer" pos="0.0 -0.06 0.065" size="0.01 0.01 0.01" rgba="0 0 1 1" type="sphere" />
             </body>
