@@ -41,23 +41,15 @@ class JntCtrlEnv(MujocoEnv):
         )
         self.is_interpolate = is_interpolate
         # choose controller
-        if jnt_controller == 'JNTIMP':
-            self.jnt_controller = controllers[jnt_controller](
-                self.robot,
-                is_interpolate=is_interpolate,
-                interpolator_config={'dof': self.robot_dof, 'control_timestep': self.control_timestep}
-            )
-        elif jnt_controller == 'JNTVEL':
-            self.jnt_controller = controllers[jnt_controller](self.robot)
-        else:
-            logging.warning("No joint controller specified, or the controller is not supported. Use the default one.")
-            self.jnt_controller = controllers[jnt_controller](
-                self.robot,
-                is_interpolate=is_interpolate,
-                interpolator_config={'dof': self.robot_dof, 'control_timestep': self.control_timestep}
-            )
+        if jnt_controller not in controllers:
+            raise AttributeError("No joint controller specified, or the controller is not supported.")
+        self.jnt_controller = controllers[jnt_controller](
+            self.robot,
+            is_interpolate=is_interpolate,
+            interpolator_config={'dof': self.robot_dof, 'control_timestep': self.control_timestep}
+        )
 
-        self.kdl_solver = self.jnt_controller.kdl_solver
+        self.kdl_solver = self.jnt_controller.kdl_solver  # shallow copy
 
         self.nsubsteps = int(self.control_timestep / self.model_timestep)
         if self.nsubsteps == 0:
@@ -117,7 +109,7 @@ if __name__ == "__main__":
         is_render=True,
         control_freq=20,
         is_interpolate=False,
-        jnt_controller='JNTIMP',
+        jnt_controller='JNTNONE',
     )
     env.reset()
     for t in range(int(1e6)):

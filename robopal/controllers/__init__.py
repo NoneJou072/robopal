@@ -7,7 +7,7 @@ from .task_imp_controller import CartImpedance
 controllers = {
     'JNTIMP': JntImpedance,
     'JNTVEL': JntVelController,
-    'default': JntNone
+    'JNTNONE': JntNone
 }
 
 __all__ = [

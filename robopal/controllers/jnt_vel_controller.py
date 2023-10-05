@@ -4,7 +4,12 @@ from collections import deque
 
 
 class JntVelController:
-    def __init__(self, robot):
+    def __init__(
+            self,
+            robot,
+            is_interpolate=False,
+            interpolator_config: dict = None
+    ):
         self.name = 'JNTVEL'
         self.kdl_solver = PinSolver(robot.urdf_path)
 
