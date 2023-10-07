@@ -8,15 +8,23 @@ Welcome to robopal's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: Introduction
+   :caption: USER GUIDE
 
-   readme_link
+   introduction
+   installation
+   quickstart
 
 .. toctree::
-   :maxdepth: 2
-   :caption: API References
+   :maxdepth: 1
+   :caption: MODULES API
 
-   python_apis/modules
+   modules/controllers
+
+.. toctree::
+   :maxdepth: 1
+   :caption: SOURCE API
+
+   python_apis/robopal
 
 Indices and tables
 ==================

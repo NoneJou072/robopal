@@ -7,7 +7,9 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   robopal.controllers.interpolators
    robopal.controllers.jnt_imp_controller
+   robopal.controllers.jnt_none_controller
    robopal.controllers.jnt_vel_controller
    robopal.controllers.task_imp_controller
 

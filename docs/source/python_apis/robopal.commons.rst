@@ -8,7 +8,6 @@ Submodules
    :maxdepth: 4
 
    robopal.commons.gym_wrapper
-   robopal.commons.interpolators
    robopal.commons.pin_utils
    robopal.commons.renderers
    robopal.commons.transform
