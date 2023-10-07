@@ -70,11 +70,14 @@ class MujocoEnv:
 
     def reset(self):
         """ Reset the simulate environment, in order to execute next episode. """
-        self.robot.construct_mjcf_data()
-        self.mj_model = self.robot.robot_model
         mujoco.mj_resetData(self.mj_model, self.mj_data)
+        self.reset_object()
         self._set_init_pose()
-        mujoco.mj_step(self.mj_model, self.mj_data)
+        mujoco.mj_forward(self.mj_model, self.mj_data)
+
+    def reset_object(self):
+        """ Set pose of the object. """
+        pass
 
     def render(self, mode="human"):
         """ render mujoco """
@@ -105,6 +108,12 @@ class MujocoEnv:
             for j in range(len(self.robot.arm[i].joint_index)):
                 self.mj_data.joint(self.robot.arm[i].joint_index[j]).qpos = self.robot.arm[i].init_pose[j]
         mujoco.mj_forward(self.mj_model, self.mj_data)
+
+    def set_object_pose(self, obj_joint_name: str = None, obj_pose: np.ndarray = None):
+        """ Set pose of the object. """
+        if isinstance(obj_joint_name, str):
+            assert obj_pose.shape[0] == 7
+            self.mj_data.joint(obj_joint_name).qpos = obj_pose
 
     def get_body_id(self, name: str):
         """ Get body id from body name.

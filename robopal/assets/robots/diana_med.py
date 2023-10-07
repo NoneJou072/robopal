@@ -68,30 +68,10 @@ class DianaGrasp(DianaMedBase, ABC):
                          mount='top_point')
 
     def add_assets(self):
-        random_x_pos = np.random.uniform(0.35, 0.55)
-        random_y_pos = np.random.uniform(-0.15, 0.15)
-        block = f"""<body pos="{random_x_pos} {random_y_pos} {0.46}" name="green_block">
-            <joint name="object2:joint" type="free" damping="0.01"/>
-            <geom name="green_block" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" solimp="0.998 0.998 0.001" group="1" condim="4" mass="0.01"/>
-            <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
-        </body>"""
-        self.mjcf_generator.add_node_from_str('worldbody', block)
+        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cube/cube.xml')
+        self.mjcf_generator.set_node_attrib('green_block', {'pos': '0.5 0.0 0.46'})
 
-        random_goal_x_pos = np.random.uniform(0.35, 0.55)
-        random_goal_y_pos = np.random.uniform(-0.15, 0.15)
-        random_goal_z_pos = np.random.uniform(0.46, 0.66)
-
-        block_pos = np.array([random_x_pos, random_y_pos, 0.46])
-        goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
-        while np.linalg.norm(block_pos - goal_pos) <= 0.05:
-            random_goal_x_pos = np.random.uniform(0.4, 0.6)
-            random_goal_y_pos = np.random.uniform(-0.2, 0.2)
-            random_goal_z_pos = np.random.uniform(0.45, 0.66)
-            goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
-
-        goal_site = f"""<body pos="{random_goal_x_pos} {random_goal_y_pos} {random_goal_z_pos}" name="goal_site">
-                    <site name="goal_site" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
-                </body>"""
+        goal_site = """<site name="goal_site" pos="0.4 0.0 0.5" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />"""
         self.mjcf_generator.add_node_from_str('worldbody', goal_site)
 
     @property
@@ -112,13 +92,10 @@ class DianaDrawer(DianaMedBase, ABC):
         self.mjcf_generator.add_mesh('cupboard', 'objects/cupboard/cupboard.stl', scale='0.001 0.001 0.001')
         self.mjcf_generator.add_mesh('drawer', 'objects/cupboard/drawer.stl', scale='0.001 0.001 0.001')
         self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cupboard/cupboard.xml')
-        self.mjcf_generator.set_node_attrib('cupboard', {'pos': f'{0.66} {0.0} {0.42}'})
+        self.mjcf_generator.set_node_attrib('cupboard', {'pos': '0.66 0.0 0.42'})
 
         # add goal site with random position
-        random_goal_x_pos = np.random.uniform(0.48, 0.56)
-        goal_site = f"""<body pos="{random_goal_x_pos} {0.0} {0.478}" name="goal_site">
-                    <site name="goal_site" pos="0 0 0" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />
-                </body>"""
+        goal_site = """<site name="goal_site" pos="0.56 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
         self.mjcf_generator.add_node_from_str('worldbody', goal_site)
 
     @property
@@ -136,8 +113,7 @@ class DianaDrawerCube(DianaMedBase, ABC):
 
     def add_assets(self):
         self.mjcf_generator.add_mesh('cupboard', 'objects/cupboard/cupboard.stl', scale='0.001 0.001 0.001')
-        self.mjcf_generator.add_mesh('drawer_up', 'objects/cupboard/drawer_up.stl', scale='0.001 0.001 0.001')
-        self.mjcf_generator.add_mesh('drawer_down', 'objects/cupboard/drawer_down.stl', scale='0.001 0.001 0.001')
+        self.mjcf_generator.add_mesh('drawer', 'objects/cupboard/drawer.stl', scale='0.001 0.001 0.001')
         cupboard_x_pos = 0.66
         cupboard_y_pos = 0.0
         self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cupboard/cupboard.xml')

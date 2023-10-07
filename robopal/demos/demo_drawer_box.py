@@ -151,7 +151,7 @@ class DrawerEnv(PosCtrlEnv):
         super().reset()
         self._timestep = 0
         # set new goal
-        self.goal_pos = self.get_body_pos('goal_site')
+        self.goal_pos = self.get_site_pos('goal_site')
 
         obs = self._get_obs()
         info = self._get_info()
@@ -160,6 +160,12 @@ class DrawerEnv(PosCtrlEnv):
             self.render()
 
         return obs, info
+
+    def reset_object(self):
+        random_goal_x_pos = np.random.uniform(0.48, 0.56)
+        goal_pos = np.array([random_goal_x_pos, 0.0, 0.478])
+        site_id = self.get_site_id('goal_site')
+        self.mj_model.site_pos[site_id] = goal_pos
 
 
 if __name__ == "__main__":

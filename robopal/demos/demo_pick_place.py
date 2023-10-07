@@ -147,7 +147,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         super().reset()
         self._timestep = 0
         # set new goal
-        self.goal_pos = self.get_body_pos('goal_site')
+        self.goal_pos = self.get_site_pos('goal_site')
 
         obs = self._get_obs()
         info = self._get_info()
@@ -156,6 +156,25 @@ class PickAndPlaceEnv(PosCtrlEnv):
             self.render()
 
         return obs, info
+
+    def reset_object(self):
+        random_x_pos = np.random.uniform(0.35, 0.55)
+        random_y_pos = np.random.uniform(-0.15, 0.15)
+        self.set_object_pose('object2:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
+
+        random_goal_x_pos = np.random.uniform(0.35, 0.55)
+        random_goal_y_pos = np.random.uniform(-0.15, 0.15)
+        random_goal_z_pos = np.random.uniform(0.46, 0.66)
+
+        block_pos = np.array([random_x_pos, random_y_pos, 0.46])
+        goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
+        while np.linalg.norm(block_pos - goal_pos) <= 0.05:
+            random_goal_x_pos = np.random.uniform(0.4, 0.6)
+            random_goal_y_pos = np.random.uniform(-0.2, 0.2)
+            random_goal_z_pos = np.random.uniform(0.45, 0.66)
+            goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
+        site_id = self.get_site_id('goal_site')
+        self.mj_model.site_pos[site_id] = goal_pos
 
 
 if __name__ == "__main__":
