@@ -11,15 +11,17 @@ class JntVelController:
             interpolator_config: dict = None
     ):
         self.name = 'JNTVEL'
+        self.dofs = robot.jnt_num
+        self.robot = robot
         self.kdl_solver = PinSolver(robot.urdf_path)
 
         # hyperparameters of impedance controller
-        self.k_p = np.zeros(7)
-        self.k_d = np.zeros(7)
+        self.k_p = np.zeros(self.dofs)
+        self.k_d = np.zeros(self.dofs)
 
         self.set_jnt_params(
-            p=3.0 * np.ones(7),
-            d=0.003 * np.ones(7),
+            p=3.0 * np.ones(self.dofs),
+            d=0.003 * np.ones(self.dofs),
         )
 
         self.last_err = np.zeros(robot.single_arm.jnt_num)
@@ -59,3 +61,14 @@ class JntVelController:
         tau = self.k_p * err - self.k_d * np.asarray(self.err_buffer).flatten().mean() + coriolis_gravity
 
         return tau
+
+    def step_controller(self, action):
+        q_target, qdot_target = np.zeros(self.dofs), action
+
+        torque = self.compute_jnt_torque(
+            q_des=q_target,
+            v_des=qdot_target,
+            q_cur=self.robot.single_arm.arm_qpos,
+            v_cur=self.robot.single_arm.arm_qvel,
+        )
+        return torque

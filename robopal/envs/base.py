@@ -17,7 +17,6 @@ class MujocoEnv:
     Note that high frequency will cause high time-lag.
     :param enable_camera_viewer(bool): Use camera or not.
     :param cam_mode(str): Camera mode, "rgb" or "depth".
-    :param enable_dynamics(bool): Enable dynamics or not.
     """
 
     def __init__(self,
@@ -26,13 +25,11 @@ class MujocoEnv:
                  renderer="viewer",
                  control_freq=1000,
                  enable_camera_viewer=False,
-                 cam_mode='rgb',
-                 enable_dynamics=True):
+                 cam_mode='rgb'):
 
         self.robot = robot
         self.is_render = is_render
         self.control_freq = control_freq
-        self.enable_dynamics = enable_dynamics
 
         self.mj_model: mujoco.MjModel = self.robot.robot_model
         self.mj_data: mujoco.MjData = self.robot.robot_data
@@ -59,8 +56,7 @@ class MujocoEnv:
             self.cur_time += 1
             self.inner_step(action)
             mujoco.mj_forward(self.mj_model, self.mj_data)
-            if self.enable_dynamics:
-                mujoco.mj_step(self.mj_model, self.mj_data)
+            mujoco.mj_step(self.mj_model, self.mj_data)
 
     @abc.abstractmethod
     def inner_step(self, action):

@@ -10,15 +10,17 @@ class JntImpedance(object):
             interpolator_config: dict = None
     ):
         self.name = 'JNTIMP'
+        self.dofs = robot.jnt_num
+        self.robot = robot
         self.kdl_solver = PinSolver(robot.urdf_path)
 
         # hyperparameters of impedance controller
-        self.Bj = np.zeros(7)
-        self.kj = np.zeros(7)
+        self.Bj = np.zeros(self.dofs)
+        self.kj = np.zeros(self.dofs)
 
         self.set_jnt_params(
-            b=47.0 * np.ones(7),
-            k=200.0 * np.ones(7),
+            b=47.0 * np.ones(self.dofs),
+            k=200.0 * np.ones(self.dofs),
         )
 
         # choose interpolator
@@ -63,6 +65,17 @@ class JntImpedance(object):
         acc_desire = self.kj * (q_des - q_cur) + self.Bj * (v_des - v_cur)
         tau = np.dot(M, acc_desire) + coriolis_gravity
         return tau
+
+    def step_controller(self, action):
+        q_target, qdot_target = action, np.zeros(self.dofs)
+
+        torque = self.compute_jnt_torque(
+            q_des=q_target,
+            v_des=qdot_target,
+            q_cur=self.robot.single_arm.arm_qpos,
+            v_cur=self.robot.single_arm.arm_qvel,
+        )
+        return torque
 
     def _init_interpolator(self, cfg: dict):
         from robopal.controllers.interpolators import OTG

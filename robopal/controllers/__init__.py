@@ -11,8 +11,5 @@ controllers = {
 }
 
 __all__ = [
-    'JntNone',
-    'JntImpedance',
-    'CartImpedance',
-    'JntVelController',
+    'controllers',
 ]

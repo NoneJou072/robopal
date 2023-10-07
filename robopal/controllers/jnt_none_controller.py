@@ -10,6 +10,8 @@ class JntNone(object):
             interpolator_config: dict = None
     ):
         self.name = 'JNTNONE'
+        self.dofs = robot.jnt_num
+        self.robot = robot
         self.kdl_solver = PinSolver(robot.urdf_path)
 
         # choose interpolator
@@ -32,6 +34,15 @@ class JntNone(object):
         if self.interpolator is not None:
             q_des, _ = self.interpolator.update_state()
         return q_des
+
+    def step_controller(self, action):
+        q_target, _ = action, np.zeros(self.dofs)
+
+        qpos = self.compute_jnt_pos(
+            q_des=q_target,
+        )
+        return qpos
+
 
     def _init_interpolator(self, cfg: dict):
         from robopal.controllers.interpolators import OTG

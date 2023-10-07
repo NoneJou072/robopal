@@ -4,6 +4,7 @@ import numpy as np
 from robopal.envs.base import MujocoEnv
 from robopal.controllers import controllers
 
+
 class JntCtrlEnv(MujocoEnv):
     """ Single arm environment.
 
@@ -37,7 +38,6 @@ class JntCtrlEnv(MujocoEnv):
             control_freq=control_freq,
             enable_camera_viewer=enable_camera_viewer,
             cam_mode=cam_mode,
-            enable_dynamics=jnt_controller is not None
         )
         self.is_interpolate = is_interpolate
         # choose controller
@@ -57,24 +57,12 @@ class JntCtrlEnv(MujocoEnv):
                              "Current Model-Timestep:{}".format(self.model_timestep))
 
     def inner_step(self, action):
-        if self.jnt_controller.name == 'JNTIMP' or self.jnt_controller.name == 'JNTNONE':
-            q_target, qdot_target = action, np.zeros(self.robot_dof)
-        elif self.jnt_controller.name == 'JNTVEL':
-            q_target, qdot_target = np.zeros(self.robot_dof), action
-        else:
-            q_target, qdot_target = np.zeros(self.robot_dof), np.zeros(self.robot_dof)
-
         if self.jnt_controller.name == 'JNTNONE':
-            q_target = self.jnt_controller.compute_jnt_pos(q_des=q_target)
+            qpos = self.jnt_controller.step_controller(action)
             for i in range(self.robot.jnt_num):
-                self.mj_data.joint(self.robot.single_arm.joint_index[i]).qpos = q_target[i]
+                self.mj_data.joint(self.robot.single_arm.joint_index[i]).qpos = qpos[i]
         else:
-            torque = self.jnt_controller.compute_jnt_torque(
-                q_des=q_target,
-                v_des=qdot_target,
-                q_cur=self.robot.single_arm.arm_qpos,
-                v_cur=self.robot.single_arm.arm_qvel,
-            )
+            torque = self.jnt_controller.step_controller(action)
             # Send torque to simulation
             for i in range(self.robot.jnt_num):
                 self.mj_data.actuator(self.robot.single_arm.actuator_index[i]).ctrl = torque[i]
@@ -109,7 +97,7 @@ if __name__ == "__main__":
         is_render=True,
         control_freq=20,
         is_interpolate=False,
-        jnt_controller='JNTNONE',
+        jnt_controller='JNTIMP',
     )
     env.reset()
     for t in range(int(1e6)):
