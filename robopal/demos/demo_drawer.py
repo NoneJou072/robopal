@@ -3,11 +3,12 @@ import logging
 
 from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
 import robopal.commons.transform as trans
+from robopal.assets.robots.diana_med import DianaDrawer
 
 logging.basicConfig(level=logging.INFO)
 
 
-class PickAndPlaceEnv(PosCtrlEnv):
+class DrawerEnv(PosCtrlEnv):
     """ Reference: https://robotics.farama.org/envs/fetch/pick_and_place/#
     The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
     in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
@@ -15,11 +16,11 @@ class PickAndPlaceEnv(PosCtrlEnv):
     metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(self,
-                 robot=None,
+                 robot=DianaDrawer(),
                  is_render=True,
                  renderer="viewer",
                  render_mode='human',
-                 control_freq=200,
+                 control_freq=10,
                  enable_camera_viewer=False,
                  cam_mode='rgb',
                  jnt_controller='JNTIMP',
@@ -37,9 +38,9 @@ class PickAndPlaceEnv(PosCtrlEnv):
             is_interpolate=is_interpolate,
             is_pd=is_pd,
         )
-        self.name = 'PickAndPlace-v1'
+        self.name = 'DrawerBox-v1'
 
-        self.obs_dim = (22,)
+        self.obs_dim = (17,)
         self.goal_dim = (3,)
         self.action_dim = (4,)
 
@@ -67,12 +68,14 @@ class PickAndPlaceEnv(PosCtrlEnv):
         pos_offset = 0.05 * action[:3]
         actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
 
-        pos_max_bound = np.array([0.6, 0.2, 0.4])
+        pos_max_bound = np.array([0.65, 0.2, 0.4])
         pos_min_bound = np.array([0.3, -0.2, 0.14])
         actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
 
         # Map to target action space bounds
-        gripper_ctrl = (action[3] + 1) * (0.0115 - (-0.01)) / 2 + (-0.01)
+        grip_max_bound = 0.02
+        grip_min_bound = -0.02
+        gripper_ctrl = (action[3] + 1) * (grip_max_bound - grip_min_bound) / 2 + grip_min_bound
         # take one step
         self.mj_data.joint('0_r_finger_joint').qpos[0] = gripper_ctrl
         self.mj_data.joint('0_l_finger_joint').qpos[0] = gripper_ctrl
@@ -106,7 +109,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         """
         assert achieved_goal.shape == desired_goal.shape
         dist = np.linalg.norm(achieved_goal - desired_goal, axis=-1)
-        return -(dist > 0.05).astype(np.float64)
+        return -(dist > 0.02).astype(np.float64)
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -115,30 +118,30 @@ class PickAndPlaceEnv(PosCtrlEnv):
         between the block and the gripper, and the last dimension corresponding to the current gripper opening.
         """
         obs = np.zeros(self.obs_dim)
+        dt = self.nsubsteps * self.mj_model.opt.timestep
 
-        obs[:3] = (  # position of the block
-            object_pos := self.get_body_pos('cupboard')
+        obs[:3] = (  # drawer position
+            object_pos := self.get_site_pos('drawer')
         )
-        obs[3:6] = (  # position of the end
-            end_pos := self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0]
+        obs[3:6] = (  # gripper position
+            end_pos := self.get_site_pos('0_grip_site')
         )
-        obs[6:9] = end_pos - object_pos  # distance between the block and the end
-        obs[9:12] = trans.mat_2_euler(self.get_body_rotm('cupboard'))
-        obs[12:15] = (  # End effector linear velocity
-            end_vel := self.kdl_solver.get_end_vel(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)[:3]
+        obs[6:9] = (  # distance between the block and the end
+            object_rel_pos := end_pos - object_pos
         )
-        # velocity with respect to the gripper
-        dt = 0.0005
-        object_velp = self.get_body_xvelp('cupboard')
-        object2end_velp = object_velp - end_vel
-        obs[15:18] = object2end_velp
-
-        obs[18:21] = self.get_body_xvelr('cupboard')
-        obs[21] = self.mj_data.joint('0_r_finger_joint').qpos[0]
+        obs[9:12] = (  # gripper linear velocity
+            end_vel := self.get_site_xvelp('0_grip_site') * dt
+        )
+        object_velp = self.get_site_xvelp('drawer') * dt
+        obs[12:15] = (  # velocity with respect to the gripper
+            object2end_velp := object_velp - end_vel
+        )
+        obs[15] = self.mj_data.joint('0_r_finger_joint').qpos[0]
+        obs[16] = self.mj_data.joint('0_r_finger_joint').qvel[0] * dt
 
         return {
             'observation': obs.copy(),
-            'achieved_goal': object_pos.copy(),  # the current state of the block
+            'achieved_goal': object_pos.copy(),  # block position
             'desired_goal': self.goal_pos.copy()
         }
 
@@ -149,7 +152,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         super().reset()
         self._timestep = 0
         # set new goal
-        self.goal_pos = self.get_body_pos('goal_site')
+        self.goal_pos = self.get_site_pos('goal_site')
 
         obs = self._get_obs()
         info = self._get_info()
@@ -159,19 +162,16 @@ class PickAndPlaceEnv(PosCtrlEnv):
 
         return obs, info
 
+    def reset_object(self):
+        random_goal_x_pos = np.random.uniform(0.48, 0.56)
+        goal_pos = np.array([random_goal_x_pos, 0.0, 0.478])
+        site_id = self.get_site_id('goal_site')
+        self.mj_model.site_pos[site_id] = goal_pos
+
 
 if __name__ == "__main__":
-    from robopal.assets.robots.diana_med import DianaDrawerCube
 
-    env = PickAndPlaceEnv(
-        robot=DianaDrawerCube(),
-        renderer="viewer",
-        is_render=True,
-        control_freq=10,
-        is_interpolate=False,
-        is_pd=False,
-        jnt_controller='JNTIMP',
-    )
+    env = DrawerEnv()
     env.reset()
 
     for t in range(int(1e6)):

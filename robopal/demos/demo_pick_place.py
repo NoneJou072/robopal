@@ -3,6 +3,7 @@ import logging
 
 from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
 import robopal.commons.transform as trans
+from robopal.assets.robots.diana_med import DianaGrasp
 
 logging.basicConfig(level=logging.INFO)
 
@@ -15,11 +16,11 @@ class PickAndPlaceEnv(PosCtrlEnv):
     metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(self,
-                 robot=None,
+                 robot=DianaGrasp(),
                  is_render=True,
                  renderer="viewer",
                  render_mode='human',
-                 control_freq=200,
+                 control_freq=10,
                  enable_camera_viewer=False,
                  cam_mode='rgb',
                  jnt_controller='JNTIMP',
@@ -178,17 +179,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
 
 
 if __name__ == "__main__":
-    from robopal.assets.robots.diana_med import DianaGrasp
-
-    env = PickAndPlaceEnv(
-        robot=DianaGrasp(),
-        renderer="viewer",
-        is_render=True,
-        control_freq=10,
-        is_interpolate=False,
-        is_pd=False,
-        jnt_controller='JNTIMP',
-    )
+    env = PickAndPlaceEnv()
     env.reset()
 
     for t in range(int(1e6)):
