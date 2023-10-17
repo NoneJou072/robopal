@@ -105,3 +105,4 @@ if __name__ == "__main__":
         env.step(action)
         if env.is_render:
             env.render()
+            env.renderer.render_traj(env.kdl_solver.fk(env.robot.single_arm.arm_qpos)[0])
