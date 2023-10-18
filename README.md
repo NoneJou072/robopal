@@ -1,3 +1,5 @@
+## 简介
+
 <p>
   <a href="https://codeup.teambition.com/62219d81e4c44077bd46bffe/RoboIMI/tree/master" alt="GitHub">
     <img src="https://img.shields.io/github/actions/workflow/status/deepmind/mujoco/build.yml?branch=main">
@@ -10,12 +12,11 @@
   </a>
 </p>
 
-## 简介
 **robopal** 是一个基于 [MuJoCo](http://mujoco.org/) 动力学引擎与 [pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 机器人动力学库搭建的多平台开源机器人仿真框架，主要用于机械臂的深度强化学习训练与控制算法验证。框架内提供了多种控制方案与底层环境，
-并具有：
-* 更高的控制精度，方便 sim2real
-* 高度可移植性，代码简洁，方便学习与使用
-* 丰富的任务环境，如物体抓取，视觉伺服等
+具有以下特征：
+* 采用 Pinocchio 动力学库计算机械臂运动学与动力学，方便将算法向实物迁移
+* 简洁的代码结构，没有复杂的嵌套关系，方便快速上手使用
+* 提供丰富的操作任务环境，如物体抓取，视觉伺服等
 
 更多了解，请查看文档 [[Documentations(正在维护中)]](https://robopal.readthedocs.io/)
 
