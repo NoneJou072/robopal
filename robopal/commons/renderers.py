@@ -25,8 +25,7 @@ class MjRenderer:
         self.viewer = None
         if is_render:
             self._init_renderer()
-
-        self.traj = deque(maxlen=200)
+            self.traj = deque(maxlen=200)  # used for rendering trajectory
 
         # keyboard flag
         self.render_paused = True

@@ -3,12 +3,12 @@ import logging
 
 from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
 import robopal.commons.transform as trans
-from robopal.assets.robots.diana_med import DianaGrasp
+from robopal.assets.robots.diana_med import DianaGraspMultiObjs
 
 logging.basicConfig(level=logging.INFO)
 
 
-class PickAndPlaceEnv(PosCtrlEnv):
+class MultiCubes(PosCtrlEnv):
     """ Reference: https://robotics.farama.org/envs/fetch/pick_and_place/#
     The control frequency of the robot is of f = 10 Hz. This is achieved by applying the same action
     in 100 subsequent simulator step (with a time step of dt = 0.001 s) before returning the control to the robot.
@@ -16,7 +16,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
     metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(self,
-                 robot=DianaGrasp(),
+                 robot=DianaGraspMultiObjs(),
                  is_render=True,
                  renderer="viewer",
                  render_mode='human',
@@ -38,7 +38,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
             is_interpolate=is_interpolate,
             is_pd=is_pd,
         )
-        self.name = 'PickAndPlace-v1'
+        self.name = 'PickAndPlace-v2'
 
         self.obs_dim = (23,)
         self.goal_dim = (3,)
@@ -47,7 +47,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         self.max_action = 1.0
         self.min_action = -1.0
 
-        self.max_episode_steps = 50
+        self.max_episode_steps = 150
         self._timestep = 0
 
         self.goal_pos = None
@@ -65,13 +65,6 @@ class PickAndPlaceEnv(PosCtrlEnv):
         """
         self._timestep += 1
 
-        pos_offset = 0.05 * action[:3]
-        actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
-
-        pos_max_bound = np.array([0.6, 0.2, 0.37])
-        pos_min_bound = np.array([0.3, -0.2, 0.12])
-        actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
-
         # Map to target action space bounds
         grip_max_bound = 0.02
         grip_min_bound = -0.01
@@ -80,7 +73,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         self.mj_data.joint('0_r_finger_joint').qpos[0] = gripper_ctrl
         self.mj_data.joint('0_l_finger_joint').qpos[0] = gripper_ctrl
 
-        super().step(actual_pos_action[:3])
+        super().step(action[:3])
 
         obs = self._get_obs()
         reward = self.compute_rewards(obs['achieved_goal'], obs['desired_goal'])
@@ -169,31 +162,25 @@ class PickAndPlaceEnv(PosCtrlEnv):
         return obs, info
 
     def reset_object(self):
-        random_x_pos = np.random.uniform(0.35, 0.55)
-        random_y_pos = np.random.uniform(-0.15, 0.15)
-        self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
+        OBJ_JNT_LIST = ['red_block:joint', 'green_block:joint', 'blue_block:joint']
+        for obj_joint in OBJ_JNT_LIST:
+            random_x_pos = np.random.uniform(0.35, 0.55)
+            random_y_pos = np.random.uniform(-0.15, 0.15)
+            self.set_object_pose(obj_joint, np.array([random_x_pos, random_y_pos, 0.56, 1.0, 0.0, 0.0, 0.0]))
 
         random_goal_x_pos = np.random.uniform(0.35, 0.55)
         random_goal_y_pos = np.random.uniform(-0.15, 0.15)
         random_goal_z_pos = np.random.uniform(0.46, 0.66)
-
-        block_pos = np.array([random_x_pos, random_y_pos, 0.46])
         goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
-        while np.linalg.norm(block_pos - goal_pos) <= 0.05:
-            random_goal_x_pos = np.random.uniform(0.4, 0.6)
-            random_goal_y_pos = np.random.uniform(-0.2, 0.2)
-            random_goal_z_pos = np.random.uniform(0.45, 0.66)
-            goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
-        site_id = self.get_site_id('goal_site')
-        self.mj_model.site_pos[site_id] = goal_pos
+        self.set_site_pose('goal_site', goal_pos)
 
 
 if __name__ == "__main__":
-    env = PickAndPlaceEnv()
+    env = MultiCubes()
     env.reset()
 
     for t in range(int(1e6)):
-        action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
+        action = np.array([0.5, 0.0, 0.5, 0.0])
         s_, r, terminated, truncated, info = env.step(action)
         if truncated:
             env.reset()

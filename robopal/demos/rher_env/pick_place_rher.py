@@ -98,8 +98,9 @@ class PickAndPlaceEnv(PosCtrlEnv):
         target position, and 0 if the block is in the final target position (the block is considered to have
         reached the goal if the Euclidean distance between both is lower than 0.05 m).
         """
-        d = self.goal_distance(achieved_goal, desired_goal)
-        return (d < 0.05).astype(np.float64)
+        assert achieved_goal.shape == desired_goal.shape
+        dist = np.linalg.norm(achieved_goal - desired_goal, axis=-1)
+        return -(dist > 0.05).astype(np.float32)
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -141,18 +142,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         }
 
     def _get_info(self) -> dict:
-        return {'is_success': self._is_success(self.get_body_pos('green_block'), self.goal_pos)}
-
-    def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray) -> np.ndarray:
-        """ Compute whether the achieved goal successfully achieved the desired goal.
-        """
-        d = self.goal_distance(achieved_goal, desired_goal)
-        return (d < 0.05).astype(np.float32)
-
-    @staticmethod
-    def goal_distance(goal_a, goal_b):
-        assert goal_a.shape == goal_b.shape
-        return np.linalg.norm(goal_a - goal_b, axis=-1)
+        return {}
 
     def reset(self, seed=None):
         super().reset()
@@ -194,6 +184,6 @@ if __name__ == "__main__":
 
     for t in range(int(1e6)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
-        s_, r, terminated, truncated, info = env.step(action)
+        s_, r, terminated, truncated, _ = env.step(action)
         if truncated:
             env.reset()

@@ -115,6 +115,13 @@ class MujocoEnv:
             assert obj_pose.shape[0] == 7
             self.mj_data.joint(obj_joint_name).qpos = obj_pose
 
+    def set_site_pose(self, site_name: str = None, site_pos: np.ndarray = None):
+        """ Set pose of the object. """
+        if isinstance(site_name, str):
+            site_id = self.get_site_id(site_name)
+            assert site_pos.shape[0] == 3
+            self.mj_model.site_pos[site_id] = site_pos
+
     def get_body_id(self, name: str):
         """ Get body id from body name.
 

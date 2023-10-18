@@ -1,0 +1,10 @@
+<mujoco>
+    <worldbody>
+        <body name="blue_block" pos="0.5 0.0 0.46">
+            <joint name="blue_block:joint" type="free" damping="0.01"/>
+            <geom name="blue_block" size="0.02 0.02 0.02" rgba="0 0 1 1" type="box" conaffinity="0" contype="0" group="1" mass="0.1"/>
+            <geom name="blue_block_collision" size="0.02 0.02 0.02" rgba="0 0 1 1" type="box" conaffinity="1" condim="4" contype="1" group="4" mass="0.01"/>
+            <site name="blue_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="0 0 1 0.5" type="sphere" />
+        </body>
+    </worldbody>
+</mujoco>
