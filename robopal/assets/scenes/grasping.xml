@@ -1,11 +1,11 @@
 <mujoco model="empty_floor">
   <compiler angle="radian"/>
-    <size memory="1000M"/>
+  <size memory="1000M"/>
   <option timestep="0.001" gravity="0 0 -9.81" integrator="implicitfast" impratio="40">
       <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable"/>
   </option>
 
-    <visual>
+  <visual>
     <rgba haze="0.15 0.25 0.35 1"/>
     <global azimuth="120" elevation="-20"/>
   </visual>
@@ -13,7 +13,7 @@
   <asset>
     <mesh name="complete_table" file="../objects/table/complete_table.STL" scale="1.0 1.0 0.66"/>
 
-      <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
     <texture name="groundplane" type="2d" builtin="checker" mark="edge"  rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
       markrgb="0.8 0.8 0.8" width="300" height="300"/>
     <material name="groundplane" reflectance="0.2" shininess="0.0" specular="0.0" texrepeat="5 5" texture="groundplane" texuniform="true"/>

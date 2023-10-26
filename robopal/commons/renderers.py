@@ -1,11 +1,13 @@
 import time
 
 import mujoco
+from mujoco import viewer
+
 from collections import deque
 import sys
 import numpy as np
 from queue import Queue
-# TODO: separate a script
+# TODO: separate cv from here
 try:
     import cv2
 except:
@@ -51,11 +53,10 @@ class MjRenderer:
             # TODO: Support unity renderer.
             raise ValueError("Unity renderer not supported now.")
         elif self.renderer == "viewer":
-            from mujoco import viewer
             # This function does not block, allowing user code to continue execution.
             self.viewer = viewer.launch_passive(self.mj_model, self.mj_data,
                                                 key_callback=key_callback, show_left_ui=False, show_right_ui=False)
-
+            self.set_renderer_config()
             if self.enable_camera_viewer:
                 cv2.namedWindow('RGB Image', cv2.WINDOW_NORMAL)
         else:
@@ -65,6 +66,7 @@ class MjRenderer:
         """ render mujoco """
         if self.viewer is not None and self.render_paused is True and self.renderer == "viewer":
             if self.viewer.is_running() and self.exit_flag is False:
+                self.viewer: viewer.Handle
                 self.viewer.sync()
             else:
                 self.close()
@@ -86,6 +88,8 @@ class MjRenderer:
         """ Setup mujoco global config while using viewer as renderer.
             It should be noted that the render thread need locked.
         """
+        self.viewer.cam.lookat = np.array([0.4, 0, 0.5])
+        self.viewer.cam.azimuth -= 0.1
         with self.viewer.lock():
             self.viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(self.mj_data.time % 2)
 
