@@ -2,8 +2,8 @@
     <worldbody>
         <body name="green_block" pos="0.5 0.0 0.46">
             <joint name="green_block:joint" type="free" damping="0.01"/>
-            <geom name="green_block" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="0" contype="0" group="1" mass="0.1"/>
-            <geom name="green_block_collision" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="1" condim="4" contype="1" group="4" mass="0.01"/>
+            <geom name="green_block" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="0" contype="0" group="1" mass="0.01"/>
+            <geom name="green_block_collision" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="1" condim="3" contype="1" group="4" mass="0.02"/>
             <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="0 1 0 0.5" type="sphere" />
         </body>
     </worldbody>

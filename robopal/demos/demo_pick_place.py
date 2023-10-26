@@ -55,17 +55,8 @@ class PickAndPlaceEnv(PosCtrlEnv):
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
 
-    def step(self, action) -> tuple:
-        """ Take one step in the environment.
-
-        :param action:  The action space is 4-dimensional, with the first 3 dimensions corresponding to the desired
-        position of the block in Cartesian coordinates, and the last dimension corresponding to the
-        desired gripper opening (0 for closed, 1 for open).
-        :return: obs, reward, terminated, truncated, info
-        """
-        self._timestep += 1
-
-        pos_offset = 0.05 * action[:3]
+    def action_scale(self, action):
+        pos_offset = 0.1 * action[:3]
         actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
 
         pos_max_bound = np.array([0.6, 0.2, 0.37])
@@ -76,9 +67,24 @@ class PickAndPlaceEnv(PosCtrlEnv):
         grip_max_bound = 0.02
         grip_min_bound = -0.01
         gripper_ctrl = (action[3] + 1) * (grip_max_bound - grip_min_bound) / 2 + grip_min_bound
+        return actual_pos_action, gripper_ctrl
+
+    def step(self, action) -> tuple:
+        """ Take one step in the environment.
+
+        :param action:  The action space is 4-dimensional, with the first 3 dimensions corresponding to the desired
+        position of the block in Cartesian coordinates, and the last dimension corresponding to the
+        desired gripper opening (0 for closed, 1 for open).
+        :return: obs, reward, terminated, truncated, info
+        """
+        self._timestep += 1
+
+        actual_pos_action, gripper_ctrl = self.action_scale(action)
         # take one step
-        self.mj_data.joint('0_r_finger_joint').qpos[0] = gripper_ctrl
-        self.mj_data.joint('0_l_finger_joint').qpos[0] = gripper_ctrl
+        # self.mj_data.joint('0_r_finger_joint').qpos[0] = gripper_ctrl
+        # self.mj_data.joint('0_l_finger_joint').qpos[0] = gripper_ctrl
+        self.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = gripper_ctrl
+        self.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = gripper_ctrl
 
         super().step(actual_pos_action[:3])
 
@@ -99,7 +105,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
         reached the goal if the Euclidean distance between both is lower than 0.05 m).
         """
         d = self.goal_distance(achieved_goal, desired_goal)
-        return (d < 0.05).astype(np.float64)
+        return -(d > 0.05).astype(np.float64)
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -110,13 +116,13 @@ class PickAndPlaceEnv(PosCtrlEnv):
         obs = np.zeros(self.obs_dim)
         dt = self.nsubsteps * self.mj_model.opt.timestep
 
-        obs[:3] = (  # block position
-            object_pos := self.get_body_pos('green_block')
-        )
-        obs[3:6] = (  # gripper position
+        obs[0:3] = (  # gripper position in global coordinates
             end_pos := self.get_site_pos('0_grip_site')
         )
-        obs[6:9] = (  # distance between the block and the end
+        obs[3:6] = (  # block position in global coordinates
+            object_pos := self.get_body_pos('green_block')
+        )
+        obs[6:9] = (  # Relative block position with respect to gripper position in globla coordinates.
             object_rel_pos := end_pos - object_pos
         )
         obs[9:12] = (  # block rotation
@@ -190,8 +196,7 @@ class PickAndPlaceEnv(PosCtrlEnv):
 
 if __name__ == "__main__":
     env = PickAndPlaceEnv()
-    env.reset()
-
+    obs, _ = env.reset()
     for t in range(int(1e6)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
         s_, r, terminated, truncated, info = env.step(action)

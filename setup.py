@@ -18,11 +18,11 @@ setup(
     install_requires=[
         "numpy>=1.23.5",
         'mujoco>=2.3.7',
-        'pin'
     ],
     extras_require={
         'gym': ['gymnasium'],
         'traj': ['ruckig~=0.9.2'],
+        'pinocchio': ['pin~=2.6.3'],
     },
     classifiers=[
         "License :: OSI Approved :: MIT License",
