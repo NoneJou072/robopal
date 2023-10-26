@@ -8,7 +8,6 @@
     <actuator>
         <position ctrllimited="true" ctrlrange="-0.020833 0.0115" joint="r_finger_joint" kp="1000" name="gripper_r_finger_joint" forcelimited="true" forcerange="-20 20"/>
         <position ctrllimited="true" ctrlrange="-0.020833 0.0115" joint="l_finger_joint" kp="1000" name="gripper_l_finger_joint" forcelimited="true" forcerange="-20 20"/>
-<!--        <motor name="gripper_l_finger_joint" ctrllimited="true" ctrlrange="-100.0 100.0" joint="l_finger_joint" />-->
     </actuator>
 
     <worldbody>

@@ -81,8 +81,6 @@ class PickAndPlaceEnv(PosCtrlEnv):
 
         actual_pos_action, gripper_ctrl = self.action_scale(action)
         # take one step
-        # self.mj_data.joint('0_r_finger_joint').qpos[0] = gripper_ctrl
-        # self.mj_data.joint('0_l_finger_joint').qpos[0] = gripper_ctrl
         self.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = gripper_ctrl
         self.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = gripper_ctrl
 

@@ -53,7 +53,8 @@ class MjRenderer:
         elif self.renderer == "viewer":
             from mujoco import viewer
             # This function does not block, allowing user code to continue execution.
-            self.viewer = viewer.launch_passive(self.mj_model, self.mj_data, key_callback=key_callback)
+            self.viewer = viewer.launch_passive(self.mj_model, self.mj_data,
+                                                key_callback=key_callback, show_left_ui=False, show_right_ui=False)
 
             if self.enable_camera_viewer:
                 cv2.namedWindow('RGB Image', cv2.WINDOW_NORMAL)

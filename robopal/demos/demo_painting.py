@@ -65,7 +65,7 @@ class DrawerEnv(PosCtrlEnv):
         """
         self._timestep += 1
 
-        pos_offset = 0.1 * action[:3]
+        pos_offset = 0.01 * action[:3]
         actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
 
         pos_max_bound = np.array([0.65, 0.2, 0.4])
