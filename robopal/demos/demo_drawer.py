@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class DrawerEnv(PosCtrlEnv):
-    """ Reference: https://robotics.farama.org/envs/fetch/pick_and_place/#
+    """
     The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
     in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
     """
@@ -38,7 +38,7 @@ class DrawerEnv(PosCtrlEnv):
             is_interpolate=is_interpolate,
             is_pd=is_pd,
         )
-        self.name = 'DrawerBox-v1'
+        self.name = 'Drawer-v1'
 
         self.obs_dim = (17,)
         self.goal_dim = (3,)
@@ -55,17 +55,8 @@ class DrawerEnv(PosCtrlEnv):
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
 
-    def step(self, action) -> tuple:
-        """ Take one step in the environment.
-
-        :param action:  The action space is 4-dimensional, with the first 3 dimensions corresponding to the desired
-        position of the block in Cartesian coordinates, and the last dimension corresponding to the
-        desired gripper opening (0 for closed, 1 for open).
-        :return: obs, reward, terminated, truncated, info
-        """
-        self._timestep += 1
-
-        pos_offset = 0.05 * action[:3]
+    def action_scale(self, action):
+        pos_offset = 0.1 * action[:3]
         actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
 
         pos_max_bound = np.array([0.65, 0.2, 0.4])
@@ -76,22 +67,31 @@ class DrawerEnv(PosCtrlEnv):
         grip_max_bound = 0.02
         grip_min_bound = -0.02
         gripper_ctrl = (action[3] + 1) * (grip_max_bound - grip_min_bound) / 2 + grip_min_bound
-        # take one step
-        self.mj_data.joint('0_r_finger_joint').qpos[0] = gripper_ctrl
-        self.mj_data.joint('0_l_finger_joint').qpos[0] = gripper_ctrl
+        return actual_pos_action, gripper_ctrl
 
-        logging.debug(f'des_pos:{actual_pos_action[:3]}')
+    def step(self, action) -> tuple:
+        """ Take one step in the environment.
+
+        :param action:  The action space is 4-dimensional, with the first 3 dimensions corresponding to the desired
+        position of the block in Cartesian coordinates, and the last dimension corresponding to the
+        desired gripper opening (0 for closed, 1 for open).
+        :return: obs, reward, terminated, truncated, info
+        """
+        self._timestep += 1
+
+        actual_pos_action, gripper_ctrl = self.action_scale(action)
+        # take one step
+        self.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = gripper_ctrl
+        self.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = gripper_ctrl
+
         super().step(actual_pos_action[:3])
-        logging.debug(f'cur_pos:{self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0]}')
 
         obs = self._get_obs()
         achieved_goal = obs['achieved_goal']
         desired_goal = obs['desired_goal']
         reward = self.compute_rewards(achieved_goal, desired_goal)
         terminated = False
-        truncated = False
-        if self._timestep >= self.max_episode_steps:
-            truncated = True
+        truncated = True if self._timestep >= self.max_episode_steps else False
         info = self._get_info()
 
         if self.render_mode == 'human':
@@ -99,16 +99,13 @@ class DrawerEnv(PosCtrlEnv):
 
         return obs, reward, terminated, truncated, info
 
-    def inner_step(self, action):
-        super().inner_step(action)
-
     def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, info: dict = None):
         """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
         target position, and 0 if the block is in the final target position (the block is considered to have
         reached the goal if the Euclidean distance between both is lower than 0.05 m).
         """
         d = self.goal_distance(achieved_goal, desired_goal)
-        return (d < 0.02).astype(np.float64)
+        return -(d > 0.05).astype(np.float64)
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -119,11 +116,11 @@ class DrawerEnv(PosCtrlEnv):
         obs = np.zeros(self.obs_dim)
         dt = self.nsubsteps * self.mj_model.opt.timestep
 
-        obs[:3] = (  # drawer position
-            object_pos := self.get_site_pos('drawer')
-        )
-        obs[3:6] = (  # gripper position
+        obs[:3] = (  # gripper position
             end_pos := self.get_site_pos('0_grip_site')
+        )
+        obs[3:6] = (  # drawer position
+            object_pos := self.get_site_pos('drawer')
         )
         obs[6:9] = (  # distance between the block and the end
             object_rel_pos := end_pos - object_pos
@@ -140,7 +137,7 @@ class DrawerEnv(PosCtrlEnv):
 
         return {
             'observation': obs.copy(),
-            'achieved_goal': object_pos.copy(),  # block position
+            'achieved_goal': object_pos.copy(),  # handle position
             'desired_goal': self.goal_pos.copy()
         }
 

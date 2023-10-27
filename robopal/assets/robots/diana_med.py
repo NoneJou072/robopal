@@ -147,27 +147,11 @@ class DianaDrawerCube(DianaMedBase, ABC):
         self.mjcf_generator.set_node_attrib('cupboard', {'pos': f'{cupboard_x_pos} {cupboard_y_pos} {0.42}'})
 
         # add cube with random position
-        random_x_pos = np.random.uniform(0.4, 0.6)
-        random_y_pos = np.random.uniform(-0.2, 0.2)
-        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cube/green_cube.xml')
-        self.mjcf_generator.set_node_attrib('green_block', {'pos': f'{random_x_pos} {random_y_pos} {0.46}'})
+        self.mjcf_generator.add_node_from_xml('worldbody',
+                                              os.path.dirname(__file__) + '/../objects/cube/green_cube.xml')
+        self.mjcf_generator.set_node_attrib('green_block', {'pos': '0.5 0.0 0.46'})
 
-        # add goal site with random position
-        random_goal_x_pos = np.random.uniform(0.4, 0.6)
-        random_goal_y_pos = np.random.uniform(-0.2, 0.2)
-        random_goal_z_pos = np.random.uniform(0.45, 0.66)
-
-        cupboard_pos = np.array([cupboard_x_pos, cupboard_y_pos, 0.46])
-        goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
-        while np.linalg.norm(cupboard_pos - goal_pos) <= 0.1:
-            random_goal_x_pos = np.random.uniform(0.4, 0.6)
-            random_goal_y_pos = np.random.uniform(-0.2, 0.2)
-            random_goal_z_pos = np.random.uniform(0.45, 0.66)
-            goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
-
-        goal_site = f"""<body pos="{random_goal_x_pos} {random_goal_y_pos} {random_goal_z_pos}" name="goal_site">
-                    <site name="goal_site" pos="0 0 0" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />
-                </body>"""
+        goal_site = """<site name="drawer_goal" pos="0.48 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
         self.mjcf_generator.add_node_from_str('worldbody', goal_site)
 
     @property
