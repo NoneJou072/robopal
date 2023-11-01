@@ -56,7 +56,7 @@ class DrawerCubeEnv(PosCtrlEnv):
         self.render_mode = render_mode
 
     def action_scale(self, action):
-        pos_offset = 0.05 * action[:3]
+        pos_offset = 0.1 * action[:3]
         actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
 
         pos_max_bound = np.array([0.6, 0.2, 0.37])
@@ -107,7 +107,7 @@ class DrawerCubeEnv(PosCtrlEnv):
         reached the goal if the Euclidean distance between both is lower than 0.05 m).
         """
         d = self.goal_distance(achieved_goal, desired_goal)
-        return -(d > 0.05).astype(np.float64)
+        return -(d >= 0.05).astype(np.float64)
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -122,14 +122,16 @@ class DrawerCubeEnv(PosCtrlEnv):
             end_pos := self.get_site_pos('0_grip_site')
         )
         obs[3:6] = (  # handle position in global coordinates
-            handle_pos := self.get_body_pos('cupboard')
+            handle_pos := self.get_site_pos('drawer')
         )
         obs[6:9] = (  # block position in global coordinates
             block_pos := self.get_body_pos('green_block')
         )
         obs[9:12] = end_pos - handle_pos  # distance between the handle and the end
         obs[12:15] = end_pos - block_pos  # distance between the block and the end
-        obs[15:18] = trans.mat_2_euler(self.get_body_rotm('cupboard'))
+        obs[15:18] = (  # block rotation
+            trans.mat_2_euler(self.get_body_rotm('green_block'))
+        )
         obs[18:21] = (  # gripper linear velocity
             end_vel := self.get_site_xvelp('0_grip_site') * dt
         )
@@ -159,7 +161,7 @@ class DrawerCubeEnv(PosCtrlEnv):
         """ Compute whether the achieved goal successfully achieved the desired goal.
         """
         d = self.goal_distance(achieved_goal, desired_goal)
-        return (d < 0.05).astype(np.float32)
+        return -(d >= 0.05).astype(np.float32)
 
     @staticmethod
     def goal_distance(goal_a, goal_b):
@@ -185,11 +187,12 @@ class DrawerCubeEnv(PosCtrlEnv):
         random_x_pos = np.random.uniform(0.35, 0.45)
         random_y_pos = np.random.uniform(-0.15, 0.15)
         self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
+
         # reset drawer goal position
-        random_goal_x_pos = np.random.uniform(0.48, 0.56)
-        goal_pos = np.array([random_goal_x_pos, 0.0, 0.478])
-        site_id = self.get_site_id('drawer_goal')
-        self.mj_model.site_pos[site_id] = goal_pos
+        # random_goal_x_pos = np.random.uniform(0.48, 0.56)
+        # goal_pos = np.array([random_goal_x_pos, 0.0, 0.478])
+        # site_id = self.get_site_id('drawer_goal')
+        # self.mj_model.site_pos[site_id] = goal_pos
 
 
 if __name__ == "__main__":
