@@ -19,10 +19,10 @@
       markrgb="0.8 0.8 0.8" width="300" height="300"/>
     <material name="groundplane" reflectance="0.2" shininess="0.0" specular="0.0" texrepeat="5 5" texture="groundplane" texuniform="true"/>
 
-    <texture name="mahjong_dong" type="2d" file="/home/mhming/zhr/robopal/robopal/assets/textures/mahjong/00.png" />
-    <texture name="mahjong_nan" type="2d" file="/home/mhming/zhr/robopal/robopal/assets/textures/mahjong/10.png" />
-    <texture name="mahjong_xi" type="2d" file="/home/mhming/zhr/robopal/robopal/assets/textures/mahjong/20.png" />
-    <texture name="mahjong_bei" type="2d" file="/home/mhming/zhr/robopal/robopal/assets/textures/mahjong/30.png" />
+    <texture name="mahjong_dong" type="2d" file="../textures/mahjong/00.png" />
+    <texture name="mahjong_nan" type="2d" file="../textures/mahjong/10.png" />
+    <texture name="mahjong_xi" type="2d" file="../textures/mahjong/20.png" />
+    <texture name="mahjong_bei" type="2d" file="../textures/mahjong/30.png" />
     <material name="mahjong_dong" texture="mahjong_dong" texrepeat="1 1" texuniform="false" />
     <material name="mahjong_nan" texture="mahjong_nan" texrepeat="1 1" texuniform="false" />
     <material name="mahjong_xi" texture="mahjong_xi" texrepeat="1 1" texuniform="false" />
