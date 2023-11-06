@@ -215,6 +215,17 @@ class MujocoEnv:
         mujoco.mj_jacSite(self.mj_model, self.mj_data, jacp, None, sid)
         return jacp
 
+    def get_site_jacr(self, name):
+        """ Query the rotation jacobian of a mujoco site using a name string.
+
+        :param name: The name of a mujoco site
+        :return: The jacr value of the mujoco site
+        """
+        sid = self.get_site_id(name)
+        jacr = np.zeros((3, self.mj_model.nv))
+        mujoco.mj_jacSite(self.mj_model, self.mj_data, None, jacr, sid)
+        return jacr
+
     def get_site_pos(self, name: str):
         """ Get body position from site name.
 
@@ -232,3 +243,29 @@ class MujocoEnv:
         jacp = self.get_site_jacp(name)
         xvelp = np.dot(jacp, self.mj_data.qvel)
         return xvelp.copy()
+
+    def get_site_xvelr(self, name: str) -> np.ndarray:
+        """ Get site rotational velocity from site name.
+
+        :param name: site name
+        :return: rotational velocity of the site
+        """
+        jacr = self.get_site_jacr(name)
+        xvelr = np.dot(jacr, self.mj_data.qvel)
+        return xvelr.copy()
+
+    def get_site_quat(self, name: str):
+        """ Get site quaternion from site name.
+
+        :param name: site name
+        :return: site quaternion
+        """
+        return self.mj_data.site(name).xquat.copy()
+
+    def get_site_rotm(self, name: str):
+        """ Get site rotation matrix from site name.
+
+        :param name: site name
+        :return: site rotation matrix
+        """
+        return self.mj_data.site(name).xmat.copy().reshape(3, 3)
