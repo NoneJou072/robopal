@@ -1,0 +1,12 @@
+<mujoco model="empty_floor">
+
+
+    <body name="table_0">
+        <geom pos="-0.6 -0.3 0.411" contype="0" conaffinity="0" group="1" euler = "0 0 1.57" type="box" rgba="0.792157 0.819608 0.933333 1" size="0.3 0.6 0.01" />
+        <geom pos="-0.6 -0.3 0.411" conaffinity="1" condim="3" contype="0" group="4" euler = "0 0 1.57" type="box" rgba="0.792157 0.819608 0.933333 1" size="0.3 0.6 0.01" />
+        <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.792157 0.819608 0.933333 1" mesh="complete_table" friction="0.95 0.9 0.9"/>
+        <geom type="mesh" conaffinity="1" condim="3" contype="0" group="4" rgba="0.792157 0.819608 0.933333 1" mesh="complete_table" friction="0.95 0.9 0.9"/>
+    </body>
+
+
+</mujoco>

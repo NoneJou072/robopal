@@ -1,11 +1,10 @@
 import os
-from abc import ABC
-
-from robopal.assets.robots.base import *
 import numpy as np
 
+from robopal.assets.robots.base import *
 
-class DianaMedBase(BaseArm, ABC):
+
+class DianaMedBase(BaseArm):
     """ DianaMed robot base class. """
 
     def __init__(self,
@@ -36,7 +35,7 @@ class DianaMedBase(BaseArm, ABC):
         return np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])
 
 
-class DianaMed(DianaMedBase, ABC):
+class DianaMed(DianaMedBase):
     """ DianaMed robot class. """
 
     def __init__(self):
@@ -48,7 +47,7 @@ class DianaAruco(DianaMedBase):
     """ DianaMed robot class. """
 
     def __init__(self):
-        super().__init__(scene='visual_imped',
+        super().__init__(scene='default',
                          gripper='Swab_gripper', )
 
     def add_assets(self):
@@ -63,7 +62,7 @@ class DianaAruco(DianaMedBase):
         self.mjcf_generator.add_joint(node='aruco', name='aruco_z', type='slide', axis='0 0 1')
 
 
-class DianaGrasp(DianaMedBase, ABC):
+class DianaGrasp(DianaMedBase):
     """ DianaMed robot class. """
 
     def __init__(self):
@@ -103,7 +102,7 @@ class DianaGraspMultiObjs(DianaGrasp):
         self.mjcf_generator.add_node_from_str('worldbody', goal_site)
 
 
-class DianaDrawer(DianaMedBase, ABC):
+class DianaDrawer(DianaMedBase):
     """ DianaMed robot class. """
 
     def __init__(self):
@@ -129,7 +128,29 @@ class DianaDrawer(DianaMedBase, ABC):
         return np.array([-0.51198529, -0.44737435, -0.50879166, 2.3063219, 0.46514545, -0.48916244, -0.37233289])
 
 
-class DianaDrawerCube(DianaMedBase, ABC):
+class DianaCabinet(DianaMedBase):
+    """ DianaMed robot class. """
+
+    def __init__(self):
+        super().__init__(scene='grasping',
+                         gripper='rethink_gripper',
+                         mount='top_point')
+
+    def add_assets(self):
+        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cabinet/cabinet.xml')
+        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cabinet/beam.xml')
+
+        # add goal site with random position
+        # goal_site = """<site name="goal_site" pos="0.56 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
+        # self.mjcf_generator.add_node_from_str('worldbody', goal_site)
+
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return np.array([-0.71325374, 0.07279728, -0.72080385, 2.5239552, -0.07686951, -0.67930021, 0.05372948])
+
+
+class DianaDrawerCube(DianaMedBase):
     """ DianaMed robot class. """
 
     def __init__(self):
@@ -160,7 +181,7 @@ class DianaDrawerCube(DianaMedBase, ABC):
         return np.array([-0.64551607, -0.29859465, -0.66478589, 2.3211311, 0.3205733, -0.61377277, -0.26366202])
 
 
-class DianaPainting(DianaMedBase, ABC):
+class DianaPainting(DianaMedBase):
     """ DianaMed robot class. """
 
     def __init__(self):

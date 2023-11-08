@@ -21,7 +21,7 @@
             <geom type="mesh" contype="0" conaffinity="0" group="1" pos="0 0 0" rgba="1 1 1 1" mesh="base_link"/>
             <body name="link1" pos="8.7058e-05 -0.00063474 0.2985" quat="-3.67321e-06 1 0 0">
                 <inertial pos="4.57641e-06 -0.0439746 0.0236145" quat="0.685631 -0.172505 0.172644 0.685818" mass="2.72698" diaginertia="0.0122186 0.0113371 0.00692616"/>
-                <joint name="j1" pos="0 0 0" axis="0 0 1" limited="true" range="-2.56 2.56" damping="1.0"/>
+                <joint name="j1" pos="0 0 0" axis="0 0 1" limited="true" range="-2.56 2.56" damping="0.5"/>
                 <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="link1"/>
                 <body name="link2" pos="0 0 -0.00092116" quat="0.707105 0.707108 0 0">
                     <inertial pos="8.26088e-06 -0.040728 -0.0363117" quat="0.596612 0.379593 -0.379572 0.596564" mass="3.18168" diaginertia="0.0189254 0.0180721 0.00757505"/>
@@ -58,12 +58,12 @@
         </body>
     </worldbody>
     <actuator>
-        <motor name="a1" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j1"/>
-        <motor name="a2" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j2"/>
-        <motor name="a3" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j3"/>
-        <motor name="a4" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j4"/>
-        <motor name="a5" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j5"/>
-        <motor name="a6" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j6"/>
-        <motor name="a7" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j7"/>
+        <motor name="a1" ctrllimited="true" ctrlrange="-200.0 200.0"  joint="j1"/>
+        <motor name="a2" ctrllimited="true" ctrlrange="-200.0 200.0"  joint="j2"/>
+        <motor name="a3" ctrllimited="true" ctrlrange="-200.0 200.0"  joint="j3"/>
+        <motor name="a4" ctrllimited="true" ctrlrange="-200.0 200.0"  joint="j4"/>
+        <motor name="a5" ctrllimited="true" ctrlrange="-200.0 200.0"  joint="j5"/>
+        <motor name="a6" ctrllimited="true" ctrlrange="-200.0 200.0"  joint="j6"/>
+        <motor name="a7" ctrllimited="true" ctrlrange="-200.0 200.0"  joint="j7"/>
     </actuator>
 </mujoco>
