@@ -57,7 +57,7 @@ class DrawerEnv(PosCtrlEnv):
 
     def action_scale(self, action):
         pos_offset = 0.1 * action[:3]
-        actual_pos_action = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)[0] + pos_offset
+        actual_pos_action = self.kdl_solver.fk(self.robot.arm_qpos)[0] + pos_offset
 
         pos_max_bound = np.array([0.65, 0.2, 0.4])
         pos_min_bound = np.array([0.3, -0.2, 0.14])
@@ -180,8 +180,7 @@ if __name__ == "__main__":
 
     env = DrawerEnv()
     env.reset()
-
-    for t in range(int(1e6)):
+    for t in range(int(1e2)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
         s_, r, terminated, truncated, _ = env.step(action)
         if truncated:

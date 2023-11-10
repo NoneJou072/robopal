@@ -9,12 +9,12 @@ class BaseArm:
     """ Base class for generating Data struct of the arm.
 
     :param name(str): robot name
-    :param scene(str):
-    :param chassis(str):
-    :param manipulator(str):
-    :param gripper(str):
-    :param g2m_body(str):
-    :param urdf_path(str):
+    :param scene(str): scene name
+    :param chassis(str): chassis name
+    :param manipulator(str): manipulator name
+    :param gripper(str): gripper name
+    :param g2m_body(str): gripper to manipulator body name
+    :param urdf_path(str): urdf file path
     :param xml_path(str): If you have specified the xml path of your local robot,
     it'll not automatically construct the xml file with input assets.
     """
@@ -42,7 +42,8 @@ class BaseArm:
         self.robot_data = None
         self.construct_mjcf_data()
 
-        self.arm = []
+        self.joint_index = []
+        self.actuator_index = []
 
     def construct_mjcf_data(self):
         self.mjcf_generator = RobotGenerator(
@@ -62,83 +63,26 @@ class BaseArm:
         """ Add objects into the xml file. """
         pass
 
-    class PartArm:
-        """
-        internal class, using for precise arm state, double (left and right) or single
-        """
+    @property
+    def jnt_num(self):
+        return len(self.joint_index)
 
-        def __init__(self, base, state):
-            self.robot_model = base.robot_model
-            self.robot_data = base.robot_data
-            self.state = state
+    def get_Arm_id(self):
+        joint_id = []
+        for i in range(self.jnt_num):
+            joint_id.append(mujoco.mj_name2id(self.robot_model, mujoco.mjtObj.mjOBJ_JOINT, self.joint_index[i]))
+        return joint_id
 
-            self.joint_index = []
-            self.actuator_index = []
-            self.base_joint_index = []
-            self.base_actuator_index = []
+    @property
+    def arm_qpos(self):
+        qpos_states = []
+        for i in range(self.jnt_num):
+            qpos_states.append(self.robot_data.joint(self.joint_index[i]).qpos[0])
+        return np.array(qpos_states)
 
-            self.init_pose = None
-            self.init_base_pose = None
-
-        @property
-        def jnt_num(self):
-            return len(self.joint_index)
-
-        def getBaseJoint(self):
-            """base joints are the rotation joints in robot stand """
-            self.base_joint_index = [string for string in self.joint_index if 'base' in string]
-            return self.base_joint_index
-
-        def getBaseActuator(self):
-            """base actuators are the rotation motors in robot stand """
-            self.base_actuator_index = [string for string in self.actuator_index if 'base' in string]
-            return self.base_actuator_index
-
-        def setArmInitPose(self, initPose: np.array):
-            if len(initPose) == self.jnt_num:
-                self.init_pose = initPose
-            else:
-                raise ValueError("shape error for input pose vector")  # need to optimize
-
-        def setBaseInitPose(self, initBasePose: np.array):
-            if len(self.init_base_pose) == len(initBasePose):
-                self.init_base_pose = initBasePose
-            else:
-                raise ValueError("shape error for input pose vector")  # need to optimize
-
-        def get_Arm_index(self):
-            joint_index = []
-            for i in range(self.jnt_num):
-                joint_index.append(self.joint_index[i])
-            return joint_index
-
-        def get_Arm_id(self):
-            joint_id = []
-            for i in range(self.jnt_num):
-                joint_id.append(mujoco.mj_name2id(self.robot_model, mujoco.mjtObj.mjOBJ_JOINT, self.joint_index[i]))
-            return joint_id
-
-        @property
-        def arm_qpos(self):
-            qpos_states = []
-            for i in range(self.jnt_num):
-                qpos_states.append(self.robot_data.joint(self.joint_index[i]).qpos[0])
-            return np.array(qpos_states)
-
-        @arm_qpos.setter
-        def arm_qpos(self, value):
-            raise ValueError("You cannot set qpos directly.")
-
-        @property
-        def arm_qvel(self):
-            qvel_states = []
-            for i in range(self.jnt_num):
-                qvel_states.append(self.robot_data.joint(self.joint_index[i]).qvel[0])
-            return np.array(qvel_states)
-
-        @property
-        def arm_torq(self):
-            qtorq_states = []
-            for i in range(self.jnt_num):
-                qtorq_states.append(self.robot_data.actuator(self.actuator_index[i]).ctrl[0])
-            return qtorq_states
+    @property
+    def arm_qvel(self):
+        qvel_states = []
+        for i in range(self.jnt_num):
+            qvel_states.append(self.robot_data.joint(self.joint_index[i]).qvel[0])
+        return np.array(qvel_states)

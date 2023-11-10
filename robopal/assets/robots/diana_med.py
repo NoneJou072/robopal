@@ -1,6 +1,4 @@
 import os
-import numpy as np
-
 from robopal.assets.robots.base import *
 
 
@@ -21,13 +19,8 @@ class DianaMedBase(BaseArm):
             g2m_body=['0_link7'],
             urdf_path=os.path.join(os.path.dirname(__file__), "../models/manipulators/DianaMed/DianaMed.urdf"),
         )
-        self.single_arm = self.PartArm(self, 'single')
-        self.single_arm.joint_index = ['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7']
-        self.single_arm.actuator_index = ['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7']
-        self.single_arm.setArmInitPose(self.init_qpos)
-        self.arm.append(self.single_arm)
-
-        self.jnt_num = self.single_arm.jnt_num
+        self.joint_index = ['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7']
+        self.actuator_index = ['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7']
 
     @property
     def init_qpos(self):

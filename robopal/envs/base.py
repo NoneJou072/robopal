@@ -104,9 +104,8 @@ class MujocoEnv:
 
     def _set_init_pose(self):
         """ Set or reset init joint position when called env reset func. """
-        for i in range(len(self.robot.arm)):
-            for j in range(len(self.robot.arm[i].joint_index)):
-                self.mj_data.joint(self.robot.arm[i].joint_index[j]).qpos = self.robot.arm[i].init_pose[j]
+        for j in range(len(self.robot.joint_index)):
+            self.mj_data.joint(self.robot.joint_index[j]).qpos = self.robot.init_qpos[j]
         mujoco.mj_forward(self.mj_model, self.mj_data)
 
     def set_object_pose(self, obj_joint_name: str = None, obj_pose: np.ndarray = None):

@@ -24,7 +24,7 @@ class JntVelController:
             d=0.003 * np.ones(self.dofs),
         )
 
-        self.last_err = np.zeros(robot.single_arm.jnt_num)
+        self.last_err = np.zeros(robot.jnt_num)
         self.err_buffer = deque(maxlen=5)
 
         print("Jnt_Impedance Initialized!")
@@ -68,7 +68,7 @@ class JntVelController:
         torque = self.compute_jnt_torque(
             q_des=q_target,
             v_des=qdot_target,
-            q_cur=self.robot.single_arm.arm_qpos,
-            v_cur=self.robot.single_arm.arm_qvel,
+            q_cur=self.robot.arm_qpos,
+            v_cur=self.robot.arm_qvel,
         )
         return torque

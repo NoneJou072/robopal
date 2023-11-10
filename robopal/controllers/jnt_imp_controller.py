@@ -19,15 +19,15 @@ class JntImpedance(object):
         self.kj = np.zeros(self.dofs)
 
         self.set_jnt_params(
-            b=47.0 * np.ones(self.dofs),
-            k=200.0 * np.ones(self.dofs),
+            b=600.0 * np.ones(self.dofs),
+            k=1000.0 * np.ones(self.dofs),
         )
 
         # choose interpolator
         self.interpolator = None
         if is_interpolate:
-            interpolator_config.setdefault('init_qpos', robot.single_arm.arm_qpos)
-            interpolator_config.setdefault('init_qvel', robot.single_arm.arm_qvel)
+            interpolator_config.setdefault('init_qpos', robot.arm_qpos)
+            interpolator_config.setdefault('init_qvel', robot.arm_qvel)
             self._init_interpolator(interpolator_config)
 
         print("Jnt_Impedance Initialized!")
@@ -72,8 +72,8 @@ class JntImpedance(object):
         torque = self.compute_jnt_torque(
             q_des=q_target,
             v_des=qdot_target,
-            q_cur=self.robot.single_arm.arm_qpos,
-            v_cur=self.robot.single_arm.arm_qvel,
+            q_cur=self.robot.arm_qpos,
+            v_cur=self.robot.arm_qvel,
         )
         return torque
 

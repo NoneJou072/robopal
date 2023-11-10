@@ -32,7 +32,7 @@ class PosCtrlEnv(JntCtrlEnv):
         self.is_pd = is_pd
         self.vel_des = np.zeros(3)
 
-        _, self.init_rot_quat = self.kdl_solver.fk(self.robot.single_arm.arm_qpos, rot_format='quaternion')
+        _, self.init_rot_quat = self.kdl_solver.fk(self.robot.arm_qpos, rot_format='quaternion')
 
     def compute_pd_increment(self, p_goal: np.ndarray,
                              p_cur: np.ndarray,
@@ -51,17 +51,17 @@ class PosCtrlEnv(JntCtrlEnv):
             p_goal = action[:3]
             r_goal = T.quat_2_mat(self.init_rot_quat if len(action) == 3 else action[3:])
         else:
-            p_cur, r_cur = self.kdl_solver.fk(self.robot.single_arm.arm_qpos, rot_format='quaternion')
+            p_cur, r_cur = self.kdl_solver.fk(self.robot.arm_qpos, rot_format='quaternion')
 
             r_target = self.init_rot_quat if len(action) == 3 else action[3:]
-            pd_cur = self.kdl_solver.get_end_vel(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)
+            pd_cur = self.kdl_solver.get_end_vel(self.robot.arm_qpos, self.robot.arm_qvel)
             p_incre, r_incre = self.compute_pd_increment(p_goal=action[:3], p_cur=p_cur,
                                                          r_goal=r_target, r_cur=r_cur,
                                                          pd_goal=self.vel_des, pd_cur=pd_cur[:3])
             p_goal = p_incre + p_cur
             r_goal = T.quat_2_mat(r_cur + r_incre)
 
-        return self.kdl_solver.ik(p_goal, r_goal, q_init=self.robot.single_arm.arm_qpos)
+        return self.kdl_solver.ik(p_goal, r_goal, q_init=self.robot.arm_qpos)
 
     def step(self, action):
         action = self.step_controller(action)

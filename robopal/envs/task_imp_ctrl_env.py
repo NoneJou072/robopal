@@ -28,19 +28,19 @@ class PosCtrlEnv(MujocoEnv):
 
         # self.interpolator = None
         # if is_interpolate:
-        #     self._init_interpolator(self.robot.single_arm)
+        #     self._init_interpolator(self.robot)
 
     def inner_step(self, action):
         # 根据阻抗控制获取末端输入力矩
         tor = self.Cart_imped.step_controller(
             action,
             np.array([[0, 0, -1], [0, 1, 0], [1, 0, 0]]),
-            q_curr=self.robot.single_arm.arm_qpos,
-            qd_curr=self.robot.single_arm.arm_qvel,
+            q_curr=self.robot.arm_qpos,
+            qd_curr=self.robot.arm_qvel,
         )
 
         for i in range(7):
-            self.mj_data.actuator(self.robot.single_arm.actuator_index[i]).ctrl = tor[i]
+            self.mj_data.actuator(self.robot.actuator_index[i]).ctrl = tor[i]
 
     def step(self, action):
         for i in range(int(self.control_timestep / self.model_timestep)):

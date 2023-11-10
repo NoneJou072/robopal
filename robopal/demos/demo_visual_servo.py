@@ -59,7 +59,7 @@ class VisualServo(JntCtrlEnv):
 
         kdl_hand2cam_f = trans.make_transform(hand2cam_p, hand2cam_M)
 
-        base2hand_p, base2hand_r = self.kdl_solver.fk(self.robot.single_arm.arm_qpos)
+        base2hand_p, base2hand_r = self.kdl_solver.fk(self.robot.arm_qpos)
         kdl_base2hand_f = trans.make_transform(base2hand_p, base2hand_r)
 
         kdl_base2cam_f = kdl_base2hand_f @ kdl_hand2cam_f
@@ -101,9 +101,9 @@ class VisualServo(JntCtrlEnv):
         else:
             V_camera = np.zeros(6)
 
-        jac_pinv = self.kdl_solver.get_full_jac_pinv(self.robot.single_arm.arm_qpos)
+        jac_pinv = self.kdl_solver.get_full_jac_pinv(self.robot.arm_qpos)
         V_dian = np.dot(jac_pinv, V_camera).reshape(-1)
-        action = gain * V_dian + self.robot.single_arm.arm_qpos
+        action = gain * V_dian + self.robot.arm_qpos
         return super().step(action)
 
 

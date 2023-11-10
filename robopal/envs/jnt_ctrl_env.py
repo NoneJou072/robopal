@@ -60,12 +60,12 @@ class JntCtrlEnv(MujocoEnv):
         if self.jnt_controller.name == 'JNTNONE':
             qpos = self.jnt_controller.step_controller(action)
             for i in range(self.robot.jnt_num):
-                self.mj_data.joint(self.robot.single_arm.joint_index[i]).qpos = qpos[i]
+                self.mj_data.joint(self.robot.joint_index[i]).qpos = qpos[i]
         else:
             torque = self.jnt_controller.step_controller(action)
             # Send torque to simulation
             for i in range(self.robot.jnt_num):
-                self.mj_data.actuator(self.robot.single_arm.actuator_index[i]).ctrl = torque[i]
+                self.mj_data.actuator(self.robot.actuator_index[i]).ctrl = torque[i]
 
     def gripper_ctrl(self, actuator_name: str = None, gripper_action: int = 1):
         """ Gripper control.
@@ -85,7 +85,7 @@ class JntCtrlEnv(MujocoEnv):
     def reset(self):
         super().reset()
         if self.is_interpolate:
-            self.jnt_controller.reset_interpolator(self.robot.single_arm.arm_qpos, self.robot.single_arm.arm_qvel)
+            self.jnt_controller.reset_interpolator(self.robot.arm_qpos, self.robot.arm_qvel)
 
 
 if __name__ == "__main__":

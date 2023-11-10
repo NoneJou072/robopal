@@ -17,8 +17,8 @@ class JntNone(object):
         # choose interpolator
         self.interpolator = None
         if is_interpolate:
-            interpolator_config.setdefault('init_qpos', robot.single_arm.arm_qpos)
-            interpolator_config.setdefault('init_qvel', robot.single_arm.arm_qvel)
+            interpolator_config.setdefault('init_qpos', robot.arm_qpos)
+            interpolator_config.setdefault('init_qvel', robot.arm_qvel)
             self._init_interpolator(interpolator_config)
 
         print("No controller has Initialized!")
