@@ -108,7 +108,7 @@ class VisualServo(JntCtrlEnv):
 
 
 if __name__ == "__main__":
-    from robopal.assets.robots.diana_med import DianaAruco
+    from robopal.robots.diana_med import DianaAruco
 
     env = VisualServo(
         robot=DianaAruco(),

@@ -39,7 +39,7 @@ class VisualForceAdmit(AdmitGymEnv):
 
 
 if __name__ == "__main__":
-    from robopal.assets.robots.diana_med import DianaMed
+    from robopal.robots.diana_med import DianaMed
 
     env = VisualForceAdmit(
         robot=DianaMed(),

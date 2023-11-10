@@ -3,7 +3,7 @@ import logging
 
 from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
 import robopal.commons.transform as trans
-from robopal.assets.robots.diana_med import DianaGrasp
+from robopal.robots.diana_med import DianaGrasp
 
 logging.basicConfig(level=logging.INFO)
 

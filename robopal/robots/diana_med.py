@@ -1,5 +1,7 @@
 import os
-from robopal.assets.robots.base import *
+from robopal.robots.base import *
+
+ASSET_DIR = os.path.join(os.path.dirname(__file__), '../assets')
 
 
 class DianaMedBase(BaseArm):
@@ -17,7 +19,7 @@ class DianaMedBase(BaseArm):
             manipulator='DianaMed',
             gripper=gripper,
             g2m_body=['0_link7'],
-            urdf_path=os.path.join(os.path.dirname(__file__), "../models/manipulators/DianaMed/DianaMed.urdf"),
+            urdf_path=os.path.join(ASSET_DIR, "models/manipulators/DianaMed/DianaMed.urdf"),
         )
         self.joint_index = ['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7']
         self.actuator_index = ['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7']
@@ -45,7 +47,7 @@ class DianaAruco(DianaMedBase):
 
     def add_assets(self):
         self.mjcf_generator.add_texture('aruco', type='2d',
-                                        file=os.path.join(os.path.dirname(__file__), '../textures/aruco.png'))
+                                        file=os.path.join(ASSET_DIR, 'textures/aruco.png'))
         self.mjcf_generator.add_material('aruco', texture='aruco', texrepeat='1 1', texuniform='false')
         self.mjcf_generator.add_body(node='worldbody', name='aruco')
         self.mjcf_generator.add_geom(node='aruco', name='aruco_box', pos='0.919 0 1.27', mass='0.001',
@@ -64,7 +66,7 @@ class DianaGrasp(DianaMedBase):
                          mount='top_point')
 
     def add_assets(self):
-        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cube/green_cube.xml')
+        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/green_cube.xml')
         self.mjcf_generator.set_node_attrib('green_block', {'pos': '0.5 0.0 0.46'})
 
         goal_site = """<site name="goal_site" pos="0.4 0.0 0.5" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />"""
@@ -82,13 +84,13 @@ class DianaGraspMultiObjs(DianaGrasp):
     def add_assets(self):
         OBJ_NAMES = ['green_block', 'red_block', 'blue_block']
 
-        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cube/green_cube.xml')
+        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/green_cube.xml')
         self.mjcf_generator.set_node_attrib('green_block', {'pos': '0.5 0.0 0.46'})
 
-        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cube/blue_cube.xml')
+        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/blue_cube.xml')
         self.mjcf_generator.set_node_attrib('blue_block', {'pos': '0.5 0.1 0.46'})
 
-        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cube/red_cube.xml')
+        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/red_cube.xml')
         self.mjcf_generator.set_node_attrib('red_block', {'pos': '0.5 -0.1 0.46'})
 
         goal_site = """<site name="goal_site" pos="0.4 0.0 0.5" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />"""
@@ -107,8 +109,7 @@ class DianaDrawer(DianaMedBase):
         # add cupboard with fixed position
         self.mjcf_generator.add_mesh('cupboard', 'objects/cupboard/cupboard.stl', scale='0.001 0.001 0.001')
         self.mjcf_generator.add_mesh('drawer', 'objects/cupboard/drawer.stl', scale='0.001 0.001 0.001')
-        self.mjcf_generator.add_node_from_xml('worldbody',
-                                              os.path.dirname(__file__) + '/../objects/cupboard/cupboard.xml')
+        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cupboard/cupboard.xml')
         self.mjcf_generator.set_node_attrib('cupboard', {'pos': '0.66 0.0 0.42'})
 
         # add goal site with random position
@@ -130,12 +131,8 @@ class DianaCabinet(DianaMedBase):
                          mount='top_point')
 
     def add_assets(self):
-        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cabinet/cabinet.xml')
-        self.mjcf_generator.add_node_from_xml('worldbody', os.path.dirname(__file__) + '/../objects/cabinet/beam.xml')
-
-        # add goal site with random position
-        # goal_site = """<site name="goal_site" pos="0.56 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
-        # self.mjcf_generator.add_node_from_str('worldbody', goal_site)
+        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cabinet/cabinet.xml')
+        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cabinet/beam.xml')
 
     @property
     def init_qpos(self):
@@ -156,13 +153,11 @@ class DianaDrawerCube(DianaMedBase):
         self.mjcf_generator.add_mesh('drawer', 'objects/cupboard/drawer.stl', scale='0.001 0.001 0.001')
         cupboard_x_pos = 0.66
         cupboard_y_pos = 0.0
-        self.mjcf_generator.add_node_from_xml('worldbody',
-                                              os.path.dirname(__file__) + '/../objects/cupboard/cupboard.xml')
+        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cupboard/cupboard.xml')
         self.mjcf_generator.set_node_attrib('cupboard', {'pos': f'{cupboard_x_pos} {cupboard_y_pos} {0.42}'})
 
         # add cube with random position
-        self.mjcf_generator.add_node_from_xml('worldbody',
-                                              os.path.dirname(__file__) + '/../objects/cube/green_cube.xml')
+        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/green_cube.xml')
         self.mjcf_generator.set_node_attrib('green_block', {'pos': '0.5 0.0 0.46'})
 
         goal_site = """<site name="drawer_goal" pos="0.48 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""

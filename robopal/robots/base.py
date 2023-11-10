@@ -59,30 +59,21 @@ class BaseArm:
         self.robot_data = mujoco.MjData(self.robot_model)
 
     @abc.abstractmethod
-    def add_assets(self):
+    def add_assets(self) -> None:
         """ Add objects into the xml file. """
         pass
 
     @property
-    def jnt_num(self):
+    def jnt_num(self) -> int:
         return len(self.joint_index)
 
-    def get_Arm_id(self):
-        joint_id = []
-        for i in range(self.jnt_num):
-            joint_id.append(mujoco.mj_name2id(self.robot_model, mujoco.mjtObj.mjOBJ_JOINT, self.joint_index[i]))
-        return joint_id
+    def get_arm_id(self) -> list:
+        return [mujoco.mj_name2id(self.robot_model, mujoco.mjtObj.mjOBJ_JOINT, self.joint_index[i]) for i in range(self.jnt_num)]
 
     @property
-    def arm_qpos(self):
-        qpos_states = []
-        for i in range(self.jnt_num):
-            qpos_states.append(self.robot_data.joint(self.joint_index[i]).qpos[0])
-        return np.array(qpos_states)
+    def arm_qpos(self) -> np.ndarray:
+        return np.array([self.robot_data.joint(self.joint_index[i]).qpos[0] for i in range(self.jnt_num)])
 
     @property
-    def arm_qvel(self):
-        qvel_states = []
-        for i in range(self.jnt_num):
-            qvel_states.append(self.robot_data.joint(self.joint_index[i]).qvel[0])
-        return np.array(qvel_states)
+    def arm_qvel(self) -> np.ndarray:
+        return np.array([self.robot_data.joint(self.joint_index[i]).qvel[0] for i in range(self.jnt_num)])

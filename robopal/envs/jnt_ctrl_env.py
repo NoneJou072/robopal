@@ -1,5 +1,3 @@
-import logging
-
 import numpy as np
 from robopal.envs.base import MujocoEnv
 from robopal.controllers import controllers
@@ -89,7 +87,7 @@ class JntCtrlEnv(MujocoEnv):
 
 
 if __name__ == "__main__":
-    from robopal.assets.robots.diana_med import DianaMed
+    from robopal.robots.diana_med import DianaMed
 
     env = JntCtrlEnv(
         robot=DianaMed(),
