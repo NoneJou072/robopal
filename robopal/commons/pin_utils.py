@@ -10,10 +10,13 @@ class PinSolver:
         # Load the urdf model
         urdf_path = urdf_path
         self.model = pin.buildModelFromUrdf(urdf_path)
-
+        print('model name: ' + self.model.name)
         # Create data required by the algorithms
         self.data = self.model.createData()
-
+        NQ = self.model.nq
+        NV = self.model.nv
+        print('Dimension of the configuration vector representation: ' + str(NQ))
+        print('Dimension of the velocity: ' + str(NV))
         self.JOINT_NUM = self.model.nq
         print(f"pinocchio model {self.model.name} init!")
 
@@ -89,13 +92,23 @@ class PinSolver:
         """
         return pin.computeGeneralizedGravity(self.model, self.data, q).copy()
 
-    def get_full_jac(self, q: np.ndarray) -> np.ndarray:
+    def get_full_jac2(self, q: np.ndarray) -> np.ndarray:
         """ Computes the full model Jacobian, expressed in the coordinate world frame.
 
         :param q: joint position
         :return: Jacobian
         """
         return pin.computeJointJacobians(self.model, self.data, q).copy()
+
+    def get_full_jac(self, q: np.ndarray) -> np.ndarray:
+        """ Computes the full model Jacobian, expressed in the coordinate world frame.
+
+        :param q: joint position
+        :return: Jacobian
+        """
+        END_BODY_NAME = self.model.frames[-1].name
+        IDX_TOOL = self.model.getFrameId(END_BODY_NAME)
+        return pin.computeFrameJacobian(self.model, self.data, q, IDX_TOOL, pin.LOCAL_WORLD_ALIGNED)
 
     def get_joint_jac(self, q: np.ndarray) -> np.ndarray:
         """ Computes the Jacobian of a specific joint frame expressed in the local frame.
