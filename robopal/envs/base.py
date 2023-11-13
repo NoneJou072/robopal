@@ -25,7 +25,8 @@ class MujocoEnv:
                  renderer="viewer",
                  control_freq=1000,
                  enable_camera_viewer=False,
-                 cam_mode='rgb'):
+                 cam_mode='rgb',
+                 camera_name=None):
 
         self.robot = robot
         self.is_render = is_render
@@ -41,7 +42,7 @@ class MujocoEnv:
         self.robot_dof = self.robot.jnt_num
 
         self.renderer = MjRenderer(self.mj_model, self.mj_data, self.is_render, renderer, enable_camera_viewer,
-                                   cam_mode)
+                                   cam_mode, camera_name)
 
         self._initialize_time()
         self._set_init_pose()
@@ -86,7 +87,8 @@ class MujocoEnv:
 
     def close(self):
         """ close the environment. """
-        self.renderer.close()
+        if self.renderer is not None:
+            self.renderer.close()
 
     def _initialize_time(self):
         """ Initializes the time constants used for simulation.

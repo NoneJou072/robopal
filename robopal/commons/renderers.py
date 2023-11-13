@@ -1,27 +1,29 @@
+import logging
 import time
-
 import mujoco
 from mujoco import viewer
-
 from collections import deque
 import sys
 import numpy as np
 from queue import Queue
-# TODO: separate cv from here
-try:
-    import cv2
-except ImportError:
-    print('Could not import cv2, please install it to enable camera viewer.')
+
+import robopal.commons.cv_utils as cv
+
+logging.basicConfig(level=logging.INFO)
 
 
 class MjRenderer:
-    def __init__(self, mj_model, mj_data, is_render, renderer, enable_camera_viewer=False, cam_mode='rgb'):
+    def __init__(self, mj_model, mj_data, is_render, renderer,
+                 enable_camera_viewer=False, cam_mode='rgb', camera_name='0_cam'):
         self.mj_model = mj_model
         self.mj_data = mj_data
 
         self.renderer = renderer
         self.enable_camera_viewer = enable_camera_viewer
+        if cv.CV_FLAG is False:
+            self.enable_camera_viewer = False
         self.cam_mode = cam_mode
+        self.camera_name = camera_name
 
         # Set up mujoco viewer
         self.viewer = None
@@ -34,31 +36,34 @@ class MjRenderer:
         self.exit_flag = False
 
         self._image = None
-        self.image_queue = Queue()
+        self.image_queue = Queue(3)
 
         self.image_renderer = mujoco.Renderer(self.mj_model)
+
+    def key_callback(self, keycode):
+        if keycode == 32:  # space
+            self.render_paused = not self.render_paused
+        elif keycode == 256:  # esc
+            self.exit_flag = not self.exit_flag
+        elif keycode == 257:  # enter
+            image = self.image_queue.get()
+            cv.save_image(image)
+            logging.info(f"Save a picture to {cv.CV_CACHE_DIR}.")
 
     def _init_renderer(self):
         """ Initialize renderer, choose official renderer with "viewer"(joined from version 2.3.3),
             another renderer with "mujoco_viewer"
         """
-
-        def key_callback(keycode):
-            if keycode == 32:
-                self.render_paused = not self.render_paused
-            elif keycode == 256:
-                self.exit_flag = not self.exit_flag
-
         if self.renderer == "unity":
             # TODO: Support unity renderer.
             raise ValueError("Unity renderer not supported now.")
         elif self.renderer == "viewer":
             # This function does not block, allowing user code to continue execution.
             self.viewer = viewer.launch_passive(self.mj_model, self.mj_data,
-                                                key_callback=key_callback, show_left_ui=False, show_right_ui=False)
+                                                key_callback=self.key_callback, show_left_ui=False, show_right_ui=False)
             self.set_renderer_config()
             if self.enable_camera_viewer:
-                cv2.namedWindow('RGB Image', cv2.WINDOW_NORMAL)
+                cv.init_cv_window()
         else:
             raise ValueError('Invalid renderer name.')
 
@@ -73,15 +78,18 @@ class MjRenderer:
 
             if self.enable_camera_viewer:
                 enable_depth = True if self.cam_mode == 'depth' else False
-                rgb = self.render_pixels_from_camera('0_cam', enable_depth=enable_depth)
-                cv2.imshow('RGB Image', rgb)
-                cv2.waitKey(1)
+                image = self.render_pixels_from_camera(self.camera_name, enable_depth=enable_depth)
+                self.image_queue.put(image)
+                if self.image_queue.full():
+                    self.image_queue.get()
+                cv.show_image(image)
 
     def close(self):
         """ close the environment. """
         if self.enable_camera_viewer:
-            cv2.destroyAllWindows()
-        self.viewer.close()
+            cv.close_cv_window()
+        if self.viewer is not None:
+            self.viewer.close()
         sys.exit(0)
 
     def set_renderer_config(self):
@@ -112,20 +120,6 @@ class MjRenderer:
                     mat=np.eye(3).flatten(),
                     rgba=np.concatenate([np.random.uniform(0, 1, 3), np.array([1])], axis=0)
                 )
-
-    def get_cam_intrinsic(self, fovy=45.0, width=320, height=240):
-        aspect = width * 1.0 / height
-        fovx = np.degrees(2 * np.arctan(aspect * np.tan(np.radians(fovy / 2))))
-
-        cx = 0.5 * width
-        cy = 0.5 * height
-        fx = cx / np.tan(fovx * np.pi / 180 * 0.5)
-        fy = cy / np.tan(fovy * np.pi / 180 * 0.5)
-
-        K = np.array([[fx, 0, cx],
-                      [0, fy, cy],
-                      [0, 0, 1]], dtype=np.float32)
-        return K
 
     def render_pixels_from_camera(self, cam='0_cam', enable_depth=True):
         self.image_renderer.update_scene(self.mj_data, camera=cam)

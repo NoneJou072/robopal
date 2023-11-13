@@ -27,6 +27,7 @@ class JntCtrlEnv(MujocoEnv):
                  cam_mode='rgb',
                  jnt_controller='JNTIMP',
                  is_interpolate=False,
+                 camera_name=None,
                  ):
 
         super().__init__(
@@ -36,6 +37,7 @@ class JntCtrlEnv(MujocoEnv):
             control_freq=control_freq,
             enable_camera_viewer=enable_camera_viewer,
             cam_mode=cam_mode,
+            camera_name=camera_name,
         )
         self.is_interpolate = is_interpolate
         # choose controller

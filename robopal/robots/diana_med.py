@@ -57,6 +57,32 @@ class DianaAruco(DianaMedBase):
         self.mjcf_generator.add_joint(node='aruco', name='aruco_z', type='slide', axis='0 0 1')
 
 
+class DianaCalib(DianaMedBase):
+    """ DianaMed for Camera Calibration. """
+
+    def __init__(self):
+        super().__init__(scene='default',
+                         gripper=None, )
+
+    def add_assets(self):
+        # link chessboard to the end
+        self.mjcf_generator.add_texture('chessboard', type='2d',
+                                        file=os.path.join(ASSET_DIR, 'textures/chessboard.png'))
+        self.mjcf_generator.add_material('chessboard', texture='chessboard', texrepeat='1 1', texuniform='false')
+        self.mjcf_generator.add_body(node='0_link7', name='chessboard')
+        self.mjcf_generator.add_geom(node='chessboard', name='chessboard_box', pos='0.0 0 0.0', mass='0.001',
+                                     euler="0 0 1.57", size='0.115 0.08 0.001', type='box', material='chessboard')
+
+        # set camera
+        self.mjcf_generator.add_mesh(name = "cambase", file = "objects/camera/meshes/cambase.STL")
+        self.mjcf_generator.add_mesh(name = "cam", file = "objects/camera/meshes/cam.STL")
+
+        cam = """<body pos="1.0 0.0 0.8" euler="0 0.785 3.14">
+        <include file="objects/camera/realsense.xml"/>
+    </body>"""
+        self.mjcf_generator.add_node_from_str('worldbody', cam)
+
+
 class DianaGrasp(DianaMedBase):
     """ DianaMed robot class. """
 

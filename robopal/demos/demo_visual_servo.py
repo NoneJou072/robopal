@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from robopal.envs.jnt_ctrl_env import JntCtrlEnv
 import robopal.commons.transform as trans
+import robopal.commons.cv_utils as cv
 
 
 class VisualServo(JntCtrlEnv):
@@ -26,7 +27,7 @@ class VisualServo(JntCtrlEnv):
             cam_mode=cam_mode
         )
 
-        self.camera_intrinsic_matrix = self.renderer.get_cam_intrinsic()
+        self.camera_intrinsic_matrix = cv.get_cam_intrinsic()
         self.distCoeffs = np.zeros(5)
         aruco_parameters = cv2.aruco.DetectorParameters()
         aruco_dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_100)

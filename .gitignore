@@ -8,6 +8,7 @@ MUJOCO_LOG.TXT
 **/.vs
 **/.vscode
 **/build
+cv_cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

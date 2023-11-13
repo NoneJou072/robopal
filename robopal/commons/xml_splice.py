@@ -225,7 +225,7 @@ class XMLSplicer:
         if node == 'worldbody':
             body_element = self.root.find('worldbody')
         else:
-            body_element = self.root.find('worldbody').find(node)
+            body_element = self.root.find(f'.//body[@name=\'{node}\']')
         body = ET.Element('body')
         for key in kwargs:
             body.set(key, kwargs[key])
