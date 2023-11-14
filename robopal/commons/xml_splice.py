@@ -171,12 +171,14 @@ class XMLSplicer:
         new_node = new_tree.getroot().find('worldbody').find('body')
         parent_element.append(new_node)
 
-    def set_node_attrib(self, node: str, attrib: dict):
+    def set_node_attrib(self, node: str, name: str, attrib: dict):
         """ Set node attribute.
+        e.g.
+        >>> self.set_node_attrib('body', 'green_block', {'pos': '0.5 0.0 0.46'})
         :param node: node name
         :param attrib: attribute dict
         """
-        node_element = self.root.find(f'.//body[@name=\'{node}\']')
+        node_element = self.root.find(f'.//{node}[@name=\'{name}\']')
         for key in attrib:
             node_element.set(key, attrib[key])
 

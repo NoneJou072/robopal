@@ -1,9 +1,5 @@
-from robopal.demos.demo_pick_place import PickAndPlaceEnv
-from robopal.demos.demo_drawer import DrawerEnv
-from robopal.demos.demo_cube_drawer import DrawerCubeEnv
-from robopal.commons.gym_wrapper import GoalEnvWrapper
-
-from gymnasium.envs.registration import register
+from robopal.demos.single_task_manipulation.demo_drawer import DrawerEnv
+from robopal.demos.multi_task_manipulation.demo_cube_drawer import DrawerCubeEnv
 
 # register(
 #     id='PickAndPlace-v1',
