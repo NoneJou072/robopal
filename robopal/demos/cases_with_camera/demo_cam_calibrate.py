@@ -3,6 +3,7 @@ import numpy as np
 from robopal.envs.jnt_ctrl_env import JntCtrlEnv
 import robopal.commons.transform as trans
 import robopal.commons.cv_utils as cv
+from robopal.robots.diana_med import DianaCalib
 
 
 class CamCalibEnv(JntCtrlEnv):
@@ -47,7 +48,6 @@ class CamCalibEnv(JntCtrlEnv):
 
 
 if __name__ == "__main__":
-    from robopal.robots.diana_med import DianaCalib
 
     env = CamCalibEnv(
         robot=DianaCalib(),

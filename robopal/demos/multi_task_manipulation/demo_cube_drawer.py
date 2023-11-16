@@ -86,9 +86,7 @@ class DrawerCubeEnv(PosCtrlEnv):
         self.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = gripper_ctrl
         self.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = gripper_ctrl
 
-        logging.debug(f'des_pos:{actual_pos_action[:3]}')
         super().step(actual_pos_action[:3])
-        logging.debug(f'cur_pos:{self.kdl_solver.fk(self.robot.arm_qpos)[0]}')
 
         obs = self._get_obs()
         achieved_goal = obs['achieved_goal']

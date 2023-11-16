@@ -17,6 +17,9 @@
     <texture name="groundplane" type="2d" builtin="checker" mark="edge"  rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
       markrgb="0.8 0.8 0.8" width="300" height="300"/>
     <material name="groundplane" reflectance="0.2" shininess="0.0" specular="0.0" texrepeat="5 5" texture="groundplane" texuniform="true"/>
+
+    <texture name="wood" type="2d" file="../textures/wood.png" />
+    <material name="wood" texture="wood" texrepeat="1 1" texuniform="true" />
   </asset>
 
   <worldbody>

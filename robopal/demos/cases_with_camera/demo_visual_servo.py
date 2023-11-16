@@ -14,7 +14,8 @@ class VisualServo(JntCtrlEnv):
                  jnt_controller='JNTIMP',
                  is_interpolate=False,
                  enable_camera_viewer=True,
-                 cam_mode='rgb'
+                 cam_mode='rgb',
+                 camera_name='0_cam'
                  ):
         super().__init__(
             robot=robot,
@@ -24,10 +25,12 @@ class VisualServo(JntCtrlEnv):
             jnt_controller=jnt_controller,
             is_interpolate=is_interpolate,
             enable_camera_viewer=enable_camera_viewer,
-            cam_mode=cam_mode
+            cam_mode=cam_mode,
+            camera_name=camera_name
         )
 
         self.camera_intrinsic_matrix = cv.get_cam_intrinsic()
+        print(self.camera_intrinsic_matrix)
         self.distCoeffs = np.zeros(5)
         aruco_parameters = cv2.aruco.DetectorParameters()
         aruco_dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_100)

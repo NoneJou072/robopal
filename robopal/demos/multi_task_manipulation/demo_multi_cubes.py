@@ -86,16 +86,6 @@ class MultiCubes(PosCtrlEnv):
 
         super().step(actual_pos_action[:3])
 
-        # green block
-        red_pos = self.get_body_pos('red_block')
-        goal_pos = np.array([red_pos[0], red_pos[1], red_pos[2] + 0.04])
-        self.set_site_pose('green_goal', goal_pos)
-
-        # blue block
-        green_pos = self.get_body_pos('green_block')
-        goal_pos = np.array([green_pos[0], green_pos[1], green_pos[2] + 0.04])
-        self.set_site_pose('blue_goal', goal_pos)
-
         obs = self._get_obs()
         achieved_goal = obs['achieved_goal']
         desired_goal = obs['desired_goal']
@@ -245,17 +235,37 @@ class MultiCubes(PosCtrlEnv):
 
         g_random_x_pos = np.random.uniform(0.35, 0.55)
         g_random_y_pos = np.random.uniform(-0.15, 0.15)
+        while np.linalg.norm(np.array([r_random_x_pos, r_random_y_pos]) - np.array([g_random_x_pos, g_random_y_pos])) < 0.06:
+            g_random_x_pos = np.random.uniform(0.35, 0.55)
+            g_random_y_pos = np.random.uniform(-0.15, 0.15)
         self.set_object_pose('green_block:joint', np.array([g_random_x_pos, g_random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
 
         b_random_x_pos = np.random.uniform(0.35, 0.55)
         b_random_y_pos = np.random.uniform(-0.15, 0.15)
+        while np.linalg.norm(np.array([r_random_x_pos, r_random_y_pos]) - np.array([b_random_x_pos, b_random_y_pos])) < 0.06 \
+            or np.linalg.norm(np.array([g_random_x_pos, g_random_y_pos]) - np.array([b_random_x_pos, b_random_y_pos])) < 0.06:
+            b_random_x_pos = np.random.uniform(0.35, 0.55)
+            b_random_y_pos = np.random.uniform(-0.15, 0.15)
         self.set_object_pose('blue_block:joint', np.array([b_random_x_pos, b_random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
 
         # red goal
         random_goal_x_pos = np.random.uniform(0.35, 0.55)
         random_goal_y_pos = np.random.uniform(-0.15, 0.15)
+        while np.linalg.norm(np.array([r_random_x_pos, r_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.06 \
+            or np.linalg.norm(np.array([g_random_x_pos, g_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.06 \
+            or np.linalg.norm(np.array([b_random_x_pos, b_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.06:
+            random_goal_x_pos = np.random.uniform(0.35, 0.55)
+            random_goal_y_pos = np.random.uniform(-0.15, 0.15)
         red_goal = np.array([random_goal_x_pos, random_goal_y_pos, 0.44])
         self.set_site_pose('red_goal', red_goal)
+
+        # green block
+        green_goal = np.array([red_goal[0], red_goal[1], red_goal[2] + 0.04])
+        self.set_site_pose('green_goal', green_goal)
+
+        # blue block
+        blue_goal = np.array([green_goal[0], green_goal[1], green_goal[2] + 0.04])
+        self.set_site_pose('blue_goal', blue_goal)
 
         if self.TASK_FLAG == 0:
             pass
