@@ -6,11 +6,10 @@ from robopal.controllers import controllers
 class JntCtrlEnv(MujocoEnv):
     """ Single arm environment.
 
-    :param robot(str): Robot configuration.
+    :param robot: Robot configuration.
     :param is_render: Choose if use the renderer to render the scene or not.
-    :param renderer: Choose official renderer with "viewer",
-            another renderer with "mujoco_viewer"
-    :param jnt_controller: Choose the joint controller.
+    :param renderer: Choose official renderer with "viewer"
+    :param controller: Choose the controller.
     :param control_freq: Upper-layer control frequency. i.g. frame per second-fps
             Note that high frequency will cause high time-lag.
     :param is_interpolate: Use interpolator while stepping.
@@ -25,7 +24,7 @@ class JntCtrlEnv(MujocoEnv):
                  control_freq=200,
                  enable_camera_viewer=False,
                  cam_mode='rgb',
-                 jnt_controller='JNTIMP',
+                 controller='JNTIMP',
                  is_interpolate=False,
                  camera_name=None,
                  ):
@@ -40,16 +39,16 @@ class JntCtrlEnv(MujocoEnv):
             camera_name=camera_name,
         )
         self.is_interpolate = is_interpolate
+
         # choose controller
-        if jnt_controller not in controllers:
-            raise AttributeError("No joint controller specified, or the controller is not supported.")
-        self.jnt_controller = controllers[jnt_controller](
+        assert controller in controllers, f"Not supported controller, you can choose from {controllers.keys()}"
+        self.controller = controllers[controller](
             self.robot,
             is_interpolate=is_interpolate,
             interpolator_config={'dof': self.robot_dof, 'control_timestep': self.control_timestep}
         )
 
-        self.kdl_solver = self.jnt_controller.kdl_solver  # shallow copy
+        self.kdl_solver = self.controller.kdl_solver  # shallow copy
 
         self.nsubsteps = int(self.control_timestep / self.model_timestep)
         if self.nsubsteps == 0:
@@ -57,12 +56,12 @@ class JntCtrlEnv(MujocoEnv):
                              "Current Model-Timestep:{}".format(self.model_timestep))
 
     def inner_step(self, action):
-        if self.jnt_controller.name == 'JNTNONE':
-            qpos = self.jnt_controller.step_controller(action)
+        if self.controller.name == 'JNTNONE':
+            qpos = self.controller.step_controller(action)
             for i in range(self.robot.jnt_num):
                 self.mj_data.joint(self.robot.joint_index[i]).qpos = qpos[i]
         else:
-            torque = self.jnt_controller.step_controller(action)
+            torque = self.controller.step_controller(action)
             # Send torque to simulation
             for i in range(self.robot.jnt_num):
                 self.mj_data.actuator(self.robot.actuator_index[i]).ctrl = torque[i]
@@ -77,7 +76,7 @@ class JntCtrlEnv(MujocoEnv):
 
     def step(self, action):
         if self.is_interpolate:
-            self.jnt_controller.step_interpolator(action)
+            self.controller.step_interpolator(action)
         # step into inner loop
         for i in range(self.nsubsteps):
             super().step(action)
@@ -85,7 +84,7 @@ class JntCtrlEnv(MujocoEnv):
     def reset(self):
         super().reset()
         if self.is_interpolate:
-            self.jnt_controller.reset_interpolator(self.robot.arm_qpos, self.robot.arm_qvel)
+            self.controller.reset_interpolator(self.robot.arm_qpos, self.robot.arm_qvel)
 
 
 if __name__ == "__main__":
@@ -97,7 +96,7 @@ if __name__ == "__main__":
         is_render=True,
         control_freq=20,
         is_interpolate=False,
-        jnt_controller='JNTIMP',
+        controller='JNTIMP',
     )
     env.reset()
     for t in range(int(1e6)):

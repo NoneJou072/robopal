@@ -9,7 +9,7 @@ class PosCtrlEnv(MujocoEnv):
                  robot=None,
                  is_render=False,
                  renderer="viewer",
-                 jnt_controller='IMPEDANCE',
+                 controller='IMPEDANCE',
                  control_freq=200,
                  is_interpolate=False,
                  enable_camera_viewer=False,
@@ -24,19 +24,13 @@ class PosCtrlEnv(MujocoEnv):
             cam_mode=cam_mode
         )
 
-        self.Cart_imped = CartImpedance(self.robot)
-
-        # self.interpolator = None
-        # if is_interpolate:
-        #     self._init_interpolator(self.robot)
+        self.controller = CartImpedance(self.robot)
 
     def inner_step(self, action):
         # 根据阻抗控制获取末端输入力矩
-        tor = self.Cart_imped.step_controller(
+        tor = self.controller.step_controller(
             action,
-            np.array([[0, 0, -1], [0, 1, 0], [1, 0, 0]]),
-            q_curr=self.robot.arm_qpos,
-            qd_curr=self.robot.arm_qvel,
+            np.array([1, 0, 0, 0]),
         )
 
         for i in range(7):

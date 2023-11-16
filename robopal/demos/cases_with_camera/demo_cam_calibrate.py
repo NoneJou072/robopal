@@ -1,7 +1,6 @@
-import cv2
 import numpy as np
+
 from robopal.envs.jnt_ctrl_env import JntCtrlEnv
-import robopal.commons.transform as trans
 import robopal.commons.cv_utils as cv
 from robopal.robots.diana_med import DianaCalib
 
@@ -16,7 +15,7 @@ class CamCalibEnv(JntCtrlEnv):
                  is_render=False,
                  renderer="viewer",
                  control_freq=200,
-                 jnt_controller='JNTIMP',
+                 controller='JNTIMP',
                  is_interpolate=False,
                  enable_camera_viewer=True,
                  cam_mode='rgb',
@@ -27,14 +26,14 @@ class CamCalibEnv(JntCtrlEnv):
             is_render=is_render,
             renderer=renderer,
             control_freq=control_freq,
-            jnt_controller=jnt_controller,
+            controller=controller,
             is_interpolate=is_interpolate,
             enable_camera_viewer=enable_camera_viewer,
             cam_mode=cam_mode,
             camera_name=camera_name,
         )
         # Set low damping for easily dragging the end.
-        self.jnt_controller.set_jnt_params(
+        self.controller.set_jnt_params(
             b=6.0 * np.ones(7),
             k=100.0 * np.ones(7),
         )
@@ -53,7 +52,7 @@ if __name__ == "__main__":
         robot=DianaCalib(),
         is_render=True,
         control_freq=200,
-        jnt_controller='JNTIMP',
+        controller='JNTIMP',
         is_interpolate=False,
         renderer='viewer',
         enable_camera_viewer=True,

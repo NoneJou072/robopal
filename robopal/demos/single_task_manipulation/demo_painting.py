@@ -22,7 +22,7 @@ class DrawerEnv(PosCtrlEnv):
                  control_freq=40,
                  enable_camera_viewer=False,
                  cam_mode='rgb',
-                 jnt_controller='JNTIMP',
+                 controller='JNTIMP',
                  is_interpolate=False,
                  is_pd=False,
                  ):
@@ -33,7 +33,7 @@ class DrawerEnv(PosCtrlEnv):
             control_freq=control_freq,
             enable_camera_viewer=enable_camera_viewer,
             cam_mode=cam_mode,
-            jnt_controller=jnt_controller,
+            controller=controller,
             is_interpolate=is_interpolate,
             is_pd=is_pd,
         )

@@ -30,8 +30,6 @@ class JntImpedance(object):
             interpolator_config.setdefault('init_qvel', robot.arm_qvel)
             self._init_interpolator(interpolator_config)
 
-        print("Jnt_Impedance Initialized!")
-
     def set_jnt_params(self, b: np.ndarray, k: np.ndarray):
         """ Used for changing the parameters. """
         self.Bj = b

@@ -15,7 +15,7 @@ if args.ctrl == 'JNTIMP':
         is_render=True,
         control_freq=200,
         is_interpolate=False,
-        jnt_controller='JNTIMP',
+        controller='JNTIMP',
     )
     action = np.array([0.33116, -0.39768533, 0.66947228, 0.33116, -0.39768533, 0.66947228, 0])
 
@@ -26,7 +26,7 @@ elif args.ctrl == 'JNTVEL':
         is_render=True,
         control_freq=200,
         is_interpolate=False,
-        jnt_controller='JNTVEL',
+        controller='JNTVEL',
     )
     action = np.array([0.01, -0.01, 0.0, 0.0, 0.01, 0.01, 0])
 
