@@ -1,14 +1,6 @@
 robopal.assets package
 ======================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   robopal.assets.robots
-
 Module contents
 ---------------
 

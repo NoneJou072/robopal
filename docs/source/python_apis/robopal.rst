@@ -13,6 +13,7 @@ Subpackages
    robopal.demos
    robopal.envs
    robopal.plugins
+   robopal.robots
 
 Module contents
 ---------------
