@@ -270,3 +270,25 @@ class MujocoEnv:
         :return: site rotation matrix
         """
         return self.mj_data.site(name).xmat.copy().reshape(3, 3)
+
+    def is_contact(self, geom1: str, geom2: str):
+        """ Check if two geom is in contact.
+
+        :param geom1: geom name
+        :param geom2: geom name
+        :return: True or False
+        """
+        geom1 = mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, geom1)
+        geom2 = mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, geom2)
+        if len(self.mj_data.contact) > 0:
+            for i, geoms in enumerate(self.mj_data.contact.geom):
+                if {geom1, geom2} != set(geoms):
+                    continue
+                contact_info = self.mj_data.contact[i]
+                name1 = mujoco.mj_id2name(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, contact_info.geom1)
+                name2 = mujoco.mj_id2name(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, contact_info.geom2)
+                dist = contact_info.dist
+                print("contact geom: ", name1, name2)
+                print("dist: ", dist)
+                return True
+        return False
