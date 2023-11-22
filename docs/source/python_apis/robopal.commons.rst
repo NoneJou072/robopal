@@ -7,6 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   robopal.commons.cv_utils
    robopal.commons.gym_wrapper
    robopal.commons.pin_utils
    robopal.commons.renderers
