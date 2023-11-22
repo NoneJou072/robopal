@@ -1,9 +1,9 @@
 import numpy as np
-from robopal.envs.jnt_ctrl_env import JntCtrlEnv
+from robopal.envs.robot import RobotEnv
 import robopal.commons.transform as T
 
 
-class PosCtrlEnv(JntCtrlEnv):
+class PosCtrlEnv(RobotEnv):
     def __init__(self,
                  robot=None,
                  is_render=True,

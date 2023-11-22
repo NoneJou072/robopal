@@ -51,13 +51,13 @@ class CartImpedance:
         self.Bc = b
         self.Kc = k
 
-    def step_controller(self, desired_pos, desired_ori):
+    def step_controller(self, desired_pose):
         """ compute the torque in the joint space from the impedance controller in the cartesian space
 
-        desired_pos: desired position
-        desired_ori: desired orientation
+        desired_pose: [x, y, z, qw, qx, qy, qz]
         """
-        desired_ori = trans.quat_2_mat(desired_ori)
+        desired_pos = desired_pose[:3]
+        desired_ori = trans.quat_2_mat(desired_pose[3:])
         q_curr = self.robot.arm_qpos
         qd_curr = self.robot.arm_qvel
 

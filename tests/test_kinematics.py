@@ -1,8 +1,9 @@
 import logging
 import numpy as np
 import mujoco
+import pinocchio as pin
 try:
-    from robopal.envs.jnt_ctrl_env import JntCtrlEnv
+    from robopal.envs.robot import RobotEnv
     from robopal.robots.diana_med import DianaMed
 except ImportError:
     pass
@@ -16,7 +17,7 @@ class TestKinematics:
     def __init__(self):
         self.urdf_path = '../robopal/assets/models/manipulators/DianaMed/DianaMed.urdf'
         self.qpos = np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])
-        self.env = JntCtrlEnv(DianaMed(), is_render=False)
+        self.env = RobotEnv(DianaMed(), is_render=False)
         self.env.reset()
 
     def compute_jacobian_mojoco(self):
@@ -38,8 +39,15 @@ class TestKinematics:
         print("-------------------------<kdl>------------------------")
         print(self.kdl_solver.getJac(self.qpos))
 
+    def get_joint_transform(self):
+        print("-------------------------<joint transform>------------------------")
+        pin.forwardKinematics(self.env.kdl_solver.model, self.env.kdl_solver.data, self.qpos)
+        for i in range(7):
+            print(self.env.kdl_solver.data.oMi[i].translation)
+
 
 if __name__ == '__main__':
     test = TestKinematics()
-    test.compute_jacobian_mojoco()
-    test.compute_jacobian_pinocchio()
+    # test.compute_jacobian_mojoco()
+    # test.compute_jacobian_pinocchio()
+    test.get_joint_transform()

@@ -3,7 +3,7 @@ from robopal.envs.base import MujocoEnv
 from robopal.controllers import controllers
 
 
-class JntCtrlEnv(MujocoEnv):
+class RobotEnv(MujocoEnv):
     """ Single arm environment.
 
     :param robot: Robot configuration.
@@ -90,7 +90,7 @@ class JntCtrlEnv(MujocoEnv):
 if __name__ == "__main__":
     from robopal.robots.diana_med import DianaMed
 
-    env = JntCtrlEnv(
+    env = RobotEnv(
         robot=DianaMed(),
         renderer='viewer',
         is_render=True,

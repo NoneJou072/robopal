@@ -1,11 +1,11 @@
 import numpy as np
 
-from robopal.envs.jnt_ctrl_env import JntCtrlEnv
+from robopal.envs.robot import RobotEnv
 import robopal.commons.cv_utils as cv
 from robopal.robots.diana_med import DianaCalib
 
 
-class CamCalibEnv(JntCtrlEnv):
+class CamCalibEnv(RobotEnv):
     """ Camera calibration environment.
     In this case, we will show the detail process of hand-eye calibration.
     Press 'Enter' to take a picture.

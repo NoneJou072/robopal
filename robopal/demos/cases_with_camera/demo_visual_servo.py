@@ -1,11 +1,11 @@
 import cv2
 import numpy as np
-from robopal.envs.jnt_ctrl_env import JntCtrlEnv
+from robopal.envs.robot import RobotEnv
 import robopal.commons.transform as trans
 import robopal.commons.cv_utils as cv
 
 
-class VisualServo(JntCtrlEnv):
+class VisualServo(RobotEnv):
     def __init__(self,
                  robot=None,
                  is_render=False,
