@@ -1,15 +1,14 @@
 
-<p>
-  <a href="https://codeup.teambition.com/62219d81e4c44077bd46bffe/RoboIMI/tree/master" alt="GitHub">
-    <img src="https://img.shields.io/github/actions/workflow/status/deepmind/mujoco/build.yml?branch=main">
-  </a>
-  <a href="https://mujoco.readthedocs.io/" alt="Documentation">
-    <img src="https://readthedocs.org/projects/mujoco/badge/?version=latest">
-  </a>
-  <a href="https://codeup.teambition.com/62219d81e4c44077bd46bffe/RoboIMI/tree/master" alt="License">
-    <img src="https://img.shields.io/github/license/deepmind/mujoco">
-  </a>
-</p>
+<div style="text-align: center;">
+
+# **ROBOPAL**
+
+![License](https://img.shields.io/badge/license-MIT-yellow?style=flat-square) 
+![GitHub Repo stars](https://img.shields.io/github/stars/NoneJou072/robopal?style=flat-square&logo=github)
+![Language](https://img.shields.io/badge/language-python-brightgreen?style=flat-square)
+[![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen?style=flat-square)](https://robopal.readthedocs.io/zh/latest/index.html)
+
+</div>
 
 **robopal** 是一个基于 [MuJoCo](http://mujoco.org/) 动力学引擎与 [Pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 机器人动力学库搭建的多平台开源机器人仿真框架，主要用于机械臂的深度强化学习训练与控制算法验证。框架内提供了多种控制方案与底层环境，
 具有以下优点：
@@ -19,19 +18,20 @@
 * 提供多种基础控制方案，如关节空间/笛卡尔空间的位置控制、速度控制、阻抗控制等
 * 提供丰富的任务环境，如桌面操作，视觉伺服等
 
-更多了解，请查看文档 [[Documentations(正在撰写中)]](https://robopal.readthedocs.io/)
+更多了解，请[查看文档](https://robopal.readthedocs.io/)(更新中)
 
 ---
 ## 安装  
 
 ### 环境要求
 
-* **Windows** 10/11 / **Linux** (recommended)
-* [MuJoCo-3.0.0](http://mujoco.org/)
-* Python 3.9+
-* [Pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 2.6.20 
+* **Windows** / **Linux** (recommended)
+* [MuJoCo-3.0.1](http://mujoco.org/)
+* Python 3.9 +
+* [Pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 2.6.20 +
 
 ### 二进制安装
+> 当前PyPi上的版本是 ![PyPI - Version](https://img.shields.io/pypi/v/robopal?style=flat-square)，Repo上的版本是 `0.3.0`，建议安装最新版本
 
 ```commandline
 $ pip install robopal
