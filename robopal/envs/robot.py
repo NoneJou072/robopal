@@ -4,7 +4,7 @@ from robopal.controllers import controllers
 
 
 class RobotEnv(MujocoEnv):
-    """ Single arm environment.
+    """ Robot environment.
 
     :param robot: Robot configuration.
     :param is_render: Choose if use the renderer to render the scene or not.
@@ -50,8 +50,8 @@ class RobotEnv(MujocoEnv):
 
         self.kdl_solver = self.controller.kdl_solver  # shallow copy
 
-        self.nsubsteps = int(self.control_timestep / self.model_timestep)
-        if self.nsubsteps == 0:
+        self.n_substeps = int(self.control_timestep / self.model_timestep)
+        if self.n_substeps == 0:
             raise ValueError("Control frequency is too low. Checkout you are not in renderer mode."
                              "Current Model-Timestep:{}".format(self.model_timestep))
 
@@ -78,13 +78,18 @@ class RobotEnv(MujocoEnv):
         if self.is_interpolate:
             self.controller.step_interpolator(action)
         # step into inner loop
-        for i in range(self.nsubsteps):
+        for i in range(self.n_substeps):
             super().step(action)
 
     def reset(self):
-        super().reset()
         if self.is_interpolate:
             self.controller.reset_interpolator(self.robot.arm_qpos, self.robot.arm_qvel)
+        super().reset()
+
+    @property
+    def dt(self):
+        "Time of each upper step in the environment."
+        return self.n_substeps * self.mj_model.opt.timestep
 
 
 if __name__ == "__main__":

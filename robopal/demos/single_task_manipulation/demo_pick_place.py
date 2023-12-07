@@ -13,7 +13,6 @@ class PickAndPlaceEnv(PosCtrlEnv):
     The control frequency of the robot is of f = 10 Hz. This is achieved by applying the same action
     in 100 subsequent simulator step (with a time step of dt = 0.001 s) before returning the control to the robot.
     """
-    metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(self,
                  robot=DianaGrasp(),
@@ -112,7 +111,6 @@ class PickAndPlaceEnv(PosCtrlEnv):
         between the block and the gripper, and the last dimension corresponding to the current gripper opening.
         """
         obs = np.zeros(self.obs_dim)
-        dt = self.nsubsteps * self.mj_model.opt.timestep
 
         obs[0:3] = (  # gripper position in global coordinates
             end_pos := self.get_site_pos('0_grip_site')
@@ -127,16 +125,16 @@ class PickAndPlaceEnv(PosCtrlEnv):
             trans.mat_2_euler(self.get_body_rotm('green_block'))
         )
         obs[12:15] = (  # gripper linear velocity
-            end_vel := self.get_site_xvelp('0_grip_site') * dt
+            end_vel := self.get_site_xvelp('0_grip_site') * self.dt
         )
-        object_velp = self.get_body_xvelp('green_block') * dt
+        object_velp = self.get_body_xvelp('green_block') * self.dt
         obs[15:18] = (  # velocity with respect to the gripper
             object2end_velp := object_velp - end_vel
         )
 
-        obs[18:21] = self.get_body_xvelr('green_block') * dt
+        obs[18:21] = self.get_body_xvelr('green_block') * self.dt
         obs[21] = self.mj_data.joint('0_r_finger_joint').qpos[0]
-        obs[22] = self.mj_data.joint('0_r_finger_joint').qvel[0] * dt
+        obs[22] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
 
         return {
             'observation': obs.copy(),

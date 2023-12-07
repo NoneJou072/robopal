@@ -12,7 +12,6 @@ class DrawerEnv(PosCtrlEnv):
     The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
     in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
     """
-    metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(self,
                  robot=DianaPainting(),

@@ -21,6 +21,14 @@ class MujocoEnv:
     :param cam_mode(str): Camera mode, "rgb" or "depth".
     """
 
+    metadata = {
+        "render_modes": [
+            "human",
+            "rgb_array",
+            "depth",
+        ],
+    }
+
     def __init__(self,
                  robot=None,
                  is_render=False,
@@ -47,7 +55,7 @@ class MujocoEnv:
                                    cam_mode, camera_name)
 
         self._initialize_time()
-        self._set_init_pose()
+        self._set_init_qpos()
 
         self._state = None
 
@@ -77,8 +85,9 @@ class MujocoEnv:
         """ Reset the simulate environment, in order to execute next episode. """
         mujoco.mj_resetData(self.mj_model, self.mj_data)
         self.reset_object()
-        self._set_init_pose()
+        self._set_init_qpos()
         mujoco.mj_forward(self.mj_model, self.mj_data)
+
         if self.is_render:
             self.render()
 
@@ -110,7 +119,7 @@ class MujocoEnv:
             raise ValueError("Control frequency {} is invalid".format(self.control_freq))
         self.control_timestep = 1.0 / self.control_freq
 
-    def _set_init_pose(self):
+    def _set_init_qpos(self):
         """ Set or reset init joint position when called env reset func. """
         for j in range(len(self.robot.joint_index)):
             self.mj_data.joint(self.robot.joint_index[j]).qpos = self.robot.init_qpos[j]
@@ -332,3 +341,47 @@ class MujocoEnv:
                 print("dist: ", dist)
             return True
         return False
+
+    def set_mocap_pos(self, name, value):
+        body_id = mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_BODY, name)
+        mocap_id = self.mj_model.body_mocapid[body_id]
+        self.mj_data.mocap_pos[mocap_id] = value
+
+    def set_mocap_quat(self, name: str, value):
+        body_id = mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_BODY, name)
+        mocap_id = self.mj_model.body_mocapid[body_id]
+        self.mj_data.mocap_quat[mocap_id] = value
+
+    def reset_mocap_welds(self):
+        """Resets the mocap welds that we use for actuation."""
+        if self.mj_model.nmocap > 0 and self.mj_model.eq_data is not None:
+            for i in range(self.mj_model.eq_data.shape[0]):
+                if self.mj_model.eq_type[i] == mujoco.mjtEq.mjEQ_WELD:
+                    self.mj_model.eq_data[i, :7] = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0])
+        mujoco.mj_forward(self.mj_model, self.mj_data)
+
+    def reset_mocap2body_xpos(self):
+        """Resets the position and orientation of the mocap bodies to the same
+        values as the bodies they're welded to.
+        """
+
+        if self.mj_model.eq_type is None or self.mj_model.eq_obj1id is None or self.mj_model.eq_obj2id is None:
+            return
+        for eq_type, obj1_id, obj2_id in zip(
+            self.mj_model.eq_type, self.mj_model.eq_obj1id, self.mj_model.eq_obj2id
+        ):
+            if eq_type != mujoco.mjtEq.mjEQ_WELD:
+                continue
+
+            mocap_id = self.mj_model.body_mocapid[obj1_id]
+            if mocap_id != -1:
+                # obj1 is the mocap, obj2 is the welded body
+                body_idx = obj2_id
+            else:
+                # obj2 is the mocap, obj1 is the welded body
+                mocap_id = self.mj_model.body_mocapid[obj2_id]
+                body_idx = obj1_id
+
+            assert mocap_id != -1
+            self.mj_data.mocap_pos[mocap_id][:] = self.mj_data.xpos[body_idx]
+            self.mj_data.mocap_quat[mocap_id][:] = self.mj_data.xquat[body_idx]

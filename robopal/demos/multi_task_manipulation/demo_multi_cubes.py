@@ -13,7 +13,6 @@ class MultiCubes(PosCtrlEnv):
     The control frequency of the robot is of f = 10 Hz. This is achieved by applying the same action
     in 100 subsequent simulator step (with a time step of dt = 0.001 s) before returning the control to the robot.
     """
-    metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(self,
                  robot=DianaGraspMultiObjs(),
@@ -38,7 +37,7 @@ class MultiCubes(PosCtrlEnv):
             is_interpolate=is_interpolate,
             is_pd=is_pd,
         )
-        self.name = 'MultiCubeStack-v1'
+        self.name = 'MultiCubeStack-v2'
 
         self.obs_dim = (44,)
         self.goal_dim = (12,)
@@ -59,8 +58,8 @@ class MultiCubes(PosCtrlEnv):
         pos_offset = 0.1 * action[:3]
         actual_pos_action = self.kdl_solver.fk(self.robot.arm_qpos)[0] + pos_offset
 
-        pos_max_bound = np.array([0.6, 0.2, 0.37])
-        pos_min_bound = np.array([0.3, -0.2, 0.12])
+        pos_max_bound = np.array([0.68, 0.25, 0.28])
+        pos_min_bound = np.array([0.3, -0.25, 0.13])
         actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
 
         # Map to target action space bounds
@@ -89,7 +88,7 @@ class MultiCubes(PosCtrlEnv):
         obs = self._get_obs()
         achieved_goal = obs['achieved_goal']
         desired_goal = obs['desired_goal']
-        reward = self.compute_rewards(achieved_goal[3:], desired_goal[3:], th=0.05)
+        reward = self.compute_rewards(achieved_goal[3:], desired_goal[3:], th=0.03)
         terminated = False
         truncated = True if self._timestep >= self.max_episode_steps else False
         info = self._get_info()
@@ -104,9 +103,10 @@ class MultiCubes(PosCtrlEnv):
         of the block, the next 3 dimensions corresponding to the position of the goal, the next 3 dimensions
         corresponding to the position of the gripper, the next 3 dimensions corresponding to the vector
         between the block and the gripper, and the last dimension corresponding to the current gripper opening.
+        The actual observation is format the table below.
+        | gripper position | blocks position & rotation | gripper vel | gripper_qpos | gripper_qvel |
         """
         obs = np.zeros(self.obs_dim)
-        dt = self.nsubsteps * self.mj_model.opt.timestep
 
         obs[0:3] = (  # gripper position
             end_pos := self.get_site_pos('0_grip_site')
@@ -139,11 +139,11 @@ class MultiCubes(PosCtrlEnv):
             trans.mat_2_euler(self.get_body_rotm('blue_block'))
         )
         obs[30:33] = (  # gripper linear velocity
-            end_vel := self.get_site_xvelp('0_grip_site') * dt
+            end_vel := self.get_site_xvelp('0_grip_site') * self.dt
         )
-        red_block_velp = self.get_body_xvelp('red_block') * dt
-        green_block_velp = self.get_body_xvelp('green_block') * dt
-        blue_block_velp = self.get_body_xvelp('blue_block') * dt
+        red_block_velp = self.get_body_xvelp('red_block') * self.dt
+        green_block_velp = self.get_body_xvelp('green_block') * self.dt
+        blue_block_velp = self.get_body_xvelp('blue_block') * self.dt
         obs[33:36] = (  # velocity with respect to the gripper
             red_block_velp - end_vel
         )
@@ -153,9 +153,9 @@ class MultiCubes(PosCtrlEnv):
         obs[39:42] = (  # velocity with respect to the gripper
             blue_block_velp - end_vel
         )
-        # obs[36:39] = self.get_body_xvelr('green_block') * dt
+        # obs[36:39] = self.get_body_xvelr('green_block') * self.dt
         obs[42] = self.mj_data.joint('0_r_finger_joint').qpos[0]
-        obs[43] = self.mj_data.joint('0_r_finger_joint').qvel[0] * dt
+        obs[43] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
 
         return {
             'observation': obs.copy(),
@@ -229,41 +229,41 @@ class MultiCubes(PosCtrlEnv):
 
     def reset_object(self):
 
-        r_random_x_pos = np.random.uniform(0.35, 0.55)
+        r_random_x_pos = np.random.uniform(0.4, 0.55)
         r_random_y_pos = np.random.uniform(-0.15, 0.15)
         self.set_object_pose('red_block:joint', np.array([r_random_x_pos, r_random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
 
-        g_random_x_pos = np.random.uniform(0.35, 0.55)
+        g_random_x_pos = np.random.uniform(0.4, 0.55)
         g_random_y_pos = np.random.uniform(-0.15, 0.15)
-        while np.linalg.norm(np.array([r_random_x_pos, r_random_y_pos]) - np.array([g_random_x_pos, g_random_y_pos])) < 0.06:
-            g_random_x_pos = np.random.uniform(0.35, 0.55)
+        while np.linalg.norm(np.array([r_random_x_pos, r_random_y_pos]) - np.array([g_random_x_pos, g_random_y_pos])) < 0.08:
+            g_random_x_pos = np.random.uniform(0.4, 0.55)
             g_random_y_pos = np.random.uniform(-0.15, 0.15)
         self.set_object_pose('green_block:joint', np.array([g_random_x_pos, g_random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
 
-        b_random_x_pos = np.random.uniform(0.35, 0.55)
+        b_random_x_pos = np.random.uniform(0.4, 0.55)
         b_random_y_pos = np.random.uniform(-0.15, 0.15)
-        while np.linalg.norm(np.array([r_random_x_pos, r_random_y_pos]) - np.array([b_random_x_pos, b_random_y_pos])) < 0.06 \
-            or np.linalg.norm(np.array([g_random_x_pos, g_random_y_pos]) - np.array([b_random_x_pos, b_random_y_pos])) < 0.06:
-            b_random_x_pos = np.random.uniform(0.35, 0.55)
+        while np.linalg.norm(np.array([r_random_x_pos, r_random_y_pos]) - np.array([b_random_x_pos, b_random_y_pos])) < 0.08 \
+            or np.linalg.norm(np.array([g_random_x_pos, g_random_y_pos]) - np.array([b_random_x_pos, b_random_y_pos])) < 0.08:
+            b_random_x_pos = np.random.uniform(0.4, 0.55)
             b_random_y_pos = np.random.uniform(-0.15, 0.15)
         self.set_object_pose('blue_block:joint', np.array([b_random_x_pos, b_random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
 
         # red goal
-        random_goal_x_pos = np.random.uniform(0.35, 0.55)
+        random_goal_x_pos = np.random.uniform(0.4, 0.55)
         random_goal_y_pos = np.random.uniform(-0.15, 0.15)
         while np.linalg.norm(np.array([r_random_x_pos, r_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.06 \
             or np.linalg.norm(np.array([g_random_x_pos, g_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.06 \
             or np.linalg.norm(np.array([b_random_x_pos, b_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.06:
-            random_goal_x_pos = np.random.uniform(0.35, 0.55)
+            random_goal_x_pos = np.random.uniform(0.4, 0.55)
             random_goal_y_pos = np.random.uniform(-0.15, 0.15)
         red_goal = np.array([random_goal_x_pos, random_goal_y_pos, 0.44])
         self.set_site_pose('red_goal', red_goal)
 
-        # green block
+        # green goal
         green_goal = np.array([red_goal[0], red_goal[1], red_goal[2] + 0.04])
         self.set_site_pose('green_goal', green_goal)
 
-        # blue block
+        # blue goal
         blue_goal = np.array([green_goal[0], green_goal[1], green_goal[2] + 0.04])
         self.set_site_pose('blue_goal', blue_goal)
 
@@ -282,6 +282,7 @@ if __name__ == "__main__":
 
     for t in range(int(1e6)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
+        # action = np.array([-1, 1, -1, 1])
         s_, r, terminated, truncated, info = env.step(action)
         if truncated:
             env.reset()

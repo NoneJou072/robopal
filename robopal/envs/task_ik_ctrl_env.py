@@ -45,9 +45,9 @@ class PosCtrlEnv(RobotEnv):
         return pos_incre, quat_incre
 
     def step_controller(self, action):
-        if len(action) != 3 and len(action) != 7:
+        if len(action) not in (3, 7):
             raise ValueError("Invalid action length.")
-        if self.is_pd is False:
+        if not self.is_pd:
             p_goal = action[:3]
             r_goal = T.quat_2_mat(self.init_rot_quat if len(action) == 3 else action[3:])
         else:

@@ -57,6 +57,17 @@ class DianaAruco(DianaMedBase):
         self.mjcf_generator.add_joint(node='aruco', name='aruco_z', type='slide', axis='0 0 1')
 
 
+class DianaCollide(DianaMedBase):
+    """ DianaMed robot class. """
+
+    def __init__(self):
+        super().__init__(scene='default')
+
+    def add_assets(self):
+        self.mjcf_generator.add_geom(node='worldbody', name='obstacle_box', pos='0.919 0.3 0.3',
+                                     size='0.4 0.05 0.2', type='box')
+
+
 class DianaCalib(DianaMedBase):
     """ DianaMed for Camera Calibration. """
 

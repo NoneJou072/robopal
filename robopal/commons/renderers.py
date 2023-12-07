@@ -49,6 +49,14 @@ class MjRenderer:
             image = self.image_queue.get()
             cv.save_image(image)
             logging.info(f"Save a picture to {cv.CV_CACHE_DIR}.")
+        if keycode == 265:  # Up arrow
+            self.mj_data.mocap_pos[0, 2] += 0.01
+        elif keycode == 264:  # Down arrow
+            self.mj_data.mocap_pos[0, 2] -= 0.01
+        elif keycode == 263:  # Left arrow
+            self.mj_data.mocap_pos[0, 0] -= 0.01
+        elif keycode == 262:  # Right arrow
+            self.mj_data.mocap_pos[0, 0] += 0.01
 
     def _init_renderer(self):
         """ Initialize renderer, choose official renderer with "viewer"(joined from version 2.3.3),
@@ -60,7 +68,7 @@ class MjRenderer:
         elif self.renderer == "viewer":
             # This function does not block, allowing user code to continue execution.
             self.viewer = viewer.launch_passive(self.mj_model, self.mj_data,
-                                                key_callback=self.key_callback, show_left_ui=False, show_right_ui=False)
+                                                key_callback=self.key_callback, show_left_ui=False, show_right_ui=True)
             self.set_renderer_config()
             if self.enable_camera_viewer:
                 cv.init_cv_window()

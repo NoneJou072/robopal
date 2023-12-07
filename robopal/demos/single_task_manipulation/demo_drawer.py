@@ -12,7 +12,6 @@ class DrawerEnv(PosCtrlEnv):
     The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
     in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
     """
-    metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(self,
                  robot=DianaDrawer(),
@@ -113,7 +112,6 @@ class DrawerEnv(PosCtrlEnv):
         between the block and the gripper, and the last dimension corresponding to the current gripper opening.
         """
         obs = np.zeros(self.obs_dim)
-        dt = self.nsubsteps * self.mj_model.opt.timestep
 
         obs[:3] = (  # gripper position
             end_pos := self.get_site_pos('0_grip_site')
@@ -125,14 +123,14 @@ class DrawerEnv(PosCtrlEnv):
             object_rel_pos := end_pos - object_pos
         )
         obs[9:12] = (  # gripper linear velocity
-            end_vel := self.get_site_xvelp('0_grip_site') * dt
+            end_vel := self.get_site_xvelp('0_grip_site') * self.dt
         )
-        object_velp = self.get_site_xvelp('drawer') * dt
+        object_velp = self.get_site_xvelp('drawer') * self.dt
         obs[12:15] = (  # velocity with respect to the gripper
             object2end_velp := object_velp - end_vel
         )
         obs[15] = self.mj_data.joint('0_r_finger_joint').qpos[0]
-        obs[16] = self.mj_data.joint('0_r_finger_joint').qvel[0] * dt
+        obs[16] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
 
         return {
             'observation': obs.copy(),

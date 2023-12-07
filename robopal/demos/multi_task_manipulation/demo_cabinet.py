@@ -13,7 +13,6 @@ class LockedCabinetEnv(PosCtrlEnv):
     The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
     in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
     """
-    metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(self,
                  robot=DianaCabinet(),
@@ -106,7 +105,6 @@ class LockedCabinetEnv(PosCtrlEnv):
         between the block and the gripper, and the last dimension corresponding to the current gripper opening.
         """
         obs = np.zeros(self.obs_dim)
-        dt = self.nsubsteps * self.mj_model.opt.timestep
 
         obs[0:3] = (  # gripper position in global coordinates
             end_pos := self.get_site_pos('0_grip_site')
@@ -122,21 +120,21 @@ class LockedCabinetEnv(PosCtrlEnv):
         obs[15:18] = trans.mat_2_euler(self.get_site_rotm('left_handle'))
         obs[18:21] = trans.mat_2_euler(self.get_site_rotm('beam_left'))
         obs[21:24] = (  # gripper linear velocity
-            end_vel := self.get_site_xvelp('0_grip_site') * dt
+            end_vel := self.get_site_xvelp('0_grip_site') * self.dt
         )
         # velocity with respect to the gripper
-        handle_velp = self.get_site_xvelp('left_handle') * dt
+        handle_velp = self.get_site_xvelp('left_handle') * self.dt
         obs[24:27] = (  # velocity with respect to the gripper
             handle_velp - end_vel
         )
-        beam_velp = self.get_site_xvelp('beam_left') * dt
+        beam_velp = self.get_site_xvelp('beam_left') * self.dt
         obs[27:30] = (  # velocity with respect to the gripper
             beam_velp - end_vel
         )
-        obs[30:33] = self.get_site_xvelr('left_handle') * dt
-        obs[33:36] = self.get_site_xvelr('beam_left') * dt
+        obs[30:33] = self.get_site_xvelr('left_handle') * self.dt
+        obs[33:36] = self.get_site_xvelr('beam_left') * self.dt
         obs[36] = self.mj_data.joint('0_r_finger_joint').qpos[0]
-        obs[37] = self.mj_data.joint('0_r_finger_joint').qvel[0] * dt
+        obs[37] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
 
         return {
             'observation': obs.copy(),
