@@ -1,4 +1,6 @@
 import abc
+import logging
+import typing
 
 import mujoco
 import numpy as np
@@ -47,6 +49,8 @@ class MujocoEnv:
         self._initialize_time()
         self._set_init_pose()
 
+        self._state = None
+
     def step(self, action):
         """ 
         This method will be called with one-step in mujoco
@@ -75,6 +79,8 @@ class MujocoEnv:
         self.reset_object()
         self._set_init_pose()
         mujoco.mj_forward(self.mj_model, self.mj_data)
+        if self.is_render:
+            self.render()
 
     def reset_object(self):
         """ Set pose of the object. """
@@ -271,24 +277,58 @@ class MujocoEnv:
         """
         return self.mj_data.site(name).xmat.copy().reshape(3, 3)
 
-    def is_contact(self, geom1: str, geom2: str):
-        """ Check if two geom is in contact.
+    def get_geom_id(self, name: str | list[str]):
+        """ Get geometry id from its name.
 
-        :param geom1: geom name
-        :param geom2: geom name
-        :return: True or False
+        :param name: geometry name
+        :return: geometry id
         """
-        geom1 = mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, geom1)
-        geom2 = mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, geom2)
+        if isinstance(name, str):
+            return mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, name)
+        else:
+            ids = []
+            for geom in name:
+                id = mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, geom)
+                ids.append(id)
+            return ids
+
+    def save_state(self):
+        """ Save the state of the mujoco model. """
+        spec = mujoco.mjtState.mjSTATE_INTEGRATION
+        size = mujoco.mj_stateSize(self.mj_model, spec)
+        state = np.empty(size, np.float64)
+        mujoco.mj_getState(self.mj_model, self.mj_data, state, spec)
+        self._state = state
+
+    def load_state(self):
+        """ Load the state of the mujoco model. """
+        spec = mujoco.mjtState.mjSTATE_INTEGRATION
+        mujoco.mj_setState(self.mj_model, self.mj_data, self._state, spec)
+
+    def is_contact(self, geom1: str | list[str], geom2: str | list[str], verbose=False) -> bool:
+        """ Check if two geom or geom list is in contact.
+
+        :param geom1: geom name/list
+        :param geom2: geom name/list
+        :return: True/False
+        """
+        if isinstance(geom1, str):
+            geom1 = [geom1]
+        if isinstance(geom2, str):
+            geom2 = [geom2]
+
         if len(self.mj_data.contact) > 0:
-            for i, geoms in enumerate(self.mj_data.contact.geom):
-                if {geom1, geom2} != set(geoms):
-                    continue
+            for i, geom_pair in enumerate(self.mj_data.contact.geom):
+                if geom_pair[0] in geom1 and geom_pair[1] in geom2:
+                    break
+                if geom_pair[0] in geom2 and geom_pair[1] in geom1:
+                    break
+            if verbose:
                 contact_info = self.mj_data.contact[i]
                 name1 = mujoco.mj_id2name(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, contact_info.geom1)
                 name2 = mujoco.mj_id2name(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, contact_info.geom2)
                 dist = contact_info.dist
-                print("contact geom: ", name1, name2)
+                logging.info("contact geom: ", name1, name2)
                 print("dist: ", dist)
-                return True
+            return True
         return False

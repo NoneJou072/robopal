@@ -67,9 +67,6 @@ class BaseArm:
     def jnt_num(self) -> int:
         return len(self.joint_index)
 
-    def get_arm_id(self) -> list:
-        return [mujoco.mj_name2id(self.robot_model, mujoco.mjtObj.mjOBJ_JOINT, self.joint_index[i]) for i in range(self.jnt_num)]
-
     @property
     def arm_qpos(self) -> np.ndarray:
         return np.array([self.robot_data.joint(self.joint_index[i]).qpos[0] for i in range(self.jnt_num)])
