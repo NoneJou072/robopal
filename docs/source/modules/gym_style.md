@@ -1,6 +1,5 @@
-# Quick Start
 
-## Gymnasium Style Interface
+# Gymnasium Style Interface
 
 我们的环境遵循 OpenAI Gymnasium 接口规范，可以方便地搭建强化学习训练环境。
 

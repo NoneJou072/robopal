@@ -19,6 +19,7 @@ Welcome to robopal's documentation!
    :caption: MODULES API
 
    modules/controllers
+   modules/gym_style
 
 .. toctree::
    :maxdepth: 1
