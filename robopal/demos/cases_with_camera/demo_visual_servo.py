@@ -28,7 +28,7 @@ class VisualServo(RobotEnv):
             cam_mode=cam_mode,
             camera_name=camera_name
         )
-
+        self.camera_name = camera_name
         self.camera_intrinsic_matrix = cv.get_cam_intrinsic()
         print(self.camera_intrinsic_matrix)
         self.distCoeffs = np.zeros(5)
@@ -37,7 +37,7 @@ class VisualServo(RobotEnv):
         self.detector = cv2.aruco.ArucoDetector(aruco_dictionary, aruco_parameters)
 
     def aruco_detection(self, marker_size):
-        cv_image = self.renderer.render_pixels_from_camera(cam='0_cam', enable_depth=False)
+        cv_image = self.renderer.render_pixels_from_camera(cam=self.camera_name, enable_depth=False)
 
         if cv_image is not None:
             corners, marker_ids, _ = self.detector.detectMarkers(cv_image)
@@ -122,7 +122,8 @@ if __name__ == "__main__":
         is_interpolate=False,
         renderer='viewer',
         enable_camera_viewer=True,
-        cam_mode='rgb'
+        cam_mode='rgb',
+        camera_name='0_cam'
     )
     env.reset()
     for t in range(int(1e6)):

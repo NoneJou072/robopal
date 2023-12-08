@@ -84,12 +84,12 @@ class DianaCalib(DianaMedBase):
         self.mjcf_generator.add_geom(node='chessboard', name='chessboard_box', pos='0.0 0 0.0', mass='0.001',
                                      euler="0 0 1.57", size='0.115 0.08 0.001', type='box', material='chessboard')
 
-        # set camera
-        self.mjcf_generator.add_mesh(name = "cambase", file = "objects/camera/meshes/cambase.STL")
-        self.mjcf_generator.add_mesh(name = "cam", file = "objects/camera/meshes/cam.STL")
+        # set realsense_d435
+        self.mjcf_generator.add_mesh(name = "cambase", file = "objects/realsense_d435/meshes/cambase.STL")
+        self.mjcf_generator.add_mesh(name = "cam", file = "objects/realsense_d435/meshes/cam.STL")
 
         cam = """<body pos="1.0 0.0 0.8" euler="0 0.785 3.14">
-        <include file="objects/camera/realsense.xml"/>
+        <include file="objects/realsense_d435/realsense.xml"/>
     </body>"""
         self.mjcf_generator.add_node_from_str('worldbody', cam)
 

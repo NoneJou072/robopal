@@ -40,7 +40,7 @@ class DrawerCubeEnv(PosCtrlEnv):
         self.name = 'DrawerBox-v1'
 
         self.obs_dim = (32,)
-        self.goal_dim = (3,)
+        self.goal_dim = (9,)
         self.action_dim = (4,)
 
         self.max_action = 1.0
@@ -149,18 +149,39 @@ class DrawerCubeEnv(PosCtrlEnv):
 
         return {
             'observation': obs.copy(),
-            'achieved_goal': block_pos.copy(),  # the current state of the block
-            'desired_goal': self.goal_pos.copy()
+            'achieved_goal': self._get_achieved_goal(),
+            'desired_goal': self._get_desired_goal()
         }
 
-    def _get_info(self) -> dict:
-        return {'is_success': self._is_success(self.get_body_pos('green_block'), self.goal_pos)}
+    def _get_achieved_goal(self):
+        achieved_goal = np.concatenate([
+            self.get_site_pos('0_grip_site'),
+            self.get_site_pos('drawer'),
+            block_pos := self.get_body_pos('green_block')
+        ], axis=0)
+        return achieved_goal.copy()
 
-    def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, th=0.05) -> np.ndarray:
+    def _get_desired_goal(self):
+        desired_goal = np.concatenate([
+            self.get_site_pos('drawer') if self._is_success(
+                self.get_site_pos('drawer'), self.get_site_pos('drawer_goal')
+            ) == 0 else self.get_body_pos('green_block'),
+            self.get_site_pos('drawer_goal'),
+            self.get_site_pos('cube_goal'),
+        ], axis=0)
+        return desired_goal.copy()
+
+    def _get_info(self) -> dict:
+        return {
+            'is_drawer_success': self._is_success(self.get_site_pos('drawer'), self.get_site_pos('drawer_goal')),
+            'is_place_success': self._is_success(self.get_body_pos('green_block'), self.get_site_pos('cube_goal'))
+        }
+
+    def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, th=0.02) -> np.ndarray:
         """ Compute whether the achieved goal successfully achieved the desired goal.
         """
         d = self.goal_distance(achieved_goal, desired_goal)
-        return -(d >= th).astype(np.float32)
+        return (d < th).astype(np.float32)
 
     @staticmethod
     def goal_distance(goal_a, goal_b):
@@ -187,21 +208,26 @@ class DrawerCubeEnv(PosCtrlEnv):
         random_y_pos = np.random.uniform(-0.15, 0.15)
         self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
 
-        # if self.TASK_FLAG == 0:
-        #     # reset drawer goal position
-        #     random_goal_x_pos = np.random.uniform(0.48, 0.56)
-        #     goal_pos = np.array([random_goal_x_pos, 0.0, 0.478])
-        #     site_id = self.get_site_id('drawer_goal')
-        #     self.mj_model.site_pos[site_id] = goal_pos
+        if self.TASK_FLAG == 0:
+            pass
+            # reset drawer goal position
+            # random_goal_x_pos = np.random.uniform(0.48, 0.56)
+            # goal_pos = np.array([random_goal_x_pos, 0.0, 0.478])
+            # site_id = self.get_site_id('drawer_goal')
+            # self.mj_model.site_pos[site_id] = goal_pos
+        elif self.TASK_FLAG == 1:
+            self.mj_data.joint('drawer:joint').qpos[0] = 0.12
 
 
 if __name__ == "__main__":
 
     env = DrawerCubeEnv()
+    env.TASK_FLAG = 0
     env.reset()
 
     for t in range(int(1e6)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
-        s_, r, terminated, truncated, _ = env.step(action)
+        # action = np.array([-1, -1, 1, 1])
+        s_, r, terminated, truncated, info = env.step(action)
         if truncated:
             env.reset()
