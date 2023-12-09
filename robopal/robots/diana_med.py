@@ -64,7 +64,7 @@ class DianaCollide(DianaMedBase):
         super().__init__(scene='default')
 
     def add_assets(self):
-        self.mjcf_generator.add_geom(node='worldbody', name='obstacle_box', pos='0.919 0.3 0.3',
+        self.mjcf_generator.add_geom(node='worldbody', name='obstacle_box', pos='0.9 0.2 0.3',
                                      size='0.4 0.05 0.2', type='box')
 
 
