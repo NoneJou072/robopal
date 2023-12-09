@@ -9,6 +9,7 @@ MUJOCO_LOG.TXT
 **/.vscode
 **/build
 cv_cache
+robot.xml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
