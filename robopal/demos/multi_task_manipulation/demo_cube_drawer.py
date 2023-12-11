@@ -204,7 +204,7 @@ class DrawerCubeEnv(PosCtrlEnv):
 
     def reset_object(self):
         # reset object position
-        random_x_pos = np.random.uniform(0.35, 0.45)
+        random_x_pos = np.random.uniform(0.35, 0.44)
         random_y_pos = np.random.uniform(-0.15, 0.15)
         self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
 
@@ -216,7 +216,7 @@ class DrawerCubeEnv(PosCtrlEnv):
             # site_id = self.get_site_id('drawer_goal')
             # self.mj_model.site_pos[site_id] = goal_pos
         elif self.TASK_FLAG == 1:
-            self.mj_data.joint('drawer:joint').qpos[0] = 0.12
+            self.mj_data.joint('drawer:joint').qpos[0] = 0.14
 
 
 if __name__ == "__main__":
@@ -227,7 +227,7 @@ if __name__ == "__main__":
 
     for t in range(int(1e6)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
-        # action = np.array([-1, -1, 1, 1])
         s_, r, terminated, truncated, info = env.step(action)
         if truncated:
             env.reset()
+    env.close()

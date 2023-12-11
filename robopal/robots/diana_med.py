@@ -205,7 +205,7 @@ class DianaDrawerCube(DianaMedBase):
         self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/green_cube.xml')
         self.mjcf_generator.set_node_attrib('body', 'green_block', {'pos': '0.5 0.0 0.46'})
 
-        goal_site = """<site name="drawer_goal" pos="0.48 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
+        goal_site = """<site name="drawer_goal" pos="0.46 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
         self.mjcf_generator.add_node_from_str('worldbody', goal_site)
 
     @property

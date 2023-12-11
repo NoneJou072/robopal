@@ -167,7 +167,7 @@ class DrawerEnv(PosCtrlEnv):
         return obs, info
 
     def reset_object(self):
-        random_goal_x_pos = np.random.uniform(0.48, 0.56)
+        random_goal_x_pos = np.random.uniform(0.46, 0.56)
         goal_pos = np.array([random_goal_x_pos, 0.0, 0.478])
         site_id = self.get_site_id('goal_site')
         self.mj_model.site_pos[site_id] = goal_pos
@@ -177,8 +177,9 @@ if __name__ == "__main__":
 
     env = DrawerEnv()
     env.reset()
-    for t in range(int(1e2)):
+    for t in range(int(1e6)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
         s_, r, terminated, truncated, _ = env.step(action)
         if truncated:
             env.reset()
+    env.close()

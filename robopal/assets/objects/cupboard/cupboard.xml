@@ -11,7 +11,7 @@
             <geom type="box" pos="0 0.17 0.10" size="0.12 0.01 0.1" conaffinity="1" condim="3" contype="0" group="4"/>
 
             <body name="drawer" pos="0.0 0.0 -0.007">
-                <joint name="drawer:joint" type="slide" armature="0.001" damping="10" frictionloss="10" axis='0 -1 0' limited="true" range="0.0 0.12"/>
+                <joint name="drawer:joint" type="slide" armature="0.001" damping="10" frictionloss="10" axis='0 -1 0' limited="true" range="0.0 0.14"/>
                 <geom name="drawer" rgba="0 1 1 1" type="mesh" mesh="drawer" group="1" contype="0" conaffinity="0" mass="1.0"/>
 
                 <geom type="box" pos="0 0.07 0.04" size="0.1 0.08 0.01" conaffinity="1" condim="3" contype="1" group="4" friction="0.001 0.09 0.9" />

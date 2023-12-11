@@ -134,3 +134,4 @@ if __name__ == "__main__":
         s_, r, terminated, truncated, _ = env.step(action)
         if truncated:
             env.reset()
+    env.close()
