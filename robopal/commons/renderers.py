@@ -109,25 +109,30 @@ class MjRenderer:
         with self.viewer.lock():
             self.viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(self.mj_data.time % 2)
 
-    def render_traj(self, pos: np.ndarray):
+    def add_visual_point(self, pos: np.ndarray | list[np.ndarray]):
         """ Render the trajectory from deque above,
             you can push the cartesian position into this deque.
 
         :param pos: One of the cartesian position of the trajectory to render.
         """
-        if self.renderer == "viewer":
+        assert self.renderer == "viewer"
+        if isinstance(pos, np.ndarray):
             self.traj.append(pos.copy())
             self.viewer.user_scn.ngeom = len(self.traj)
-            for i, point in enumerate(self.traj):
-                # Add a 3x3x3 grid of variously colored spheres to the middle of the scene.
-                mujoco.mjv_initGeom(
-                    self.viewer.user_scn.geoms[i],
-                    type=mujoco.mjtGeom.mjGEOM_SPHERE,
-                    size=[0.01, 0, 0],
-                    pos=point,
-                    mat=np.eye(3).flatten(),
-                    rgba=np.concatenate([np.random.uniform(0, 1, 3), np.array([1])], axis=0)
-                )
+        else:
+            for p in pos:
+                self.traj.append(p.copy())
+            self.viewer.user_scn.ngeom = len(pos)
+        for i, point in enumerate(self.traj):
+            # Add a 3x3x3 grid of variously colored spheres to the middle of the scene.
+            mujoco.mjv_initGeom(
+                self.viewer.user_scn.geoms[i],
+                type=mujoco.mjtGeom.mjGEOM_SPHERE,
+                size=[0.01, 0, 0],
+                pos=point,
+                mat=np.eye(3).flatten(),
+                rgba=np.concatenate([np.random.uniform(0, 1, 3), np.array([1])], axis=0)
+            )
 
     def render_pixels_from_camera(self, cam='0_cam', enable_depth=True):
         self.image_renderer.update_scene(self.mj_data, camera=cam)

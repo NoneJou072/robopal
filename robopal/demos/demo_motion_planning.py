@@ -20,7 +20,7 @@ path = rrt_star(current_pos, [0.6, 0.5, 0.4], env)
 env.load_state()
 assert path is not None
 
-for pos in path:
+for pos in reversed(path):
     pos = np.array(pos)
     print(pos)
     current_pos, _ = env.kdl_solver.fk(env.robot.arm_qpos)
@@ -28,11 +28,10 @@ for pos in path:
         env.step(np.concatenate([pos, [1, 0, 0, 0]]))
         current_pos, _ = env.kdl_solver.fk(env.robot.arm_qpos)
         env.render()
+        env.renderer.add_visual_point(path)
 
 print("finished.")
 for t in range(int(1e4)):
-    # action = np.array([0.33, -0.39, 0.66])
-    # env.step(action)
-    if env.is_render:
-        env.render()
+    env.render()
+
 env.close()

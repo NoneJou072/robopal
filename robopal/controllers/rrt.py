@@ -421,7 +421,7 @@ def rrt_star(start, end, sim):
         play_area=play_area,  # 树的生长区域，左下[-2, 0, 0] ==> 右上[13, 13, 13]
         sim=sim,
         expand_dis=0.04,  # 树枝长度
-        goal_sample_rate=40,
+        goal_sample_rate=10,
         max_iter=1000,
     )
     MAX_FAILTURE_TIMES = 3
@@ -451,6 +451,5 @@ def rrt_star(start, end, sim):
 
             plt.pause(1)
             plt.close()
-        path = reversed(path)
         return path
     return None
