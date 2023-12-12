@@ -32,7 +32,7 @@ class TensorboardCallback(BaseCallback):
 log_dir = "log/"
 
 env = PickAndPlaceEnv(
-    is_render=False,
+    render_mode="human",
     control_freq=10,
     controller='JNTIMP',
 )

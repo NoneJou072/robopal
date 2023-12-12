@@ -12,24 +12,20 @@ class CamCalibEnv(RobotEnv):
     """
     def __init__(self,
                  robot=None,
-                 is_render=False,
-                 renderer="viewer",
+                 render_mode='human',
                  control_freq=200,
                  controller='JNTIMP',
                  is_interpolate=False,
                  enable_camera_viewer=True,
-                 cam_mode='rgb',
                  camera_name=None
                  ):
         super().__init__(
             robot=robot,
-            is_render=is_render,
-            renderer=renderer,
+            render_mode=render_mode,
             control_freq=control_freq,
             controller=controller,
             is_interpolate=is_interpolate,
             enable_camera_viewer=enable_camera_viewer,
-            cam_mode=cam_mode,
             camera_name=camera_name,
         )
         # Set low damping for easily dragging the end.
@@ -50,13 +46,11 @@ if __name__ == "__main__":
 
     env = CamCalibEnv(
         robot=DianaCalib(),
-        is_render=True,
+        render_mode='human',
         control_freq=200,
         controller='JNTIMP',
         is_interpolate=False,
-        renderer='viewer',
         enable_camera_viewer=True,
-        cam_mode='rgb',
         camera_name='cam'
     )
     env.reset()

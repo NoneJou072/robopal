@@ -20,6 +20,7 @@ Welcome to robopal's documentation!
 
    modules/controllers
    modules/gym_style
+   modules/renderers
 
 .. toctree::
    :maxdepth: 1

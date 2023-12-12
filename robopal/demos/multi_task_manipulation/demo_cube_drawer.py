@@ -16,23 +16,18 @@ class DrawerCubeEnv(PosCtrlEnv):
 
     def __init__(self,
                  robot=DianaDrawerCube(),
-                 is_render=True,
-                 renderer="viewer",
                  render_mode='human',
                  control_freq=10,
                  enable_camera_viewer=False,
-                 cam_mode='rgb',
                  controller='JNTIMP',
                  is_interpolate=False,
                  is_pd=False,
                  ):
         super().__init__(
             robot=robot,
-            is_render=is_render,
-            renderer=renderer,
+            render_mode=render_mode,
             control_freq=control_freq,
             enable_camera_viewer=enable_camera_viewer,
-            cam_mode=cam_mode,
             controller=controller,
             is_interpolate=is_interpolate,
             is_pd=is_pd,
@@ -50,9 +45,6 @@ class DrawerCubeEnv(PosCtrlEnv):
         self._timestep = 0
 
         self.goal_pos = None
-
-        assert render_mode is None or render_mode in self.metadata["render_modes"]
-        self.render_mode = render_mode
 
         self.TASK_FLAG = 0
 

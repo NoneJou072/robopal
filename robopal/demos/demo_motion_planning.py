@@ -7,8 +7,7 @@ from robopal.controllers.rrt import rrt_star
 
 env = PosCtrlEnv(
     robot=DianaCollide(),
-    renderer='viewer',
-    is_render=True,
+    render_mode="human",
     control_freq=200,
     is_interpolate=False,
     is_pd=False

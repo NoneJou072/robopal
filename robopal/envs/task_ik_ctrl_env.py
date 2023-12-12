@@ -6,24 +6,20 @@ import robopal.commons.transform as T
 class PosCtrlEnv(RobotEnv):
     def __init__(self,
                  robot=None,
-                 is_render=True,
-                 renderer="viewer",
                  control_freq=200,
                  enable_camera_viewer=False,
-                 cam_mode='rgb',
                  controller='JNTIMP',
                  is_interpolate=False,
                  is_pd=False,
+                 render_mode='human',
                  ):
         super().__init__(
             robot=robot,
-            is_render=is_render,
-            renderer=renderer,
             control_freq=control_freq,
             enable_camera_viewer=enable_camera_viewer,
-            cam_mode=cam_mode,
             controller=controller,
             is_interpolate=is_interpolate,
+            render_mode=render_mode,
         )
         self.p_cart = 0.2
         self.d_cart = 0.01
@@ -73,8 +69,7 @@ if __name__ == "__main__":
 
     env = PosCtrlEnv(
         robot=DianaMed(),
-        renderer='viewer',
-        is_render=True,
+        render_mode='human',
         control_freq=20,
         is_interpolate=False,
         is_pd=False,

@@ -18,7 +18,6 @@ class MujocoEnv:
     :param control_freq(int): Upper-layer control frequency.
     Note that high frequency will cause high time-lag.
     :param enable_camera_viewer(bool): Use camera or not.
-    :param cam_mode(str): Camera mode, "rgb" or "depth".
     """
 
     metadata = {
@@ -26,20 +25,20 @@ class MujocoEnv:
             "human",
             "rgb_array",
             "depth",
+            "unity",
         ],
     }
 
     def __init__(self,
                  robot=None,
-                 is_render=False,
-                 renderer="viewer",
                  control_freq=1000,
                  enable_camera_viewer=False,
-                 cam_mode='rgb',
-                 camera_name=None):
+                 camera_name=None,
+                 render_mode='human',
+                 ):
 
         self.robot = robot
-        self.is_render = is_render
+
         self.control_freq = control_freq
 
         self.mj_model: mujoco.MjModel = self.robot.robot_model
@@ -51,9 +50,14 @@ class MujocoEnv:
         self.control_timestep = 0
         self.robot_dof = self.robot.jnt_num
 
-        self.renderer = MjRenderer(self.mj_model, self.mj_data, self.is_render, renderer, enable_camera_viewer,
-                                   cam_mode, camera_name)
-
+        assert render_mode is None or render_mode in self.metadata["render_modes"]
+        self.render_mode = render_mode
+        if self.render_mode in ["human", "rgb_array", "depth"]:
+            self.is_render = True
+        if self.render_mode is None:
+            self.is_render = False
+        self.renderer = MjRenderer(self.mj_model, self.mj_data, self.render_mode,
+                                   enable_camera_viewer, camera_name)
         self._initialize_time()
         self._set_init_qpos()
 

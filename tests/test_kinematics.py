@@ -17,7 +17,7 @@ class TestKinematics:
     def __init__(self):
         self.urdf_path = '../robopal/assets/models/manipulators/DianaMed/DianaMed.urdf'
         self.qpos = np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])
-        self.env = RobotEnv(DianaMed(), is_render=False)
+        self.env = RobotEnv(DianaMed(), render_mode=None)
         self.env.reset()
 
     def compute_jacobian_mojoco(self):

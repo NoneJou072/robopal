@@ -8,25 +8,21 @@ import robopal.commons.cv_utils as cv
 class VisualServo(RobotEnv):
     def __init__(self,
                  robot=None,
-                 is_render=False,
-                 renderer="viewer",
+                 render_mode='human',
                  control_freq=200,
                  controller='JNTIMP',
                  is_interpolate=False,
                  enable_camera_viewer=True,
-                 cam_mode='rgb',
                  camera_name='0_cam'
                  ):
         super().__init__(
             robot=robot,
-            is_render=is_render,
-            renderer=renderer,
             control_freq=control_freq,
             controller=controller,
             is_interpolate=is_interpolate,
             enable_camera_viewer=enable_camera_viewer,
-            cam_mode=cam_mode,
-            camera_name=camera_name
+            camera_name=camera_name,
+            render_mode=render_mode,
         )
         self.camera_name = camera_name
         self.camera_intrinsic_matrix = cv.get_cam_intrinsic()
@@ -116,13 +112,11 @@ if __name__ == "__main__":
 
     env = VisualServo(
         robot=DianaAruco(),
-        is_render=True,
+        render_mode='human',
         control_freq=200,
         controller='JNTIMP',
         is_interpolate=False,
-        renderer='viewer',
         enable_camera_viewer=True,
-        cam_mode='rgb',
         camera_name='0_cam'
     )
     env.reset()

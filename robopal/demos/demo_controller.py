@@ -1,5 +1,6 @@
 import argparse
 import numpy as np
+
 from robopal.robots.diana_med import DianaMed
 from robopal.envs import RobotEnv, PosCtrlEnv
 
@@ -13,8 +14,7 @@ assert args.ctrl in ['JNTIMP', 'JNTNONE', 'JNTVEL', 'CARTIMP', 'CARTIK']
 if args.ctrl in ['JNTIMP', 'JNTNONE', 'JNTVEL', 'CARTIMP']:
     env = RobotEnv(
         robot=DianaMed(),
-        renderer='viewer',
-        is_render=True,
+        render_mode='human',
         control_freq=200,
         is_interpolate=False,
         controller=args.ctrl,
@@ -32,8 +32,7 @@ if args.ctrl in ['JNTIMP', 'JNTNONE', 'JNTVEL', 'CARTIMP']:
 elif args.ctrl == 'CARTIK':
     env = PosCtrlEnv(
         robot=DianaMed(),
-        renderer='viewer',
-        is_render=True,
+        render_mode='human',
         control_freq=200,
         is_interpolate=False,
         is_pd=False

@@ -1,11 +1,10 @@
 import logging
-import time
+import sys
+from queue import Queue
+import numpy as np
 import mujoco
 from mujoco import viewer
 from collections import deque
-import sys
-import numpy as np
-from queue import Queue
 
 import robopal.commons.cv_utils as cv
 
@@ -13,21 +12,20 @@ logging.basicConfig(level=logging.INFO)
 
 
 class MjRenderer:
-    def __init__(self, mj_model, mj_data, is_render, renderer,
-                 enable_camera_viewer=False, cam_mode='rgb', camera_name='0_cam'):
+    def __init__(self, mj_model, mj_data, render_mode,
+                 enable_camera_viewer=False, camera_name='0_cam'):
         self.mj_model = mj_model
         self.mj_data = mj_data
 
-        self.renderer = renderer
+        self.render_mode = render_mode
         self.enable_camera_viewer = enable_camera_viewer
         if cv.CV_FLAG is False:
             self.enable_camera_viewer = False
-        self.cam_mode = cam_mode
         self.camera_name = camera_name
 
         # Set up mujoco viewer
         self.viewer = None
-        if is_render:
+        if render_mode is not None:
             self._init_renderer()
             self.traj = deque(maxlen=200)  # used for rendering trajectory
 
@@ -62,10 +60,10 @@ class MjRenderer:
         """ Initialize renderer, choose official renderer with "viewer"(joined from version 2.3.3),
             another renderer with "mujoco_viewer"
         """
-        if self.renderer == "unity":
+        if self.render_mode == "unity":
             # TODO: Support unity renderer.
             raise ValueError("Unity renderer not supported now.")
-        elif self.renderer == "viewer":
+        elif self.render_mode in ["human", "rgb_array", "depth"]:
             # This function does not block, allowing user code to continue execution.
             self.viewer = viewer.launch_passive(self.mj_model, self.mj_data,
                                                 key_callback=self.key_callback, show_left_ui=False, show_right_ui=True)
@@ -77,7 +75,7 @@ class MjRenderer:
 
     def render(self):
         """ render mujoco """
-        if self.viewer is not None and self.render_paused is True and self.renderer == "viewer":
+        if self.viewer is not None and self.render_paused is True and self.render_mode in ["human", "rgb_array", "depth"]:
             if self.viewer.is_running() and self.exit_flag is False:
                 self.viewer: viewer.Handle
                 self.viewer.sync()
@@ -85,7 +83,7 @@ class MjRenderer:
                 self.close()
 
             if self.enable_camera_viewer:
-                enable_depth = True if self.cam_mode == 'depth' else False
+                enable_depth = True if self.render_mode == 'depth' else False
                 image = self.render_pixels_from_camera(self.camera_name, enable_depth=enable_depth)
                 self.image_queue.put(image)
                 if self.image_queue.full():
@@ -115,7 +113,7 @@ class MjRenderer:
 
         :param pos: One of the cartesian position of the trajectory to render.
         """
-        assert self.renderer == "viewer"
+        assert self.render_mode in ["human", "rgb_array", "depth"]
         if isinstance(pos, np.ndarray):
             self.traj.append(pos.copy())
             self.viewer.user_scn.ngeom = len(self.traj)

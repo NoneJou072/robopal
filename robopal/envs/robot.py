@@ -1,4 +1,5 @@
 import numpy as np
+
 from robopal.envs.base import MujocoEnv
 from robopal.controllers import controllers
 
@@ -14,29 +15,24 @@ class RobotEnv(MujocoEnv):
             Note that high frequency will cause high time-lag.
     :param is_interpolate: Use interpolator while stepping.
     :param enable_camera_viewer: Use camera or not.
-    :param cam_mode: Camera mode, "rgb" or "depth".
     """
 
     def __init__(self,
                  robot=None,
-                 is_render=False,
-                 renderer="viewer",
                  control_freq=200,
                  enable_camera_viewer=False,
-                 cam_mode='rgb',
                  controller='JNTIMP',
                  is_interpolate=False,
                  camera_name=None,
+                 render_mode='human',
                  ):
 
         super().__init__(
             robot=robot,
-            is_render=is_render,
-            renderer=renderer,
             control_freq=control_freq,
             enable_camera_viewer=enable_camera_viewer,
-            cam_mode=cam_mode,
             camera_name=camera_name,
+            render_mode=render_mode,
         )
         self.is_interpolate = is_interpolate
 
@@ -90,22 +86,3 @@ class RobotEnv(MujocoEnv):
     def dt(self):
         "Time of each upper step in the environment."
         return self.n_substeps * self.mj_model.opt.timestep
-
-
-if __name__ == "__main__":
-    from robopal.robots.diana_med import DianaMed
-
-    env = RobotEnv(
-        robot=DianaMed(),
-        renderer='viewer',
-        is_render=True,
-        control_freq=20,
-        is_interpolate=False,
-        controller='JNTIMP',
-    )
-    env.reset()
-    for t in range(int(1e6)):
-        action = np.array([0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        env.step(action)
-        if env.is_render:
-            env.render()
