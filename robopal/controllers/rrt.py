@@ -1,12 +1,11 @@
 import math
 import logging
 import random
-import numpy as np
 import copy
-import time
-import mujoco
-import threading
 from dataclasses import dataclass, field
+
+import mujoco
+import numpy as np
 
 try:
     import matplotlib
@@ -24,25 +23,26 @@ class Node:
     x: float  # 节点坐标
     y: float
     z: float
-    cost: float=0.0
+    cost: float = 0.0
     path_x: list[float] = field(default_factory=list)  # 路径，作为画图的数据
     path_y: list[float] = field(default_factory=list)
     path_z: list[float] = field(default_factory=list)
-    parent: None=None  # 父节点
+    parent: None = None  # 父节点
+
+
+class AreaBounds:
+    """ 规划区域大小 """
+
+    def __init__(self, area):
+        self.xmin = float(area[0])
+        self.xmax = float(area[1])
+        self.ymin = float(area[2])
+        self.ymax = float(area[3])
+        self.zmin = float(area[4])
+        self.zmax = float(area[5])
 
 
 class RRT:
-    class AreaBounds:
-        """区域大小"""
-
-        def __init__(self, area):
-            self.xmin = float(area[0])
-            self.xmax = float(area[1])
-            self.ymin = float(area[2])
-            self.ymax = float(area[3])
-            self.zmin = float(area[4])
-            self.zmax = float(area[5])
-
     def __init__(self,
                  start,
                  goal,
@@ -65,7 +65,7 @@ class RRT:
         self.end = Node(goal[0], goal[1], goal[2])
 
         if play_area is not None:
-            self.play_area = self.AreaBounds(play_area)  # 树枝生长区域，左下(-2,0)==>右上(12,14)
+            self.play_area = AreaBounds(play_area)  # 树枝生长区域，左下(-2,0)==>右上(12,14)
         else:
             self.play_area = None  # 数值无限生长
 
@@ -150,8 +150,7 @@ class RRT:
     def generate_final_course(self, lastIndex):
         path = [[self.end.x, self.end.y, self.end.z]]
 
-        while lastIndex is not None and isinstance(lastIndex, int) and lastIndex >= 0 and lastIndex < len(
-                self.node_list):
+        while lastIndex is not None and isinstance(lastIndex, int) and 0 <= lastIndex < len(self.node_list):
             node = self.node_list[lastIndex]
             path.append([node.x, node.y, node.z])
             lastIndex = node.parent
@@ -190,8 +189,7 @@ class RRT:
 
         # if a feasible area is defined,drew it in 3D
         if self.play_area is not None:
-            """ 绘制正方形框
-            """
+            # 绘制正方形框
             vertices = [
                 (self.play_area.xmin, self.play_area.ymin, self.play_area.zmin),
                 (self.play_area.xmax, self.play_area.ymin, self.play_area.zmin),
@@ -401,7 +399,6 @@ class RRT:
             if not TYPE_CHANGED:
                 LEFT_GRIPPER_GEOMS = sim.get_geom_id(LEFT_GRIPPER_GEOMS)
                 COLLISIONS = sim.get_geom_id(COLLISIONS)
-                sim.mj_model.geom('obstacle_box').margin[0] = 0.1
                 TYPE_CHANGED = True
 
             is_collision = sim.is_contact(LEFT_GRIPPER_GEOMS, COLLISIONS)
@@ -411,7 +408,7 @@ class RRT:
         return False
 
 
-def rrt_star(start, end, sim):
+def rrt_star(start, end, sim) -> list[list] | None:
     show_animation = True
     play_area = [0.1, 1.0, -0.65, 0.65, 0.1, 0.75]
     # Set Initial parameters
@@ -421,19 +418,26 @@ def rrt_star(start, end, sim):
         play_area=play_area,  # 树的生长区域，左下[-2, 0, 0] ==> 右上[13, 13, 13]
         sim=sim,
         expand_dis=0.04,  # 树枝长度
-        goal_sample_rate=10,
+        goal_sample_rate=20,
         max_iter=1000,
     )
+
+    sim.mj_model.geom('obstacle_box').margin[0] = 0.1
+    sim.save_state()
+
     MAX_FAILTURE_TIMES = 3
     path = None
     for i in range(MAX_FAILTURE_TIMES):
         path = rrt.planning(animation=show_animation)
         if path is None:
             logging.info("Cannot find path")
+            sim.load_state()
             continue
         else:
             logging.info("found path!!")
+            sim.load_state()
             break
+
     sim.mj_model.geom('obstacle_box').margin[0] = 0.0
 
     plt.close()
@@ -447,7 +451,8 @@ def rrt_star(start, end, sim):
             ax.set_xlim([play_area[0], play_area[1]])
             ax.set_ylim([play_area[2], play_area[3]])
             ax.set_zlim([play_area[4], play_area[5]])
-            ax.plot([x for (x, y, z) in path], [y for (x, y, z) in path], [z for (x, y, z) in path], '-b', linewidth=2.0)
+            ax.plot([x for (x, y, z) in path], [y for (x, y, z) in path], [z for (x, y, z) in path], '-b',
+                    linewidth=2.0)
 
             plt.pause(1)
             plt.close()

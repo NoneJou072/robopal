@@ -105,7 +105,7 @@ class MjRenderer:
             It should be noted that the render thread need locked.
         """
         self.viewer.cam.lookat = np.array([0.4, 0, 0.5])
-        self.viewer.cam.azimuth -= 0.005
+        self.viewer.cam.azimuth += 0.005
         with self.viewer.lock():
             self.viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(self.mj_data.time % 2)
 

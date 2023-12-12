@@ -222,7 +222,6 @@ class DrawerCubeEnv(PosCtrlEnv):
 if __name__ == "__main__":
 
     env = DrawerCubeEnv()
-    env.TASK_FLAG = 0
     env.reset()
 
     for t in range(int(1e6)):
