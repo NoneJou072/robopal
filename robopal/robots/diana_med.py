@@ -158,13 +158,32 @@ class DianaDrawer(DianaMedBase):
         self.mjcf_generator.set_node_attrib('body', 'cupboard', {'pos': '0.66 0.0 0.42'})
 
         # add goal site with random position
-        goal_site = """<site name="goal_site" pos="0.56 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
+        goal_site = """<site name="drawer_goal" pos="0.46 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
         self.mjcf_generator.add_node_from_str('worldbody', goal_site)
 
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
         return np.array([-0.51198529, -0.44737435, -0.50879166, 2.3063219, 0.46514545, -0.48916244, -0.37233289])
+
+
+class DianaDrawerCube(DianaDrawer):
+    """ DianaMed robot class. """
+
+    def add_assets(self):
+        super(DianaDrawerCube, self).add_assets()
+
+        # add cube with random position
+        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/green_cube.xml')
+        self.mjcf_generator.set_node_attrib('body', 'green_block', {'pos': '0.5 0.0 0.46'})
+
+        goal_site = """<site name="cube_goal" pos="0.59 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
+        self.mjcf_generator.add_node_from_str('worldbody', goal_site)
+
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return np.array([-0.64551607, -0.29859465, -0.66478589, 2.3211311, 0.3205733, -0.61377277, -0.26366202])
 
 
 class DianaCabinet(DianaMedBase):
@@ -183,46 +202,3 @@ class DianaCabinet(DianaMedBase):
     def init_qpos(self):
         """ Robot's init joint position. """
         return np.array([-0.71325374, 0.07279728, -0.72080385, 2.5239552, -0.07686951, -0.67930021, 0.05372948])
-
-
-class DianaDrawerCube(DianaMedBase):
-    """ DianaMed robot class. """
-
-    def __init__(self):
-        super().__init__(scene='grasping',
-                         gripper='rethink_gripper',
-                         mount='top_point')
-
-    def add_assets(self):
-        self.mjcf_generator.add_mesh('cupboard', 'objects/cupboard/cupboard.stl', scale='0.001 0.001 0.001')
-        self.mjcf_generator.add_mesh('drawer', 'objects/cupboard/drawer.stl', scale='0.001 0.001 0.001')
-        cupboard_x_pos = 0.66
-        cupboard_y_pos = 0.0
-        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cupboard/cupboard.xml')
-        self.mjcf_generator.set_node_attrib('body', 'cupboard', {'pos': f'{cupboard_x_pos} {cupboard_y_pos} {0.42}'})
-
-        # add cube with random position
-        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/green_cube.xml')
-        self.mjcf_generator.set_node_attrib('body', 'green_block', {'pos': '0.5 0.0 0.46'})
-
-        goal_site = """<site name="drawer_goal" pos="0.46 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
-        self.mjcf_generator.add_node_from_str('worldbody', goal_site)
-
-    @property
-    def init_qpos(self):
-        """ Robot's init joint position. """
-        return np.array([-0.64551607, -0.29859465, -0.66478589, 2.3211311, 0.3205733, -0.61377277, -0.26366202])
-
-
-class DianaPainting(DianaMedBase):
-    """ DianaMed robot class. """
-
-    def __init__(self):
-        super().__init__(scene='grasping',
-                         gripper='Swab_gripper',
-                         mount='top_point')
-
-    @property
-    def init_qpos(self):
-        """ Robot's init joint position. """
-        return np.array([-0.51198529, -0.44737435, -0.50879166, 2.3063219, 0.46514545, -0.48916244, -0.37233289])
