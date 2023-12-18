@@ -79,5 +79,4 @@ if __name__ == "__main__":
     for t in range(int(1e6)):
         action = np.array([0.33116, -0.09768533, 0.26947228, 1, 0, 0, 0])
         env.step(action)
-        if env.is_render:
-            env.render()
+        env.render()

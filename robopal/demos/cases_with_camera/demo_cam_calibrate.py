@@ -57,5 +57,4 @@ if __name__ == "__main__":
     for t in range(int(1e6)):
         env.step()
         print(env.kdl_solver.fk(env.robot.arm_qpos))
-        if env.is_render:
-            env.render()
+        env.render()

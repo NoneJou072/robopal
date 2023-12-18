@@ -8,8 +8,7 @@ class RobotEnv(MujocoEnv):
     """ Robot environment.
 
     :param robot: Robot configuration.
-    :param is_render: Choose if use the renderer to render the scene or not.
-    :param renderer: Choose official renderer with "viewer"
+    :param render_mode: Choose the render mode.
     :param controller: Choose the controller.
     :param control_freq: Upper-layer control frequency. i.g. frame per second-fps
             Note that high frequency will cause high time-lag.
@@ -41,7 +40,7 @@ class RobotEnv(MujocoEnv):
         self.controller = controllers[controller](
             self.robot,
             is_interpolate=is_interpolate,
-            interpolator_config={'dof': self.robot_dof, 'control_timestep': self.control_timestep}
+            interpolator_config={'dof': self.robot.jnt_num, 'control_timestep': self.control_timestep}
         )
 
         self.kdl_solver = self.controller.kdl_solver  # shallow copy
@@ -73,8 +72,9 @@ class RobotEnv(MujocoEnv):
     def step(self, action):
         if self.is_interpolate:
             self.controller.step_interpolator(action)
-        # step into inner loop
+        # high-level control
         for i in range(self.n_substeps):
+            # low-level control
             super().step(action)
 
     def reset(self):

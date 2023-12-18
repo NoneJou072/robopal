@@ -42,6 +42,5 @@ elif args.ctrl == 'CARTIK':
 env.reset()
 for t in range(int(1e4)):
     env.step(action)
-    if env.is_render:
-        env.render()
+    env.render()
 env.close()

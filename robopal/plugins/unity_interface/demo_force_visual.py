@@ -10,13 +10,12 @@ class VisualForceAdmit(AdmitGymEnv):
     """
     def __init__(self,
                  robot=None,
-                 is_render=False,
-                 renderer="mujoco_viewer",
+                 render_mode="human",
                  controller=1,
                  control_freq=50,
                  is_interpolate=True,
                  ):
-        super(VisualForceAdmit, self).__init__(
+        super().__init__(
             robot=robot,
             is_render=is_render,
             renderer=renderer,
@@ -43,8 +42,7 @@ if __name__ == "__main__":
 
     env = VisualForceAdmit(
         robot=DianaMed(),
-        is_render=False,
-        renderer="mujoco_viewer",
+        render_mode="human",
         controller=1,
         control_freq=100,
         is_interpolate=True,
@@ -57,7 +55,6 @@ if __name__ == "__main__":
         obs, reward, done, _ = env.step(action)
         m.setqpos(env.mj_data.qpos[:env.robot_freedom])
         m.sendForce(env.current_ee_force)
-        if env.is_render:
-            env.render()
+        env.render()
         if i % 800 == 0:
             env.reset()

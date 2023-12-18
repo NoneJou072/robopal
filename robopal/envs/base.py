@@ -11,10 +11,9 @@ from robopal.commons.renderers import MjRenderer
 class MujocoEnv:
     """ This environment is the base class.
 
-    :param xml_path(str): Load xml file from xml_path to build the mujoco model.
-    :param is_render(bool): Choose if use the renderer to render the scene or not.
-    :param renderer(str): choose official renderer with "viewer",
-    another renderer with "mujoco_viewer"
+    :param robot(str): Load xml file from xml_path to build the mujoco model.
+    :param render_mode(str): Choose if use the renderer to render the scene or not.
+    :param camera_name(str): Choose the camera.
     :param control_freq(int): Upper-layer control frequency.
     Note that high frequency will cause high time-lag.
     :param enable_camera_viewer(bool): Use camera or not.
@@ -31,7 +30,7 @@ class MujocoEnv:
 
     def __init__(self,
                  robot=None,
-                 control_freq=1000,
+                 control_freq=200,
                  enable_camera_viewer=False,
                  camera_name=None,
                  render_mode='human',
@@ -48,20 +47,15 @@ class MujocoEnv:
         self.timestep = 0
         self.model_timestep = 0
         self.control_timestep = 0
-        self.robot_dof = self.robot.jnt_num
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
-        if self.render_mode in ["human", "rgb_array", "depth"]:
-            self.is_render = True
-        if self.render_mode is None:
-            self.is_render = False
         self.renderer = MjRenderer(self.mj_model, self.mj_data, self.render_mode,
                                    enable_camera_viewer, camera_name)
         self._initialize_time()
         self._set_init_qpos()
 
-        self._state = None
+        self._mj_state = None
 
     def step(self, action):
         """ 
@@ -92,7 +86,7 @@ class MujocoEnv:
         self._set_init_qpos()
         mujoco.mj_forward(self.mj_model, self.mj_data)
 
-        if self.is_render:
+        if self.render_mode in ["human", "rgb_array", "depth"]:
             self.render()
 
     def reset_object(self):
@@ -100,8 +94,8 @@ class MujocoEnv:
         pass
 
     def render(self, mode="human"):
-        """ render mujoco """
-        if self.is_render is True:
+        """ render one frame in mujoco """
+        if self.render_mode in ["human", "rgb_array", "depth"]:
             self.renderer.render()
 
     def close(self):
@@ -311,12 +305,12 @@ class MujocoEnv:
         size = mujoco.mj_stateSize(self.mj_model, spec)
         state = np.empty(size, np.float64)
         mujoco.mj_getState(self.mj_model, self.mj_data, state, spec)
-        self._state = state
+        self._mj_state = state
 
     def load_state(self):
         """ Load the state of the mujoco model. """
         spec = mujoco.mjtState.mjSTATE_INTEGRATION
-        mujoco.mj_setState(self.mj_model, self.mj_data, self._state, spec)
+        mujoco.mj_setState(self.mj_model, self.mj_data, self._mj_state, spec)
 
     def is_contact(self, geom1: str | list[str], geom2: str | list[str], verbose=False) -> bool:
         """ Check if two geom or geom list is in contact.
