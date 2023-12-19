@@ -195,6 +195,7 @@ class DianaCabinet(DianaMedBase):
                          mount='top_point')
 
     def add_assets(self):
+        self.mjcf_generator.add_mesh('cabinet_door', 'objects/cabinet/kapak mab 27.stl', scale='0.0045 0.005 0.0035')
         self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cabinet/cabinet.xml')
         self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cabinet/beam.xml')
 

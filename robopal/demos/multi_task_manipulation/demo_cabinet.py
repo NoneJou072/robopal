@@ -197,44 +197,10 @@ class LockedCabinetEnv(PosCtrlEnv):
 
 
 if __name__ == "__main__":
-
     env = LockedCabinetEnv()
-    # env.TASK_FLAG = 1
     env.reset()
     for t in range(int(1e6)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
-        # beam_right_pos = env.get_site_pos('beam_right') - np.array([0, 0, 0.32])
-        # action = np.concatenate([beam_right_pos,np.ones(1)])
         s_, r, terminated, truncated, _ = env.step(action)
-        print(env.goal_distance(env.get_site_pos('beam_left'), env.get_site_pos('cabinet_mid')))
-        # if truncated:
-        #     env.reset()
-    a = None
-    for t in range(int(1e2)):
-        drawer_pos = env.get_site_pos('beam_right') - np.array([0, 0, 0.32])
-        action = np.concatenate([drawer_pos,-1.0 * np.ones(1)])
-        s_, r, terminated, truncated, _ = env.step(action)
-        a = drawer_pos.copy()
-    a[1] -= 0.11
-    for t in range(int(1e2)):
-        action = np.concatenate([a,-1.0 * np.ones(1)])
-        s_, r, terminated, truncated, _ = env.step(action)
-    for t in range(int(1e2)):
-        action = np.concatenate([a,1.0 * np.ones(1)])
-        s_, r, terminated, truncated, _ = env.step(action)
-    for t in range(int(1e2)):
-        beam_right_pos = env.get_site_pos('left_handle') - np.array([0, 0, 0.2])
-        action = np.concatenate([beam_right_pos,np.ones(1)])
-        s_, r, terminated, truncated, _ = env.step(action)
-    for t in range(int(1e2)):
-        beam_right_pos = env.get_site_pos('left_handle') - np.array([0, 0, 0.32])
-        action = np.concatenate([beam_right_pos,np.ones(1)])
-        s_, r, terminated, truncated, _ = env.step(action)
-    for t in range(int(1e2)):
-        beam_right_pos = env.get_site_pos('left_handle') - np.array([0, 0, 0.32])
-        action = np.concatenate([beam_right_pos,-1.0 * np.ones(1)])
-        s_, r, terminated, truncated, _ = env.step(action)
-    for t in range(int(1e6)):
-        beam_right_pos = env.get_site_pos('cabinet_left_opened') - np.array([0, 0, 0.32])
-        action = np.concatenate([beam_right_pos, -1.0 * np.ones(1)])
-        s_, r, terminated, truncated, _ = env.step(action)
+        if truncated:
+            env.reset()
