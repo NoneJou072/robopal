@@ -59,6 +59,11 @@ class BaseArm:
         self.robot_data = mujoco.MjData(self.robot_model)
 
     @abc.abstractmethod
+    def init_qpos(self) -> np.ndarray:
+        """ Robot's init joint position. """
+        pass
+
+    @abc.abstractmethod
     def add_assets(self) -> None:
         """ Add objects into the xml file. """
         pass

@@ -6,7 +6,7 @@ import mujoco
 import numpy as np
 
 from robopal.commons.renderers import MjRenderer
-
+from robopal.robots.base import BaseArm
 
 class MujocoEnv:
     """ This environment is the base class.
@@ -35,7 +35,8 @@ class MujocoEnv:
                  camera_name=None,
                  render_mode='human',
                  ):
-
+        if not isinstance(robot, BaseArm):
+            raise ValueError("Please select a robot config.")
         self.robot = robot
 
         self.control_freq = control_freq
