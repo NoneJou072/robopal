@@ -45,10 +45,10 @@ class XMLSplicer:
                 for node in self.root.findall(element):
                     self._file_repath(scene, node)
 
-    def add_component_from_xml(self, xml: str, goal_body: tuple):
+    def add_component_from_xml(self, xml: str, goal_body: tuple) -> None:
         """
-        For each input xml file, we extract the component we need, and append it into
-        global tree.
+        For each input xml file, we extract the component we need, and append it into global tree.
+
         :param xml: xml file path
         :param goal_body: goal body, a tuple consist of id and name
         """
@@ -253,7 +253,7 @@ class XMLSplicer:
         return path.abspath(path.join(output_path, f"{self.xml_name}.xml"))
 
     def splice_robot(self, scene=None, chassis=None, manipulator=None, gripper=None, **kwargs):
-        """
+        """ Splice the robot with the given scene, chassis, manipulator and gripper.
 
         :param scene: scene name
         :param chassis: chassis name
@@ -268,7 +268,7 @@ class XMLSplicer:
                 scene_path = path.join(SCENES_DIR_PATH, '{}.xml'.format(scene))
             self._init_scene(scene_path)
         else:
-            raise ValueError("Must has scene.xml to generate the world.")
+            raise ValueError("Must have scene.xml to generate the world.")
 
         if isinstance(chassis, str):
             chassis_path = path.join(CHASSISES_DIR_PATH, chassis, '{}.xml'.format(chassis))

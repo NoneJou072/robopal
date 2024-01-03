@@ -154,7 +154,7 @@ class LockedCabinetEnv(PosCtrlEnv):
 
     def _get_info(self) -> dict:
         return {
-            'is_unlock_success': self._is_success(self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.05),
+            'is_unlock_success': self._is_success(self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.03),
             'is_door_success': self._is_success(self.get_site_pos('left_handle'), self.get_site_pos('cabinet_left_opened'), th=0.03)
         }
 
@@ -184,7 +184,7 @@ class LockedCabinetEnv(PosCtrlEnv):
         d = self.goal_distance(achieved_goal, desired_goal)
         return -(d > kwargs['th']).astype(np.float64)
 
-    def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, th=0.03) -> np.ndarray:
+    def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, th=0.02) -> np.ndarray:
         """ Compute whether the achieved goal successfully achieved the desired goal.
         """
         d = self.goal_distance(achieved_goal, desired_goal)

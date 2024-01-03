@@ -6,7 +6,7 @@
             <geom type="box" pos="0.00 0.2 0.1" size="0.1 0.01 0.14" rgba="0 0.5 0 1"/>
             <geom type="box" pos="0.00 -0.2 0.1" size="0.1 0.01 0.14" rgba="0 0.5 0 1"/>
             <geom type="box" pos="0.09 0 0.11" size="0.01 0.2 0.12" rgba="0 0.5 0 1"/>
-            <site name="cabinet_mid" pos="-0.18 0 0.10" size="0.01" rgba="1 0 1 0.5" type="sphere" />
+            <site name="cabinet_mid" pos="-0.18 0 0.13" size="0.01" rgba="1 0 1 0.5" type="sphere" />
             <site name="cabinet_left_opened" pos="-0.28 0.2 0.14" size="0.01" rgba="1 0 1 0.5" type="sphere" />
             <body>
                 <joint name="hinge_left" pos="-0.1 0.2 0" axis="0 0 -1" range="0 1.57" damping="1" frictionloss="2" />
