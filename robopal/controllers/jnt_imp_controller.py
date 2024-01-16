@@ -76,7 +76,10 @@ class JntImpedance(object):
         return torque
 
     def _init_interpolator(self, cfg: dict):
-        from robopal.controllers.interpolators import OTG
+        try:
+            from robopal.controllers.interpolators import OTG
+        except ImportError:
+            raise ImportError("Please install ruckig first: pip install ruckig")
         self.interpolator = OTG(
             OTG_dim=cfg['dof'],
             control_cycle=cfg['control_timestep'],

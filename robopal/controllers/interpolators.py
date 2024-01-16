@@ -1,5 +1,5 @@
-from ruckig import InputParameter, OutputParameter, Result, Ruckig
 import numpy as np
+from ruckig import InputParameter, OutputParameter, Result, Ruckig
 
 
 class OTG:
