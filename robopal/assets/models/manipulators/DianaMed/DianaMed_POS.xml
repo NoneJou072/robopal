@@ -50,7 +50,7 @@
                                     <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="link6"/>
                                     <geom name="link6_collision" type="mesh" rgba="1 1 1 1" mesh="link6"/>
                                     <body name="link7" pos="0.076728 -0.1059 0" quat="0.707105 -0.707108 0 0">
-                                        <joint name="j7" pos="0 0 0" axis="0 0 -1" limited="true" range="-3.14 3.14" damping="0.01"/>
+                                        <joint name="j7" pos="0 0 0" axis="0 0 -1" limited="true" range="-3.14 3.14" damping="1"/>
                                         <inertial pos="0.00068467 1.5999e-05 0.020834" quat="0.000547318 0.708756 -0.000448023 0.705453" mass="0.16696" diaginertia="0.000143911 8.8902e-05 8.75358e-05"/>
                                         <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="link7"/>
                                         <geom name="link7_collision" type="mesh" rgba="1 1 1 1" mesh="link7"/>

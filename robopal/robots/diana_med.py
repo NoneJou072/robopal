@@ -9,6 +9,7 @@ class DianaMedBase(BaseArm):
 
     def __init__(self,
                  scene='default',
+                 manipulator='DianaMed',
                  gripper=None,
                  mount=None
                  ):
@@ -16,7 +17,7 @@ class DianaMedBase(BaseArm):
             name="diana_med",
             scene=scene,
             chassis=mount,
-            manipulator='DianaMed',
+            manipulator=manipulator,
             gripper=gripper,
             g2m_body=['0_link7'],
             urdf_path=os.path.join(ASSET_DIR, "models/manipulators/DianaMed/DianaMed.urdf"),
@@ -147,6 +148,7 @@ class DianaDrawer(DianaMedBase):
 
     def __init__(self):
         super().__init__(scene='grasping',
+                         # manipulator='/home/mhming/zhr/robopal/robopal/assets/models/manipulators/DianaMed/DianaMed_POS.xml',
                          gripper='rethink_gripper',
                          mount='top_point')
 

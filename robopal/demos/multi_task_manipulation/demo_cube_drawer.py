@@ -34,7 +34,7 @@ class DrawerCubeEnv(PosCtrlEnv):
         )
         self.name = 'DrawerBox-v1'
 
-        self.obs_dim = (32,)
+        self.obs_dim = (35,)
         self.goal_dim = (9,)
         self.action_dim = (4,)
 
@@ -43,8 +43,6 @@ class DrawerCubeEnv(PosCtrlEnv):
 
         self.max_episode_steps = 50
         self._timestep = 0
-
-        self.goal_pos = None
 
         self.TASK_FLAG = 0
 
@@ -80,9 +78,7 @@ class DrawerCubeEnv(PosCtrlEnv):
         super().step(actual_pos_action[:3])
 
         obs = self._get_obs()
-        achieved_goal = obs['achieved_goal']
-        desired_goal = obs['desired_goal']
-        reward = self.compute_rewards(achieved_goal[3:], desired_goal[3:], th=0.05)
+        reward = self.compute_rewards(obs['achieved_goal'][3:], obs['desired_goal'][3:], th=0.05)
         terminated = False
         truncated = True if self._timestep >= self.max_episode_steps else False
         info = self._get_info()
@@ -108,36 +104,50 @@ class DrawerCubeEnv(PosCtrlEnv):
         between the block and the gripper, and the last dimension corresponding to the current gripper opening.
         """
         obs = np.zeros(self.obs_dim)
-
+        # gripper state
         obs[0:3] = (  # gripper position in global coordinates
             end_pos := self.get_site_pos('0_grip_site')
         )
-        obs[3:6] = (  # handle position in global coordinates
-            handle_pos := self.get_site_pos('drawer')
-        )
-        obs[6:9] = (  # block position in global coordinates
-            block_pos := self.get_body_pos('green_block')
-        )
-        obs[9:12] = end_pos - handle_pos  # distance between the handle and the end
-        obs[12:15] = end_pos - block_pos  # distance between the block and the end
-        obs[15:18] = (  # block rotation
-            trans.mat_2_euler(self.get_body_rotm('green_block'))
-        )
-        obs[18:21] = (  # gripper linear velocity
+        obs[3:6] = (  # gripper linear velocity
             end_vel := self.get_site_xvelp('0_grip_site') * self.dt
         )
-        # velocity with respect to the gripper
-        handle_velp = self.get_site_xvelp('drawer') * self.dt
-        obs[21:24] = (  # velocity with respect to the gripper
-            handle_velp - end_vel
+        obs[6] = self.mj_data.joint('0_r_finger_joint').qpos[0]
+        obs[7] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
+        obs[8:11] = (  # gripper rotation
+            # trans.mat_2_euler(self.get_site_rotm('0_grip_site'))
+            np.zeros(3)
         )
-        block_velp = self.get_body_xvelp('green_block') * self.dt
-        obs[24:27] = (  # velocity with respect to the gripper
-            block_velp - end_vel
-        )
-        obs[27:30] = self.get_body_xvelr('green_block') * self.dt
-        obs[30] = self.mj_data.joint('0_r_finger_joint').qpos[0]
-        obs[31] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
+
+        # drawer state
+        if self.TASK_FLAG == 1:
+            obs[11:20] = np.zeros(9)
+        else:
+            obs[11:14] = (  # handle position in global coordinates
+                handle_pos := self.get_site_pos('drawer')
+            )
+            obs[14:17] = end_pos - handle_pos  # distance between the handle and the end
+            # velocity with respect to the gripper
+            handle_velp = self.get_site_xvelp('drawer') * self.dt
+            obs[17:20] = (  # velocity with respect to the gripper
+                    handle_velp - end_vel
+            )
+
+        # block state
+        if self.TASK_FLAG == 0:
+            obs[20:35] = np.zeros(15)
+        else:
+            obs[20:23] = (  # block position in global coordinates
+                block_pos := self.get_body_pos('green_block')
+            )
+            obs[23:26] = end_pos - block_pos  # distance between the block and the end
+            obs[26:29] = (  # block rotation
+                trans.mat_2_euler(self.get_body_rotm('green_block'))
+            )
+            block_velp = self.get_body_xvelp('green_block') * self.dt
+            obs[29:32] = (  # velocity with respect to the gripper
+                block_velp - end_vel
+            )
+            obs[32:35] = self.get_body_xvelr('green_block') * self.dt
 
         return {
             'observation': obs.copy(),
@@ -149,15 +159,18 @@ class DrawerCubeEnv(PosCtrlEnv):
         achieved_goal = np.concatenate([
             self.get_site_pos('0_grip_site'),
             self.get_site_pos('drawer'),
-            block_pos := self.get_body_pos('green_block')
+            self.get_body_pos('green_block')
         ], axis=0)
         return achieved_goal.copy()
 
     def _get_desired_goal(self):
+        if self._is_success(self.get_site_pos('drawer'), self.get_site_pos('drawer_goal')) == 0:
+            reach_goal = self.get_site_pos('drawer')
+        else:
+            reach_goal = self.get_body_pos('green_block')
+
         desired_goal = np.concatenate([
-            self.get_site_pos('drawer') if self._is_success(
-                self.get_site_pos('drawer'), self.get_site_pos('drawer_goal')
-            ) == 0 else self.get_body_pos('green_block'),
+            reach_goal,
             self.get_site_pos('drawer_goal'),
             self.get_site_pos('cube_goal'),
         ], axis=0)
@@ -183,39 +196,35 @@ class DrawerCubeEnv(PosCtrlEnv):
     def reset(self, seed=None):
         super().reset()
         self._timestep = 0
-        # set new goal
-        self.goal_pos = self.get_site_pos('cube_goal')
-
         obs = self._get_obs()
         info = self._get_info()
-
-        if self.render_mode == 'human':
-            self.render()
-
         return obs, info
 
     def reset_object(self):
-        # reset object position
-        random_x_pos = np.random.uniform(0.35, 0.44)
-        random_y_pos = np.random.uniform(-0.15, 0.15)
-        self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
-
         if self.TASK_FLAG == 0:
-            pass
-            # reset drawer goal position
-            # random_goal_x_pos = np.random.uniform(0.48, 0.56)
-            # goal_pos = np.array([random_goal_x_pos, 0.0, 0.478])
-            # site_id = self.get_site_id('drawer_goal')
-            # self.mj_model.site_pos[site_id] = goal_pos
+            # reset object position
+            random_x_pos = np.random.uniform(0.35, 0.4)
+            random_y_pos = np.random.uniform(-0.15, 0.15)
+            self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
+            self.set_site_pose('cube_goal', np.array([0.59, 0.0, 0.478]))
         elif self.TASK_FLAG == 1:
             self.mj_data.joint('drawer:joint').qpos[0] = 0.14
+            # reset object position
+            random_x_pos = np.random.uniform(0.35, 0.4)
+            random_y_pos = np.random.uniform(-0.15, 0.15)
+            self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
+            self.set_site_pose('cube_goal', np.array([0.59, 0.0, 0.478]))
+        elif self.TASK_FLAG == 2:
+            self.mj_data.joint('drawer:joint').qpos[0] = 0.14
+            self.set_object_pose('green_block:joint', np.array([0.59, 0.0, 0.478, 1.0, 0.0, 0.0, 0.0]))
+            random_x_pos = np.random.uniform(0.35, 0.4)
+            random_y_pos = np.random.uniform(-0.15, 0.15)
+            self.set_site_pose('cube_goal', np.array([random_x_pos, random_y_pos, 0.46]))
 
 
 if __name__ == "__main__":
-
     env = DrawerCubeEnv()
     env.reset()
-
     for t in range(int(1e6)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
         s_, r, terminated, truncated, info = env.step(action)

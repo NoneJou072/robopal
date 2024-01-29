@@ -210,13 +210,8 @@ class MultiCubes(PosCtrlEnv):
     def reset(self, seed=None):
         super().reset()
         self._timestep = 0
-
         obs = self._get_obs()
         info = self._get_info()
-
-        if self.render_mode == 'human':
-            self.render()
-
         return obs, info
 
     def reset_object(self):
@@ -271,10 +266,8 @@ class MultiCubes(PosCtrlEnv):
 if __name__ == "__main__":
     env = MultiCubes()
     env.reset()
-
     for t in range(int(1e6)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
-        # action = np.array([-1, 1, -1, 1])
         s_, r, terminated, truncated, info = env.step(action)
         if truncated:
             env.reset()

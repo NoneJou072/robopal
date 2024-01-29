@@ -145,7 +145,7 @@ class LockedCabinetEnv(PosCtrlEnv):
     def _get_desired_goal(self):
         desired_goal = np.concatenate([
             self.get_site_pos('beam_right') if self._is_success(
-                self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.05
+                self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.03
             ) == 0 else self.get_site_pos('left_handle'),
             self.get_site_pos('cabinet_mid'),
             self.get_site_pos('cabinet_left_opened'),
@@ -161,19 +161,15 @@ class LockedCabinetEnv(PosCtrlEnv):
     def reset(self, seed=None):
         super().reset()
         self._timestep = 0
+        obs = self._get_obs()
+        info = self._get_info()
+        return obs, info
 
+    def reset_object(self):
         if self.TASK_FLAG == 0:
             pass
         elif self.TASK_FLAG == 1:
             self.mj_data.joint('OBJTy').qpos[0] = -0.12
-
-        obs = self._get_obs()
-        info = self._get_info()
-
-        if self.render_mode == 'human':
-            self.render()
-
-        return obs, info
 
     def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, **kwargs) -> np.ndarray:
         """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final

@@ -1,10 +1,11 @@
 import logging
 import sys
 from queue import Queue
+from collections import deque
+
 import numpy as np
 import mujoco
 from mujoco import viewer
-from collections import deque
 
 import robopal.commons.cv_utils as cv
 
@@ -94,7 +95,7 @@ class MjRenderer:
         """ close the environment. """
         if self.enable_camera_viewer:
             cv.close_cv_window()
-        if self.viewer is not None:
+        if self.viewer is not None and self.viewer.is_running():
             self.viewer.close()
         sys.exit(0)
 
