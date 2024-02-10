@@ -1,14 +1,11 @@
 import numpy as np
-import logging
 
-from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
+from robopal.envs import ManipulateEnv
 import robopal.commons.transform as trans
 from robopal.robots.diana_med import DianaGraspMultiObjs
 
-logging.basicConfig(level=logging.INFO)
 
-
-class MultiCubes(PosCtrlEnv):
+class MultiCubes(ManipulateEnv):
     """
     The control frequency of the robot is of f = 10 Hz. This is achieved by applying the same action
     in 100 subsequent simulator step (with a time step of dt = 0.001 s) before returning the control to the robot.
@@ -42,7 +39,6 @@ class MultiCubes(PosCtrlEnv):
         self.min_action = -1.0
 
         self.max_episode_steps = 50
-        self._timestep = 0
 
         self.TASK_FLAG = 0
 
@@ -61,34 +57,7 @@ class MultiCubes(PosCtrlEnv):
         return actual_pos_action, gripper_ctrl
 
     def step(self, action) -> tuple:
-        """ Take one step in the environment.
-
-        :param action:  The action space is 4-dimensional, with the first 3 dimensions corresponding to the desired
-        position of the block in Cartesian coordinates, and the last dimension corresponding to the
-        desired gripper opening (0 for closed, 1 for open).
-        :return: obs, reward, terminated, truncated, info
-        """
-        self._timestep += 1
-
-        actual_pos_action, gripper_ctrl = self.action_scale(action)
-        # take one step
-        self.mj_data.joint('0_r_finger_joint').qpos[0] = gripper_ctrl
-        self.mj_data.joint('0_l_finger_joint').qpos[0] = gripper_ctrl
-
-        super().step(actual_pos_action[:3])
-
-        obs = self._get_obs()
-        achieved_goal = obs['achieved_goal']
-        desired_goal = obs['desired_goal']
-        reward = self.compute_rewards(achieved_goal[3:], desired_goal[3:], th=0.03)
-        terminated = False
-        truncated = True if self._timestep >= self.max_episode_steps else False
-        info = self._get_info()
-
-        if self.render_mode == 'human':
-            self.render()
-
-        return obs, reward, terminated, truncated, info
+        return super().step(action)
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -187,35 +156,10 @@ class MultiCubes(PosCtrlEnv):
             'is_blue_success': self._is_success(self.get_body_pos('blue_block'), self.get_site_pos('blue_goal'), th=0.02)
         }
 
-    def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, **kwargs) -> np.ndarray:
-        """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
-        target position, and 0 if the block is in the final target position (the block is considered to have
-        reached the goal if the Euclidean distance between both is lower than 0.05 m).
-        """
-        assert 'th' in kwargs.keys()
-        d = self.goal_distance(achieved_goal, desired_goal)
-        return -(d > kwargs['th']).astype(np.float64)
-
-    def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, th=0.03) -> np.ndarray:
-        """ Compute whether the achieved goal successfully achieved the desired goal.
-        """
-        d = self.goal_distance(achieved_goal, desired_goal)
-        return (d < th).astype(np.float32)
-
-    @staticmethod
-    def goal_distance(goal_a, goal_b):
-        assert goal_a.shape == goal_b.shape
-        return np.linalg.norm(goal_a - goal_b, axis=-1)
-
     def reset(self, seed=None):
-        super().reset()
-        self._timestep = 0
-        obs = self._get_obs()
-        info = self._get_info()
-        return obs, info
+        return super().reset()
 
     def reset_object(self):
-
         r_random_x_pos = np.random.uniform(0.4, 0.55)
         r_random_y_pos = np.random.uniform(-0.15, 0.15)
         self.set_object_pose('red_block:joint', np.array([r_random_x_pos, r_random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))

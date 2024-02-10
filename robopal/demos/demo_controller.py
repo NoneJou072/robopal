@@ -1,12 +1,15 @@
 import argparse
 import numpy as np
+import logging
 
 from robopal.robots.diana_med import DianaMed
 from robopal.envs import RobotEnv, PosCtrlEnv
 
+logging.basicConfig(level=logging.INFO)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--ctrl', default='JNTIMP', type=str, help='JSC for task space controller or OSC for joint space controller')
+parser.add_argument('--ctrl', default='JNTIMP', type=str,
+                    help='JSC for task space controller or OSC for joint space controller')
 args = parser.parse_args()
 
 assert args.ctrl in ['JNTIMP', 'JNTNONE', 'JNTVEL', 'CARTIMP', 'CARTIK']
@@ -38,9 +41,12 @@ elif args.ctrl == 'CARTIK':
         is_pd=False
     )
     action = np.array([0.33, -0.39, 0.66])
+else:
+    raise ValueError('Invalid controller')
 
-env.reset()
-for t in range(int(1e4)):
-    env.step(action)
-    env.render()
-env.close()
+if isinstance(env, RobotEnv):
+    env.reset()
+    for t in range(int(1e4)):
+        env.step(action)
+        env.render()
+    env.close()

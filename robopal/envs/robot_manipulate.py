@@ -7,7 +7,12 @@ from robopal.robots.diana_med import DianaDrawer
 logging.basicConfig(level=logging.INFO)
 
 
-class DianaTask(PosCtrlEnv):
+def goal_distance(goal_a, goal_b):
+    assert goal_a.shape == goal_b.shape
+    return np.linalg.norm(goal_a - goal_b, axis=-1)
+
+
+class ManipulateEnv(PosCtrlEnv):
     """
     The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
     in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
@@ -31,18 +36,10 @@ class DianaTask(PosCtrlEnv):
             is_interpolate=is_interpolate,
             is_pd=is_pd,
         )
-        self.name = 'Drawer-v1'
-
-        self.obs_dim = (17,)
-        self.goal_dim = (3,)
-        self.action_dim = (4,)
-
-        self.max_action = 1.0
-        self.min_action = -1.0
 
         self.max_episode_steps = 50
-        self._timestep = 0
 
+        self._timestep = 0
         self.goal_pos = None
 
     def action_scale(self, action):
@@ -77,9 +74,7 @@ class DianaTask(PosCtrlEnv):
         super().step(actual_pos_action[:3])
 
         obs = self._get_obs()
-        achieved_goal = obs['achieved_goal']
-        desired_goal = obs['desired_goal']
-        reward = self.compute_rewards(achieved_goal, desired_goal)
+        reward = self.compute_rewards(obs['achieved_goal'], obs['desired_goal'], th=0.05)
         terminated = False
         truncated = True if self._timestep >= self.max_episode_steps else False
         info = self._get_info()
@@ -89,13 +84,20 @@ class DianaTask(PosCtrlEnv):
 
         return obs, reward, terminated, truncated, info
 
-    def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, info: dict = None):
+    def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, **kwargs):
         """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
         target position, and 0 if the block is in the final target position (the block is considered to have
         reached the goal if the Euclidean distance between both is lower than 0.05 m).
         """
-        d = self.goal_distance(achieved_goal, desired_goal)
-        return -(d > 0.05).astype(np.float64)
+        assert 'th' in kwargs.keys()
+        d = goal_distance(achieved_goal, desired_goal)
+        return -(d >= kwargs['th']).astype(np.float64)
+
+    def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, th=0.02) -> np.ndarray:
+        """ Compute whether the achieved goal successfully achieved the desired goal.
+        """
+        d = goal_distance(achieved_goal, desired_goal)
+        return (d < th).astype(np.float32)
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -103,63 +105,17 @@ class DianaTask(PosCtrlEnv):
         corresponding to the position of the gripper, the next 3 dimensions corresponding to the vector
         between the block and the gripper, and the last dimension corresponding to the current gripper opening.
         """
-        obs = np.zeros(self.obs_dim)
-
-        obs[:3] = (  # gripper position
-            end_pos := self.get_site_pos('0_grip_site')
-        )
-        obs[3:6] = (  # drawer position
-            object_pos := self.get_site_pos('drawer')
-        )
-        obs[6:9] = (  # distance between the block and the end
-            object_rel_pos := end_pos - object_pos
-        )
-        obs[9:12] = (  # gripper linear velocity
-            end_vel := self.get_site_xvelp('0_grip_site') * self.dt
-        )
-        object_velp = self.get_site_xvelp('drawer') * self.dt
-        obs[12:15] = (  # velocity with respect to the gripper
-            object2end_velp := object_velp - end_vel
-        )
-        obs[15] = self.mj_data.joint('0_r_finger_joint').qpos[0]
-        obs[16] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
-
-        return {
-            'observation': obs.copy(),
-            'achieved_goal': object_pos.copy(),  # handle position
-            'desired_goal': self.goal_pos.copy()
-        }
+        return {}
 
     def _get_info(self) -> dict:
-        return {'is_success': self._is_success(self.get_site_pos('drawer'), self.goal_pos)}
-
-    def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray) -> np.ndarray:
-        """ Compute whether the achieved goal successfully achieved the desired goal.
-        """
-        d = self.goal_distance(achieved_goal, desired_goal)
-        return (d < 0.02).astype(np.float32)
-
-    @staticmethod
-    def goal_distance(goal_a, goal_b):
-        assert goal_a.shape == goal_b.shape
-        return np.linalg.norm(goal_a - goal_b, axis=-1)
+        return {}
 
     def reset(self, seed=None):
         super().reset()
         self._timestep = 0
-        # set new goal
-        self.goal_pos = self.get_site_pos('drawer_goal')
-
         obs = self._get_obs()
         info = self._get_info()
-
-        if self.render_mode == 'human':
-            self.render()
-
         return obs, info
 
     def reset_object(self):
-        random_goal_x_pos = np.random.uniform(0.46, 0.56)
-        goal_pos = np.array([random_goal_x_pos, 0.0, 0.478])
-        site_id = self.get_site_id('drawer_goal')
-        self.mj_model.site_pos[site_id] = goal_pos
+        pass

@@ -58,15 +58,3 @@ $ conda install pinocchio
 ## Contribute
 这个项目是我在学习过程中所搭建的仿真框架，目前还有很多不足之处，欢迎大家提出建议和意见，也欢迎对这个项目有兴趣的一起来完善。
 目前对该框架的近期规划是，加入双臂控制，并充分利用 Mujoco 的各种特性，加入更多新颖的任务环境。
-
-## Citation
-```bibtex
-@misc{robopal2023,
-    author = {Haoran Zhou},
-    title = {robopal: A Modular Robotic Simulation Framework for Reinforcement Learning},
-    year = {2023},
-    publisher = {GitHub},
-    journal = {GitHub repository},
-    howpublished = {\url{https://github.com/NoneJou072/robopal}},
-}
-```
