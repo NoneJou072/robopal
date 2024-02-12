@@ -4,7 +4,7 @@ from robopal.robots.base import *
 ASSET_DIR = os.path.join(os.path.dirname(__file__), '../assets')
 
 
-class DianaMedBase(BaseArm):
+class DianaMed(BaseArm):
     """ DianaMed robot base class. """
 
     def __init__(self,
@@ -31,15 +31,7 @@ class DianaMedBase(BaseArm):
         return np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])
 
 
-class DianaMed(DianaMedBase):
-    """ DianaMed robot class. """
-
-    def __init__(self):
-        super().__init__(scene='default',
-                         gripper=None, )
-
-
-class DianaAruco(DianaMedBase):
+class DianaAruco(DianaMed):
     """ DianaMed robot class. """
 
     def __init__(self):
@@ -58,7 +50,7 @@ class DianaAruco(DianaMedBase):
         self.mjcf_generator.add_joint(node='aruco', name='aruco_z', type='slide', axis='0 0 1')
 
 
-class DianaCollide(DianaMedBase):
+class DianaCollide(DianaMed):
     """ DianaMed robot class. """
 
     def __init__(self):
@@ -69,7 +61,7 @@ class DianaCollide(DianaMedBase):
                                      size='0.4 0.05 0.2', type='box')
 
 
-class DianaCalib(DianaMedBase):
+class DianaCalib(DianaMed):
     """ DianaMed for Camera Calibration. """
 
     def __init__(self):
@@ -95,7 +87,7 @@ class DianaCalib(DianaMedBase):
         self.mjcf_generator.add_node_from_str('worldbody', cam)
 
 
-class DianaGrasp(DianaMedBase):
+class DianaGrasp(DianaMed):
     """ DianaMed robot class. """
 
     def __init__(self):
@@ -143,7 +135,7 @@ class DianaGraspMultiObjs(DianaGrasp):
         self.mjcf_generator.add_node_from_str('worldbody', b_goal_site)
 
 
-class DianaDrawer(DianaMedBase):
+class DianaDrawer(DianaMed):
     """ DianaMed robot class. """
 
     def __init__(self):
@@ -188,7 +180,7 @@ class DianaDrawerCube(DianaDrawer):
         return np.array([-0.64551607, -0.29859465, -0.66478589, 2.3211311, 0.3205733, -0.61377277, -0.26366202])
 
 
-class DianaCabinet(DianaMedBase):
+class DianaCabinet(DianaMed):
     """ DianaMed robot class. """
 
     def __init__(self):
