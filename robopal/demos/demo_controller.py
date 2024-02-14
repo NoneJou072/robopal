@@ -12,9 +12,9 @@ parser.add_argument('--ctrl', default='JNTIMP', type=str,
                     help='JSC for task space controller or OSC for joint space controller')
 args = parser.parse_args()
 
-assert args.ctrl in ['JNTIMP', 'JNTNONE', 'JNTVEL', 'CARTIMP', 'CARTIK']
+assert args.ctrl in ['JNTIMP', 'JNTVEL', 'CARTIMP', 'CARTIK']
 
-if args.ctrl in ['JNTIMP', 'JNTNONE', 'JNTVEL', 'CARTIMP']:
+if args.ctrl in ['JNTIMP', 'JNTVEL', 'CARTIMP']:
     env = RobotEnv(
         robot=DianaMed(),
         render_mode='human',
@@ -23,7 +23,7 @@ if args.ctrl in ['JNTIMP', 'JNTNONE', 'JNTVEL', 'CARTIMP']:
         controller=args.ctrl,
     )
 
-    if args.ctrl == 'JNTIMP' or args.ctrl == 'JNTNONE':
+    if args.ctrl == 'JNTIMP':
         action = np.array([0.33116, -0.39768533, 0.66947228, 0.33116, -0.39768533, 0.66947228, 0])
 
     elif args.ctrl == 'JNTVEL':
