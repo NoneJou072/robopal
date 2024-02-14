@@ -1,4 +1,5 @@
 import os
+
 from robopal.robots.base import *
 
 ASSET_DIR = os.path.join(os.path.dirname(__file__), '../assets')
@@ -29,6 +30,36 @@ class DianaMed(BaseArm):
     def init_qpos(self):
         """ Robot's init joint position. """
         return np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])
+
+
+class DualDianaMed(BaseArm):
+    """ Dual DianaMed robots base class. """
+
+    def __init__(self,
+                 scene='default',
+                 manipulator=['DianaMed', 'DianaMed'],
+                 gripper=None,
+                 mount=['floor_left', 'floor_right']
+                 ):
+        super().__init__(
+            name="diana_med",
+            scene=scene,
+            chassis=mount,
+            manipulator=manipulator,
+            gripper=gripper,
+            g2m_body=['0_link7'],
+            urdf_path=os.path.join(ASSET_DIR, "models/manipulators/DianaMed/DianaMed.urdf"),
+        )
+        self.joint_index = [['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7'],
+                            ['1_j1', '1_j2', '1_j3', '1_j4', '1_j5', '1_j6', '1_j7']]
+        self.actuator_index = [['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7'],
+                               ['1_a1', '1_a2', '1_a3', '1_a4', '1_a5', '1_a6', '1_a7']]
+
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return np.array([[0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0],
+                         [0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0]])
 
 
 class DianaAruco(DianaMed):
@@ -78,8 +109,8 @@ class DianaCalib(DianaMed):
                                      euler="0 0 1.57", size='0.115 0.08 0.001', type='box', material='chessboard')
 
         # set realsense_d435
-        self.mjcf_generator.add_mesh(name = "cambase", file = "objects/realsense_d435/meshes/cambase.STL")
-        self.mjcf_generator.add_mesh(name = "cam", file = "objects/realsense_d435/meshes/cam.STL")
+        self.mjcf_generator.add_mesh(name="cambase", file="objects/realsense_d435/meshes/cambase.STL")
+        self.mjcf_generator.add_mesh(name="cam", file="objects/realsense_d435/meshes/cam.STL")
 
         cam = """<body pos="1.0 0.0 0.8" euler="0 0.785 3.14">
         <include file="objects/realsense_d435/realsense.xml"/>
@@ -112,7 +143,6 @@ class DianaGraspMultiObjs(DianaGrasp):
     """ DianaMed robot class. """
 
     def add_assets(self):
-
         self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/red_cube.xml')
         self.mjcf_generator.set_node_attrib('body', 'red_block', {'pos': '0.5 -0.1 0.46'})
         self.mjcf_generator.set_node_attrib('geom', 'red_block', {'rgba': '1 0 0 0.6'})

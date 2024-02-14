@@ -11,11 +11,11 @@ SCENES_DIR_PATH = path.join(ASSETS_PATH, 'scenes')
 
 class XMLSplicer:
     def __init__(self,
-                 name='robot',
-                 scene='default',
-                 chassis=None,
-                 manipulator=None,
-                 gripper=None,
+                 name: str = 'robot',
+                 scene: str = 'default',
+                 chassis: str | list[str] = None,
+                 manipulator: str | list[str] = None,
+                 gripper: str | list[str] = None,
                  **kwargs,
                  ):
         self.xml_name = name
@@ -116,6 +116,9 @@ class XMLSplicer:
                 for key, value in element.attrib.items():
                     if value == body.attrib['name'] and key != 'mesh':
                         element.attrib[key] = '{}_{}'.format(id, element.attrib[key])
+
+        for geom in node.findall('.//geom[@name]'):
+            geom.attrib['name'] = '{}_{}'.format(id, geom.attrib['name'])
 
         for default in node.findall('.//default'):
             if 'class' in default.attrib:
@@ -261,6 +264,7 @@ class XMLSplicer:
         :param gripper: gripper name
         :param kwargs:
         """
+        # Check the scene.
         if isinstance(scene, str):
             if scene.endswith('.xml'):
                 scene_path = scene
@@ -271,17 +275,27 @@ class XMLSplicer:
             raise ValueError("Must have scene.xml to generate the world.")
 
         if isinstance(chassis, str):
-            chassis_path = path.join(CHASSISES_DIR_PATH, chassis, '{}.xml'.format(chassis))
-            self.add_component_from_xml(chassis_path, goal_body=(0, 'worldbody'))
+            chassis = [chassis]
+        if isinstance(chassis, list):
+            for ch_id, ch_name in enumerate(chassis):
+                if ch_name.endswith('.xml'):
+                    chassis_path = ch_name
+                else:
+                    chassis_path = path.join(CHASSISES_DIR_PATH, ch_name, '{}.xml'.format(ch_name))
+                self.add_component_from_xml(chassis_path, goal_body=(ch_id, 'worldbody'))
 
         if isinstance(manipulator, str):
-            if manipulator.endswith('.xml'):
-                manipulator_path = manipulator
-            else:
-                manipulator_path = path.join(MANIPULATORS_DIR_PATH, manipulator, '{}.xml'.format(manipulator))
-            self.add_component_from_xml(manipulator_path,
-                                        goal_body=(0, '0_mount_base_link') if chassis is not None else (0, 'worldbody'))
-            if isinstance(gripper, str):
-                for goal_body in enumerate(kwargs['g2m_body']):
-                    gripper_path = path.join(GRIPPERS_DIR_PATH, gripper, '{}.xml'.format(gripper))
-                    self.add_component_from_xml(gripper_path, goal_body=goal_body)
+            manipulator = [manipulator]
+        if isinstance(manipulator, list):
+            for mani_id, mani_name in enumerate(manipulator):
+                if mani_name.endswith('.xml'):
+                    manipulator_path = mani_name
+                else:
+                    manipulator_path = path.join(MANIPULATORS_DIR_PATH, mani_name, '{}.xml'.format(mani_name))
+                self.add_component_from_xml(manipulator_path,
+                                            goal_body=(mani_id, f'{mani_id}_mount_base_link') if chassis is not None else (mani_id, 'worldbody'))
+
+                if isinstance(gripper, str):
+                    for goal_body in enumerate(kwargs['g2m_body']):
+                        gripper_path = path.join(GRIPPERS_DIR_PATH, gripper, '{}.xml'.format(gripper))
+                        self.add_component_from_xml(gripper_path, goal_body=goal_body)
