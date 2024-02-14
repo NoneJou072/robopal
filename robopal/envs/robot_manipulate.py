@@ -19,7 +19,7 @@ class ManipulateEnv(PosCtrlEnv):
     """
 
     def __init__(self,
-                 robot=DianaDrawer(),
+                 robot=None,
                  render_mode='human',
                  control_freq=10,
                  enable_camera_viewer=False,
@@ -42,18 +42,19 @@ class ManipulateEnv(PosCtrlEnv):
         self._timestep = 0
         self.goal_pos = None
 
+        self.pos_ratio = 0.1
+        self.pos_max_bound = np.array([0.65, 0.2, 0.4])
+        self.pos_min_bound = np.array([0.3, -0.2, 0.14])
+        self.grip_max_bound = 0.02
+        self.grip_min_bound = -0.02
+
     def action_scale(self, action):
-        pos_offset = 0.1 * action[:3]
-        actual_pos_action = self.kdl_solver.fk(self.robot.arm_qpos)[0] + pos_offset
-
-        pos_max_bound = np.array([0.65, 0.2, 0.4])
-        pos_min_bound = np.array([0.3, -0.2, 0.14])
-        actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
-
-        # Map to target action space bounds
-        grip_max_bound = 0.02
-        grip_min_bound = -0.02
-        gripper_ctrl = (action[3] + 1) * (grip_max_bound - grip_min_bound) / 2 + grip_min_bound
+        """
+        Map to target action space bounds
+        """
+        actual_pos_action = self.kd_solver.fk(self.robot.get_arm_qpos())[0] + self.pos_ratio * action[:3]
+        actual_pos_action = actual_pos_action.clip(self.pos_min_bound, self.pos_max_bound)
+        gripper_ctrl = (action[3] + 1) * (self.grip_max_bound - self.grip_min_bound) / 2 + self.grip_min_bound
         return actual_pos_action, gripper_ctrl
 
     def step(self, action) -> tuple:

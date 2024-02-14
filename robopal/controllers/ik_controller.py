@@ -1,34 +1,30 @@
 import numpy as np
 
-from robopal.envs.robot import RobotEnv
-import robopal.commons.transform as T
-from robopal.controllers.ik_controller import JntIK
+from robopal.commons.pin_utils import PinSolver
+import robopal.commons.transform as trans
 
 
-class PosCtrlEnv(RobotEnv):
-    def __init__(self,
-                 robot=None,
-                 control_freq=200,
-                 enable_camera_viewer=False,
-                 controller='JNTIMP',
-                 is_interpolate=False,
-                 is_pd=False,
-                 render_mode='human',
-                 ):
-        super().__init__(
-            robot=robot,
-            control_freq=control_freq,
-            enable_camera_viewer=enable_camera_viewer,
-            controller=controller,
-            is_interpolate=is_interpolate,
-            render_mode=render_mode,
-        )
+class JntIK:
+    """
+    ik
+    """
+
+    def __init__(
+            self,
+            robot,
+            is_pd=False,
+            **kwargs
+    ):
+        self.name = 'CARTIMP'
+        self.dofs = 7
+        self.robot = robot
+
         self.p_cart = 0.2
         self.d_cart = 0.01
         self.p_quat = 0.2
         self.d_quat = 0.01
+
         self.is_pd = is_pd
-        self.vel_des = np.zeros(3)
 
     def compute_pd_increment(self, p_goal: np.ndarray,
                              p_cur: np.ndarray,
@@ -58,25 +54,3 @@ class PosCtrlEnv(RobotEnv):
             r_goal = T.quat_2_mat(r_cur + r_incre)
 
         return self.kd_solver.ik(p_goal, r_goal, q_init=self.robot.get_arm_qpos())
-
-    def step(self, action):
-        action = self.step_controller(action)
-        super().step(action)
-
-
-if __name__ == "__main__":
-    from robopal.robots.diana_med import DianaMed
-
-    env = PosCtrlEnv(
-        robot=DianaMed(),
-        render_mode='human',
-        control_freq=20,
-        is_interpolate=False,
-        is_pd=False,
-        controller='JNTIMP'
-    )
-    env.reset()
-    for t in range(int(1e6)):
-        action = np.array([0.33116, -0.09768533, 0.26947228, 1, 0, 0, 0])
-        env.step(action)
-        env.render()

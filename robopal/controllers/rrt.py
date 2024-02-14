@@ -389,9 +389,8 @@ class RRT:
         for x, y, z in zip(node.path_x, node.path_y, node.path_z):
             target_pos = np.array([x, y, z])
             target_rot = np.eye(3)
-            qpos = sim.kdl_solver.ik(target_pos, target_rot, sim.robot.arm_qpos)
-            for i in range(sim.robot.jnt_num):
-                sim.mj_data.joint(sim.robot.joint_index[i]).qpos = qpos[i]
+            qpos = sim.kd_solver.ik(target_pos, target_rot, sim.robot.get_arm_qpos())
+            sim.set_joint_qpos(qpos)
 
             mujoco.mj_forward(sim.mj_model, sim.mj_data)
             sim.render()

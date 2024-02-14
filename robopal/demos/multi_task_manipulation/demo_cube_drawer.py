@@ -42,22 +42,10 @@ class DrawerCubeEnv(ManipulateEnv):
 
         self.TASK_FLAG = 0
 
-    def action_scale(self, action):
-        pos_offset = 0.1 * action[:3]
-        actual_pos_action = self.kdl_solver.fk(self.robot.arm_qpos)[0] + pos_offset
-
-        pos_max_bound = np.array([0.6, 0.2, 0.37])
-        pos_min_bound = np.array([0.3, -0.2, 0.12])
-        actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
-
-        # Map to target action space bounds
-        grip_max_bound = 0.02
-        grip_min_bound = -0.01
-        gripper_ctrl = (action[3] + 1) * (grip_max_bound - grip_min_bound) / 2 + grip_min_bound
-        return actual_pos_action, gripper_ctrl
-
-    def step(self, action) -> tuple:
-        return super().step(action)
+        self.pos_max_bound = np.array([0.6, 0.2, 0.37])
+        self.pos_min_bound = np.array([0.3, -0.2, 0.12])
+        self.grip_max_bound = 0.02
+        self.grip_min_bound = -0.01
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -143,9 +131,6 @@ class DrawerCubeEnv(ManipulateEnv):
             'is_drawer_success': self._is_success(self.get_site_pos('drawer'), self.get_site_pos('drawer_goal')),
             'is_place_success': self._is_success(self.get_body_pos('green_block'), self.get_site_pos('cube_goal'))
         }
-
-    def reset(self, seed=None):
-        return super().reset()
 
     def reset_object(self):
         if self.TASK_FLAG == 0:

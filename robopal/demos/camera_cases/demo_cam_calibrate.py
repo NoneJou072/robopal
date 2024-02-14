@@ -38,7 +38,7 @@ class CamCalibEnv(RobotEnv):
         print(self.camera_intrinsic_matrix)
 
     def step(self, action=None):
-        action = self.robot.arm_qpos
+        action = self.robot.get_arm_qpos()
         return super().step(action)
 
 
@@ -56,5 +56,5 @@ if __name__ == "__main__":
     env.reset()
     for t in range(int(1e6)):
         env.step()
-        print(env.kdl_solver.fk(env.robot.arm_qpos))
+        print(env.kd_solver.fk(env.robot.get_arm_qpos()))
         env.render()

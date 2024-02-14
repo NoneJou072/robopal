@@ -1,4 +1,5 @@
 import numpy as np
+
 from robopal.commons.pin_utils import PinSolver
 
 
@@ -12,7 +13,7 @@ class JntImpedance(object):
         self.name = 'JNTIMP'
         self.dofs = robot.jnt_num
         self.robot = robot
-        self.kdl_solver = PinSolver(robot.urdf_path)
+        self.kd_solver = PinSolver(robot.urdf_path)
 
         # hyperparameters of impedance controller
         self.Bj = np.zeros(self.dofs)
@@ -26,8 +27,8 @@ class JntImpedance(object):
         # choose interpolator
         self.interpolator = None
         if is_interpolate:
-            interpolator_config.setdefault('init_qpos', robot.arm_qpos)
-            interpolator_config.setdefault('init_qvel', robot.arm_qvel)
+            interpolator_config.setdefault('init_qpos', robot.get_arm_qpos())
+            interpolator_config.setdefault('init_qvel', robot.get_arm_qvel())
             self._init_interpolator(interpolator_config)
 
     def set_jnt_params(self, b: np.ndarray, k: np.ndarray):
@@ -55,9 +56,9 @@ class JntImpedance(object):
         if self.interpolator is not None:
             q_des, v_des = self.interpolator.update_state()
 
-        M = self.kdl_solver.get_inertia_mat(q_cur)
-        C = self.kdl_solver.get_coriolis_mat(q_cur, v_cur)
-        g = self.kdl_solver.get_gravity_mat(q_cur)
+        M = self.kd_solver.get_inertia_mat(q_cur)
+        C = self.kd_solver.get_coriolis_mat(q_cur, v_cur)
+        g = self.kd_solver.get_gravity_mat(q_cur)
         coriolis_gravity = C[-1] + g
 
         acc_desire = self.kj * (q_des - q_cur) + self.Bj * (v_des - v_cur)
@@ -70,8 +71,8 @@ class JntImpedance(object):
         torque = self.compute_jnt_torque(
             q_des=q_target,
             v_des=qdot_target,
-            q_cur=self.robot.arm_qpos,
-            v_cur=self.robot.arm_qvel,
+            q_cur=self.robot.get_arm_qpos(),
+            v_cur=self.robot.get_arm_qvel(),
         )
         return torque
 
@@ -92,5 +93,6 @@ class JntImpedance(object):
     def step_interpolator(self, action):
         self.interpolator.update_target_position(action)
 
-    def reset_interpolator(self, arm_qpos, arm_qvel):
-        self.interpolator.set_params(arm_qpos, arm_qvel)
+    def reset(self):
+        if self.interpolator is not None:
+            self.interpolator.set_params(self.robot.get_arm_qpos(), self.robot.get_arm_qvel())

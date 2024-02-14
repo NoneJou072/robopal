@@ -1,6 +1,8 @@
 import numpy as np
+
 from robopal.commons.pin_utils import PinSolver
 import robopal.commons.transform as trans
+
 
 def orientation_error(desired: np.ndarray, current: np.ndarray) -> np.ndarray:
     """computer ori error from ori to cartesian 姿态矩阵的偏差3*3的
@@ -25,7 +27,10 @@ def orientation_error(desired: np.ndarray, current: np.ndarray) -> np.ndarray:
 
 
 class CartImpedance:
-    """ Cartesian Impedance Controller in the end-effector frame """
+    """
+    Cartesian Impedance Controller in the end-effector frame
+    """
+
     def __init__(
             self,
             robot,
@@ -35,7 +40,7 @@ class CartImpedance:
         self.name = 'CARTIMP'
         self.dofs = 7
         self.robot = robot
-        self.kdl_solver = PinSolver(robot.urdf_path)
+        self.kd_solver = PinSolver(robot.urdf_path)
 
         # hyper-parameters of impedance
         self.Bc = np.zeros(6)
@@ -51,23 +56,23 @@ class CartImpedance:
         self.Bc = b
         self.Kc = k
 
-    def step_controller(self, desired_pose):
+    def step_controller(self, action):
         """ compute the torque in the joint space from the impedance controller in the cartesian space
 
-        desired_pose: [x, y, z, qw, qx, qy, qz]
+        action: desired_pose [x, y, z, qw, qx, qy, qz]
         """
-        desired_pos = desired_pose[:3]
-        desired_ori = trans.quat_2_mat(desired_pose[3:])
-        q_curr = self.robot.arm_qpos
-        qd_curr = self.robot.arm_qvel
+        desired_pos = action[:3]
+        desired_ori = trans.quat_2_mat(action[3:])
+        q_curr = self.robot.get_arm_qpos()
+        qd_curr = self.robot.get_arm_qvel()
 
-        current_pos, current_ori = self.kdl_solver.fk(q_curr)
+        current_pos, current_ori = self.kd_solver.fk(q_curr)
 
-        J = self.kdl_solver.get_full_jac(q_curr)
-        J_inv = self.kdl_solver.get_full_jac_pinv(q_curr)
-        Jd = self.kdl_solver.get_jac_dot(q_curr, qd_curr)
+        J = self.kd_solver.get_full_jac(q_curr)
+        J_inv = self.kd_solver.get_full_jac_pinv(q_curr)
+        Jd = self.kd_solver.get_jac_dot(q_curr, qd_curr)
 
-        M = self.kdl_solver.get_inertia_mat(q_curr)
+        M = self.kd_solver.get_inertia_mat(q_curr)
         Md = np.dot(J_inv.T, np.dot(M, J_inv))  # 目标质量矩阵
 
         pos_error = desired_pos - current_pos  # 位置偏差
@@ -78,8 +83,8 @@ class CartImpedance:
         sum = self.Kc * x_error - np.dot(np.dot(Md, Jd), qd_curr) + self.Bc * v_error
         inertial = np.dot(M, J_inv)  # the inertial matrix in the end-effector frame
 
-        C = self.kdl_solver.get_coriolis_mat(q_curr, qd_curr)
-        g = self.kdl_solver.get_gravity_mat(q_curr)
+        C = self.kd_solver.get_coriolis_mat(q_curr, qd_curr)
+        g = self.kd_solver.get_gravity_mat(q_curr)
         coriolis_gravity = C[-1] + g
         tau = np.dot(inertial, sum) + coriolis_gravity
 

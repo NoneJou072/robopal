@@ -1,4 +1,5 @@
 import numpy as np
+
 from robopal.commons.pin_utils import PinSolver
 from collections import deque
 
@@ -10,10 +11,13 @@ class JntVelController:
             is_interpolate=False,
             interpolator_config: dict = None
     ):
+        if is_interpolate:
+            raise ValueError("JntVelController does not support interpolation")
+
         self.name = 'JNTVEL'
         self.dofs = robot.jnt_num
         self.robot = robot
-        self.kdl_solver = PinSolver(robot.urdf_path)
+        self.kd_solver = PinSolver(robot.urdf_path)
 
         # hyperparameters of impedance controller
         self.k_p = np.zeros(self.dofs)
@@ -50,8 +54,8 @@ class JntVelController:
         :param v_cur: current joint velocity
         :return: desired joint torque
         """
-        C = self.kdl_solver.get_coriolis_mat(q_cur, v_cur)
-        g = self.kdl_solver.get_gravity_mat(q_cur)
+        C = self.kd_solver.get_coriolis_mat(q_cur, v_cur)
+        g = self.kd_solver.get_gravity_mat(q_cur)
         coriolis_gravity = C[-1] + g
 
         err = v_des - v_cur
@@ -68,7 +72,7 @@ class JntVelController:
         torque = self.compute_jnt_torque(
             q_des=q_target,
             v_des=qdot_target,
-            q_cur=self.robot.arm_qpos,
-            v_cur=self.robot.arm_qvel,
+            q_cur=self.robot.get_arm_qpos(),
+            v_cur=self.robot.get_arm_qvel(),
         )
         return torque

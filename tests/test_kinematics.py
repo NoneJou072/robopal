@@ -32,18 +32,18 @@ class TestKinematics:
 
     def compute_jacobian_pinocchio(self):
         print("-------------------------<pinocchio>------------------------")
-        print(self.env.kdl_solver.get_full_jac(self.qpos))
+        print(self.env.kd_solver.get_full_jac(self.qpos))
 
     def compute_jacobian_kdl(self):
-        self.kdl_solver = KDL_utils(self.urdf_path)
+        self.kd_solver = KDL_utils(self.urdf_path)
         print("-------------------------<kdl>------------------------")
-        print(self.kdl_solver.getJac(self.qpos))
+        print(self.kd_solver.getJac(self.qpos))
 
     def get_joint_transform(self):
         print("-------------------------<joint transform>------------------------")
-        pin.forwardKinematics(self.env.kdl_solver.model, self.env.kdl_solver.data, self.qpos)
+        pin.forwardKinematics(self.env.kd_solver.model, self.env.kd_solver.data, self.qpos)
         for i in range(7):
-            print(self.env.kdl_solver.data.oMi[i].translation)
+            print(self.env.kd_solver.data.oMi[i].translation)
 
 
 if __name__ == '__main__':

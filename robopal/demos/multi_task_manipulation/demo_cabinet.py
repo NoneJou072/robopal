@@ -42,22 +42,8 @@ class LockedCabinetEnv(ManipulateEnv):
 
         self.TASK_FLAG = 0
 
-    def action_scale(self, action):
-        pos_offset = 0.1 * action[:3]
-        actual_pos_action = self.kdl_solver.fk(self.robot.arm_qpos)[0] + pos_offset
-
-        pos_max_bound = np.array([0.6, 0.25, 0.4])
-        pos_min_bound = np.array([0.4, -0.25, 0.2])
-        actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
-
-        # Map to target action space bounds
-        grip_max_bound = 0.02
-        grip_min_bound = -0.02
-        gripper_ctrl = (action[3] + 1) * (grip_max_bound - grip_min_bound) / 2 + grip_min_bound
-        return actual_pos_action, gripper_ctrl
-
-    def step(self, action) -> tuple:
-        return super().step(action)
+        self.pos_max_bound = np.array([0.6, 0.25, 0.4])
+        self.pos_min_bound = np.array([0.4, -0.25, 0.2])
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -126,9 +112,6 @@ class LockedCabinetEnv(ManipulateEnv):
             'is_unlock_success': self._is_success(self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.03),
             'is_door_success': self._is_success(self.get_site_pos('left_handle'), self.get_site_pos('cabinet_left_opened'), th=0.03)
         }
-
-    def reset(self, seed=None):
-        return super().reset()
 
     def reset_object(self):
         if self.TASK_FLAG == 0:

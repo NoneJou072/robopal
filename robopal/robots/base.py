@@ -1,4 +1,5 @@
 import abc
+import logging
 
 import mujoco
 import numpy as np
@@ -22,46 +23,50 @@ class BaseArm:
     def __init__(self,
                  name: str = None,
                  scene: str = 'default',
-                 chassis: str = None,
-                 manipulator: str = None,
-                 gripper: str = None,
-                 g2m_body: list = None,
+                 chassis: str | list[str] = None,
+                 manipulator: str | list[str] = None,
+                 gripper: str | list[str] = None,
+                 g2m_body: list[str | list[str]] = None,
                  urdf_path: str = None,
                  ):
         self.name = name
-        self.scene = scene
-        self.chassis = chassis
-        self.manipulator = manipulator
-        self.gripper = gripper
-        self.g2m_body = g2m_body
+
+        manipulator = [manipulator] if isinstance(manipulator, str) else manipulator
+        self.agent_num = len(manipulator)
+        self.agents = [f'arm{i}' for i in range(self.agent_num)]
+        logging.info(f'Agents: {self.agents}')
+
+        self._scene = scene
+        self._chassis = chassis
+        self._manipulator = manipulator
+        self._gripper = gripper
+        self._g2m_body = g2m_body
 
         self.urdf_path = urdf_path  # urdf file used for pinocchio lib
 
-        self.mjcf_generator: RobotGenerator
-        self.robot_model = None
-        self.robot_data = None
-        self.construct_mjcf_data()
-
-        self.joint_index = []
-        self.actuator_index = []
-
-    def construct_mjcf_data(self):
-        self.mjcf_generator = RobotGenerator(
-            scene=self.scene,
-            chassis=self.chassis,
-            manipulator=self.manipulator,
-            gripper=self.gripper,
-            g2m_body=self.g2m_body
-        )
+        self.mjcf_generator = self._construct_mjcf_data()
         self.add_assets()
+
         xml_path = self.mjcf_generator.save_and_load_xml()
         self.robot_model = mujoco.MjModel.from_xml_path(filename=xml_path, assets=None)
         self.robot_data = mujoco.MjData(self.robot_model)
 
-    @abc.abstractmethod
+        self.joint_index = [[]]
+        self.actuator_index = [[]]
+
+    def _construct_mjcf_data(self) -> RobotGenerator:
+        return RobotGenerator(
+            scene=self._scene,
+            chassis=self._chassis,
+            manipulator=self._manipulator,
+            gripper=self._gripper,
+            g2m_body=self._g2m_body
+        )
+
+    @property
     def init_qpos(self) -> np.ndarray:
         """ Robot's init joint position. """
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def add_assets(self) -> None:
@@ -70,12 +75,34 @@ class BaseArm:
 
     @property
     def jnt_num(self) -> int:
-        return len(self.joint_index)
+        return sum([len(self.joint_index[i]) for i in range(self.agent_num)])
 
-    @property
-    def arm_qpos(self) -> np.ndarray:
-        return np.array([self.robot_data.joint(self.joint_index[i]).qpos[0] for i in range(self.jnt_num)])
+    def get_arm_qpos(self, agent=None) -> np.ndarray:
+        """ Get arm joint position of the specified agent.
 
-    @property
-    def arm_qvel(self) -> np.ndarray:
-        return np.array([self.robot_data.joint(self.joint_index[i]).qvel[0] for i in range(self.jnt_num)])
+        :param agent: agent name
+        :return: joint position
+        """
+        if agent is None:
+            agent = 0
+        return np.array([self.robot_data.joint(j).qpos[0] for j in self.joint_index[agent]])
+
+    def get_arm_qvel(self, agent=None) -> np.ndarray:
+        """ Get arm joint velocity of the specified agent.
+
+        :param agent: agent name
+        :return: joint position
+        """
+        if agent is None:
+            agent = 0
+        return np.array([self.robot_data.joint(j).qvel[0] for j in self.joint_index[agent]])
+
+    def get_arm_qacc(self, agent=None) -> np.ndarray:
+        """ Get arm joint accelerate of the specified agent.
+
+        :param agent: agent name
+        :return: joint position
+        """
+        if agent is None:
+            agent = 0
+        return np.array([self.robot_data.joint(j).qacc[0] for j in self.joint_index[agent]])
