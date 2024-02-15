@@ -132,7 +132,7 @@ class MujocoEnv:
         if self.robot.agent_num == 1:
             qpos = qpos.reshape(1, self.robot.jnt_num)
         for mani, joint_indexes in enumerate(self.robot.joint_index):
-            assert math.prod(qpos.shape) == self.robot.jnt_num
+            assert qpos.shape[1] == self.robot.jnt_num
             for j, joint_index in enumerate(joint_indexes):
                 self.mj_data.joint(joint_index).qpos = qpos[mani, j]
 
@@ -141,7 +141,7 @@ class MujocoEnv:
         if self.robot.agent_num == 1:
             torque = torque.reshape(1, self.robot.jnt_num)
         for mani, actuator_indexes in enumerate(self.robot.actuator_index):
-            assert math.prod(torque.shape) == self.robot.jnt_num
+            assert torque.shape[1] == self.robot.jnt_num
             for j, joint_index in enumerate(actuator_indexes):
                 self.mj_data.actuator(joint_index).ctrl = torque[mani, j]
 

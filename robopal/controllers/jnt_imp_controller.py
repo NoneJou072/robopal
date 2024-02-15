@@ -1,6 +1,7 @@
 import numpy as np
 
 from robopal.commons.pin_utils import PinSolver
+from robopal.robots.base import BaseArm
 
 
 class JntImpedance(object):
@@ -12,7 +13,7 @@ class JntImpedance(object):
     ):
         self.name = 'JNTIMP'
         self.dofs = robot.jnt_num
-        self.robot = robot
+        self.robot: BaseArm = robot
         self.kd_solver = PinSolver(robot.urdf_path)
 
         # hyperparameters of impedance controller
@@ -65,16 +66,23 @@ class JntImpedance(object):
         tau = np.dot(M, acc_desire) + coriolis_gravity
         return tau
 
-    def step_controller(self, action):
-        q_target, qdot_target = action, np.zeros(self.dofs)
-
-        torque = self.compute_jnt_torque(
-            q_des=q_target,
-            v_des=qdot_target,
-            q_cur=self.robot.get_arm_qpos(),
-            v_cur=self.robot.get_arm_qvel(),
-        )
-        return torque
+    def step_controller(self, action: np.ndarray) -> np.ndarray:
+        ret = np.zeros(shape=(self.robot.agent_num, self.dofs))
+        if isinstance(action, np.ndarray):
+            action = {self.robot.agents[0]: action}
+        action = np.array(list(action.values()))
+        for agent_index, act in enumerate(action):
+            torque = self.compute_jnt_torque(
+                q_des=act,
+                v_des=np.zeros(self.dofs),
+                q_cur=self.robot.get_arm_qpos(agent_index),
+                v_cur=self.robot.get_arm_qvel(agent_index),
+            )
+            if self.robot.agent_num == 1:
+                ret = torque
+            else:
+                ret[agent_index] = torque
+        return ret
 
     def _init_interpolator(self, cfg: dict):
         try:

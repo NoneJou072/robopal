@@ -74,35 +74,30 @@ class BaseArm:
         pass
 
     @property
-    def jnt_num(self) -> int:
-        return sum([len(self.joint_index[i]) for i in range(self.agent_num)])
+    def jnt_num(self) -> int | dict[str, int]:
+        """ Number of joints. """
+        return len(self.joint_index[0])
 
-    def get_arm_qpos(self, agent=None) -> np.ndarray:
+    def get_arm_qpos(self, agent_index: int = 0) -> np.ndarray:
         """ Get arm joint position of the specified agent.
 
-        :param agent: agent name
+        :param agent_index: agent name
         :return: joint position
         """
-        if agent is None:
-            agent = 0
-        return np.array([self.robot_data.joint(j).qpos[0] for j in self.joint_index[agent]])
+        return np.array([self.robot_data.joint(j).qpos[0] for j in self.joint_index[agent_index]])
 
-    def get_arm_qvel(self, agent=None) -> np.ndarray:
+    def get_arm_qvel(self, agent_index: int = 0) -> np.ndarray:
         """ Get arm joint velocity of the specified agent.
 
-        :param agent: agent name
+        :param agent_index: agent name
         :return: joint position
         """
-        if agent is None:
-            agent = 0
-        return np.array([self.robot_data.joint(j).qvel[0] for j in self.joint_index[agent]])
+        return np.array([self.robot_data.joint(j).qvel[0] for j in self.joint_index[agent_index]])
 
-    def get_arm_qacc(self, agent=None) -> np.ndarray:
+    def get_arm_qacc(self, agent_index: int = 0) -> np.ndarray:
         """ Get arm joint accelerate of the specified agent.
 
-        :param agent: agent name
+        :param agent_index: agent name
         :return: joint position
         """
-        if agent is None:
-            agent = 0
-        return np.array([self.robot_data.joint(j).qacc[0] for j in self.joint_index[agent]])
+        return np.array([self.robot_data.joint(j).qacc[0] for j in self.joint_index[agent_index]])
