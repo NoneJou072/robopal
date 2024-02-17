@@ -40,7 +40,7 @@ elif args.ctrl == 'CARTIK':
         is_interpolate=False,
         is_pd=False
     )
-    action = np.array([0.33, -0.39, 0.66])
+    action = np.array([0.33, -0.39, 0.66, 1, 0, 0, 0])
 else:
     raise ValueError('Invalid controller')
 

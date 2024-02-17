@@ -20,6 +20,9 @@ class GymWrapper(gym.Env):
         self.name = env.name
         self.render_mode = env.render_mode
 
+    def __getattr__(self, attr):
+        return getattr(self.env, attr)
+
     def step(self, action):
         return self.env.step(action)
 
@@ -54,12 +57,6 @@ class GoalEnvWrapper(GymWrapper):
 
     def reset(self, seed=None, options=None):
         return super().reset(seed=seed, options=options)
-
-    def render(self, mode="human"):
-        super().render(mode=mode)
-
-    def close(self):
-        super().close()
 
     def compute_reward(self, achieved_goal, desired_goal, **kwargs):
         return self.env.compute_rewards(achieved_goal, desired_goal, **kwargs)

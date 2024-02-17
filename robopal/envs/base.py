@@ -60,7 +60,7 @@ class MujocoEnv:
 
         self._mj_state = None
 
-    def step(self, action):
+    def step(self, action: np.ndarray | dict[str, np.ndarray]):
         """ 
         This method will be called with one-step in mujoco
         :param action: Input action

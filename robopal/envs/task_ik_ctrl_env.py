@@ -40,7 +40,7 @@ class PosCtrlEnv(RobotEnv):
         quat_incre = self.p_quat * (r_goal - r_cur)
         return pos_incre, quat_incre
 
-    def step_controller(self, action):
+    def step_controller(self, action: np.ndarray):
         if len(action) not in (3, 7):
             raise ValueError("Invalid action length.")
         if not self.is_pd:
@@ -59,24 +59,10 @@ class PosCtrlEnv(RobotEnv):
 
         return self.kd_solver.ik(p_goal, r_goal, q_init=self.robot.get_arm_qpos())
 
-    def step(self, action):
-        action = self.step_controller(action)
-        super().step(action)
+    def step(self, action: np.ndarray | dict[str, np.ndarray]):
+        if self.robot.agent_num == 1:
+            inputs = self.step_controller(action)
+        else:
+            inputs = {agent: self.step_controller(action[agent]) for agent in self.robot.agents}
 
-
-if __name__ == "__main__":
-    from robopal.robots.diana_med import DianaMed
-
-    env = PosCtrlEnv(
-        robot=DianaMed(),
-        render_mode='human',
-        control_freq=20,
-        is_interpolate=False,
-        is_pd=False,
-        controller='JNTIMP'
-    )
-    env.reset()
-    for t in range(int(1e6)):
-        action = np.array([0.33116, -0.09768533, 0.26947228, 1, 0, 0, 0])
-        env.step(action)
-        env.render()
+        super().step(inputs)

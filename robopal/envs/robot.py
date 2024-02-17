@@ -59,7 +59,7 @@ class RobotEnv(MujocoEnv):
         # Send joint_inputs to simulation
         self.set_joint_ctrl(joint_inputs)
 
-    def step(self, action):
+    def step(self, action: np.ndarray | dict[str, np.ndarray]):
         if self.is_interpolate:
             self.controller.step_interpolator(action)
         # low-level control
