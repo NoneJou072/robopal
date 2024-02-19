@@ -26,7 +26,7 @@ class BaseArm:
                  chassis: str | list[str] = None,
                  manipulator: str | list[str] = None,
                  gripper: str | list[str] = None,
-                 g2m_body: list[str | list[str]] = None,
+                 g2m_body: str | list[str] = None,
                  urdf_path: str = None,
                  ):
         self.name = name

@@ -1,0 +1,6 @@
+<mujoco>
+    <asset>
+        <mesh name="cupboard" file="objects/cupboard/cupboard.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="drawer" file="objects/cupboard/drawer.stl" scale="0.001 0.001 0.001"/>
+    </asset>
+</mujoco>

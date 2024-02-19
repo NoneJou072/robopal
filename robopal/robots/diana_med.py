@@ -20,7 +20,7 @@ class DianaMed(BaseArm):
             chassis=mount,
             manipulator=manipulator,
             gripper=gripper,
-            g2m_body=['0_link7'],
+            g2m_body='0_link7',
             urdf_path=os.path.join(ASSET_DIR, "models/manipulators/DianaMed/DianaMed.urdf"),
         )
         self.joint_index = [['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7']]
@@ -38,8 +38,9 @@ class DualDianaMed(BaseArm):
     def __init__(self,
                  scene='default',
                  manipulator=['DianaMed', 'DianaMed'],
-                 gripper=None,
-                 mount=['floor_left', 'floor_right']
+                 gripper=['rethink_gripper', 'rethink_gripper'],
+                 mount=['floor_left', 'floor_right'],
+                 g2m_body=['0_link7', '1_link7']
                  ):
         super().__init__(
             name="diana_med",
@@ -47,7 +48,7 @@ class DualDianaMed(BaseArm):
             chassis=mount,
             manipulator=manipulator,
             gripper=gripper,
-            g2m_body=['0_link7'],
+            g2m_body=g2m_body,
             urdf_path=os.path.join(ASSET_DIR, "models/manipulators/DianaMed/DianaMed.urdf"),
         )
         self.joint_index = [['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7'],
@@ -73,12 +74,7 @@ class DianaAruco(DianaMed):
         self.mjcf_generator.add_texture('aruco', type='2d',
                                         file=os.path.join(ASSET_DIR, 'textures/aruco.png'))
         self.mjcf_generator.add_material('aruco', texture='aruco', texrepeat='1 1', texuniform='false')
-        self.mjcf_generator.add_body(node='worldbody', name='aruco')
-        self.mjcf_generator.add_geom(node='aruco', name='aruco_box', pos='0.919 0 1.27', mass='0.001',
-                                     euler="0 -1.57 0", size='0.05 0.05 0.001', type='box', material='aruco')
-        self.mjcf_generator.add_joint(node='aruco', name='aruco_x', type='slide', axis='1 0 0')
-        self.mjcf_generator.add_joint(node='aruco', name='aruco_y', type='slide', axis='0 1 0')
-        self.mjcf_generator.add_joint(node='aruco', name='aruco_z', type='slide', axis='0 0 1')
+        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/aruco/aruco.xml')
 
 
 class DianaCollide(DianaMed):
@@ -175,13 +171,10 @@ class DianaDrawer(DianaMed):
                          mount='top_point')
 
     def add_assets(self):
-        # add cupboard with fixed position
-        self.mjcf_generator.add_mesh('cupboard', 'objects/cupboard/cupboard.stl', scale='0.001 0.001 0.001')
-        self.mjcf_generator.add_mesh('drawer', 'objects/cupboard/drawer.stl', scale='0.001 0.001 0.001')
+        # add cupboard
         self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cupboard/cupboard.xml')
-        self.mjcf_generator.set_node_attrib('body', 'cupboard', {'pos': '0.66 0.0 0.42'})
-
-        # add goal site with random position
+        self.mjcf_generator.add_node_from_xml('asset', ASSET_DIR + '/objects/cupboard/cupboard_assets.xml')
+        # add goal site
         goal_site = """<site name="drawer_goal" pos="0.46 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
         self.mjcf_generator.add_node_from_str('worldbody', goal_site)
 

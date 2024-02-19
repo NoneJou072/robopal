@@ -1,0 +1,12 @@
+<mujoco>
+    <worldbody>
+        <body name="aruco">
+            <joint name="aruco_x" pos="0 0 0" axis="1 0 0" type="slide" />
+            <joint name="aruco_y" pos="0 0 0" axis="0 1 0" type="slide" />
+            <joint name="aruco_z" pos="0 0 0" axis="0 0 1" type="slide" />
+
+            <geom name="aruco_box" type="box" pos="0.919 0 1.27" size='0.05 0.05 0.001' euler="0 -1.57 0" mass='0.001' material='aruco'/>
+        </body>
+    </worldbody>
+</mujoco>
+
