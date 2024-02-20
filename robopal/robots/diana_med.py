@@ -134,15 +134,12 @@ class DianaGraspMultiObjs(DianaGrasp):
     def add_assets(self):
         self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/red_cube.xml')
         self.mjcf_generator.set_node_attrib('body', 'red_block', {'pos': '0.5 -0.1 0.46'})
-        self.mjcf_generator.set_node_attrib('geom', 'red_block', {'rgba': '1 0 0 0.6'})
 
         self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/green_cube.xml')
         self.mjcf_generator.set_node_attrib('body', 'green_block', {'pos': '0.5 0.0 0.46'})
-        self.mjcf_generator.set_node_attrib('geom', 'green_block', {'rgba': '0 1 0 0.6'})
 
         self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/blue_cube.xml')
         self.mjcf_generator.set_node_attrib('body', 'blue_block', {'pos': '0.5 0.1 0.46'})
-        self.mjcf_generator.set_node_attrib('geom', 'blue_block', {'rgba': '0 0 1 0.6'})
 
         r_goal_site = """<site name="red_goal" pos="0.4 0.0 0.5" size="0.015 0.015 0.015" rgba="1 0 0 1" type="sphere" />"""
         self.mjcf_generator.add_node_from_str('worldbody', r_goal_site)

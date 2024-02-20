@@ -100,7 +100,7 @@ class LockedCabinetEnv(ManipulateEnv):
     def _get_desired_goal(self):
         desired_goal = np.concatenate([
             self.get_site_pos('beam_right') if self._is_success(
-                self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.03
+                self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.02
             ) == 0 else self.get_site_pos('left_handle'),
             self.get_site_pos('cabinet_mid'),
             self.get_site_pos('cabinet_left_opened'),
@@ -110,7 +110,7 @@ class LockedCabinetEnv(ManipulateEnv):
     def _get_info(self) -> dict:
         return {
             'is_unlock_success': self._is_success(self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.02),
-            'is_door_success': self._is_success(self.get_site_pos('left_handle'), self.get_site_pos('cabinet_left_opened'), th=0.02)
+            'is_door_success': self._is_success(self.get_site_pos('left_handle'), self.get_site_pos('cabinet_left_opened'), th=0.03)
         }
 
     def reset_object(self):
