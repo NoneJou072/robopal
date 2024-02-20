@@ -109,8 +109,8 @@ class LockedCabinetEnv(ManipulateEnv):
 
     def _get_info(self) -> dict:
         return {
-            'is_unlock_success': self._is_success(self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.03),
-            'is_door_success': self._is_success(self.get_site_pos('left_handle'), self.get_site_pos('cabinet_left_opened'), th=0.03)
+            'is_unlock_success': self._is_success(self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.02),
+            'is_door_success': self._is_success(self.get_site_pos('left_handle'), self.get_site_pos('cabinet_left_opened'), th=0.02)
         }
 
     def reset_object(self):
@@ -123,8 +123,9 @@ class LockedCabinetEnv(ManipulateEnv):
 if __name__ == "__main__":
     env = LockedCabinetEnv()
     env.reset()
-    for t in range(int(1e6)):
+    for t in range(int(1e5)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
-        s_, r, terminated, truncated, _ = env.step(action)
+        s_, r, terminated, truncated, info = env.step(action)
         if truncated:
             env.reset()
+    env.close()

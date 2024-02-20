@@ -80,9 +80,6 @@ class DianaAruco(DianaMed):
 class DianaCollide(DianaMed):
     """ DianaMed robot class. """
 
-    def __init__(self):
-        super().__init__(scene='default')
-
     def add_assets(self):
         self.mjcf_generator.add_geom(node='worldbody', name='obstacle_box', pos='0.9 0.2 0.3',
                                      size='0.4 0.05 0.2', type='box')
@@ -90,10 +87,6 @@ class DianaCollide(DianaMed):
 
 class DianaCalib(DianaMed):
     """ DianaMed for Camera Calibration. """
-
-    def __init__(self):
-        super().__init__(scene='default',
-                         gripper=None, )
 
     def add_assets(self):
         # link chessboard to the end
@@ -173,10 +166,6 @@ class DianaDrawer(DianaMed):
     def add_assets(self):
         # add cupboard
         self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cupboard/cupboard.xml')
-        self.mjcf_generator.add_node_from_xml('asset', ASSET_DIR + '/objects/cupboard/cupboard_assets.xml')
-        # add goal site
-        goal_site = """<site name="drawer_goal" pos="0.46 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
-        self.mjcf_generator.add_node_from_str('worldbody', goal_site)
 
     @property
     def init_qpos(self):

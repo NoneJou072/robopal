@@ -1,7 +1,7 @@
 <mujoco model="empty_floor">
   <compiler angle="radian"/>
   <size memory="1000M"/>
-  <option timestep="0.001" gravity="0 0 -9.81" integrator="implicitfast" impratio="10">
+  <option timestep="0.001" gravity="0 0 -9.81" integrator="implicitfast" impratio="1">
       <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable"/>
   </option>
 

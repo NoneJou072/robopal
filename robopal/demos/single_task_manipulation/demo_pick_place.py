@@ -109,7 +109,7 @@ class PickAndPlaceEnv(ManipulateEnv):
 if __name__ == "__main__":
     env = PickAndPlaceEnv()
     env.reset()
-    for t in range(int(1e6)):
+    for t in range(int(1e5)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
         s_, r, terminated, truncated, info = env.step(action)
         if truncated:
