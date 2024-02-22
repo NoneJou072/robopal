@@ -6,10 +6,6 @@ from robopal.robots.diana_med import DianaGraspMultiObjs
 
 
 class MultiCubes(ManipulateEnv):
-    """
-    The control frequency of the robot is of f = 10 Hz. This is achieved by applying the same action
-    in 100 subsequent simulator step (with a time step of dt = 0.001 s) before returning the control to the robot.
-    """
 
     def __init__(self,
                  robot=DianaGraspMultiObjs(),

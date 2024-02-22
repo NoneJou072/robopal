@@ -6,10 +6,6 @@ from robopal.robots.diana_med import DianaCabinet
 
 
 class LockedCabinetEnv(ManipulateEnv):
-    """
-    The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
-    in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
-    """
 
     def __init__(self,
                  robot=DianaCabinet(),
@@ -100,7 +96,7 @@ class LockedCabinetEnv(ManipulateEnv):
     def _get_desired_goal(self):
         desired_goal = np.concatenate([
             self.get_site_pos('beam_right') if self._is_success(
-                self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.02
+                self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.03
             ) == 0 else self.get_site_pos('left_handle'),
             self.get_site_pos('cabinet_mid'),
             self.get_site_pos('cabinet_left_opened'),
@@ -109,7 +105,7 @@ class LockedCabinetEnv(ManipulateEnv):
 
     def _get_info(self) -> dict:
         return {
-            'is_unlock_success': self._is_success(self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.02),
+            'is_unlock_success': self._is_success(self.get_site_pos('beam_left'), self.get_site_pos('cabinet_mid'), th=0.03),
             'is_door_success': self._is_success(self.get_site_pos('left_handle'), self.get_site_pos('cabinet_left_opened'), th=0.03)
         }
 
@@ -126,6 +122,7 @@ if __name__ == "__main__":
     for t in range(int(1e5)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
         s_, r, terminated, truncated, info = env.step(action)
-        if truncated:
-            env.reset()
+        print(info)
+        # if truncated:
+            # env.reset()
     env.close()

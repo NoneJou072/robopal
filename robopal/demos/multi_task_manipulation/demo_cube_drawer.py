@@ -6,10 +6,6 @@ from robopal.robots.diana_med import DianaDrawerCube
 
 
 class DrawerCubeEnv(ManipulateEnv):
-    """
-    The control frequency of the robot is of f = 10 Hz. This is achieved by applying the same action
-    in 200 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
-    """
 
     def __init__(self,
                  robot=DianaDrawerCube(),
