@@ -12,9 +12,9 @@
                 <joint name="hinge_left" pos="-0.13 0.2 0" axis="0 0 -1" range="0 1.57" damping="1" frictionloss="2" />
                 <geom type="box" pos="-0.125 0.103 0.12" size="0.003 0.096 0.11" rgba="0.68 0.68 0.68 0.5"/>
                 <geom name="cabinet_door_l" pos="1.25 0.12 0.28" euler="0 0 -1.57" rgba="0.68 0.68 0.68 1" type="mesh" mesh="cabinet_door" contype="0" conaffinity="0"/>
-                <geom type="box" pos="-0.17 0.05 0.14" size="0.04 0.01 0.01" rgba="0.7 0.7 0.1 1"/>
-                <geom type="box" pos="-0.17 0.05 0.08" size="0.04 0.01 0.01" rgba="0.7 0.7 0.1 1"/>
-                <geom type="box" pos="-0.20 0.05 0.1" size="0.01 0.01 0.03" rgba="0.7 0.7 0.1 1"/>
+                <geom type="box" pos="-0.17 0.05 0.14" size="0.04 0.01 0.005" rgba="0.7 0.7 0.1 1"/>
+                <geom type="box" pos="-0.17 0.05 0.08" size="0.04 0.01 0.005" rgba="0.7 0.7 0.1 1"/>
+                <geom type="box" pos="-0.20 0.05 0.11" size="0.01 0.01 0.03" rgba="0.7 0.7 0.1 1"/>
                 <site name="left_handle" pos="-0.20 0.05 0.14" size="0.01" rgba="1 1 0 0.5" type="sphere" />
             </body>
 
@@ -23,9 +23,9 @@
                 <geom type="box" pos="-0.125 -0.103 0.12" size="0.003 0.096 0.11" rgba="0.68 0.68 0.68 0.5"/>
                 <geom name="cabinet_door_r" pos="1.25 -0.085 0.28" euler="0 0 -1.57" rgba="0.68 0.68 0.68 1" type="mesh" mesh="cabinet_door" contype="0" conaffinity="0"/>
                 <!-- handle -->
-                <geom type="box" pos="-0.162 -0.05 0.14" size="0.05 0.01 0.01" rgba="0.68 0.68 0.68 1"/>
-                <geom type="box" pos="-0.162 -0.05 0.08" size="0.05 0.01 0.01" rgba="0.68 0.68 0.68 1"/>
-                <geom type="box" pos="-0.202 -0.05 0.1" size="0.01 0.01 0.03" rgba="0.68 0.68 0.68 1"/>
+                <geom type="box" pos="-0.162 -0.05 0.14" size="0.05 0.01 0.005" rgba="0.68 0.68 0.68 1"/>
+                <geom type="box" pos="-0.162 -0.05 0.08" size="0.05 0.01 0.005" rgba="0.68 0.68 0.68 1"/>
+                <geom type="box" pos="-0.202 -0.05 0.11" size="0.01 0.01 0.03" rgba="0.68 0.68 0.68 1"/>
                 <site name="right_handle" pos="-0.20 -0.05 0.14" size="0.01" rgba="1 1 0 0.5" type="sphere" />
             </body>
         </body>

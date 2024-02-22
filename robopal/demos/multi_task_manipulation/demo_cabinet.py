@@ -122,7 +122,6 @@ if __name__ == "__main__":
     for t in range(int(1e5)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
         s_, r, terminated, truncated, info = env.step(action)
-        print(info)
-        # if truncated:
-            # env.reset()
+        if truncated:
+            env.reset()
     env.close()
