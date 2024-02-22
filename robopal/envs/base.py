@@ -1,12 +1,13 @@
 import abc
 import logging
-import typing
+import math
 
 import mujoco
 import numpy as np
 
 from robopal.commons.renderers import MjRenderer
 from robopal.robots.base import BaseArm
+
 
 class MujocoEnv:
     """ This environment is the base class.
@@ -38,6 +39,7 @@ class MujocoEnv:
         if not isinstance(robot, BaseArm):
             raise ValueError("Please select a robot config.")
         self.robot = robot
+        self.agents = self.robot.agents
 
         self.control_freq = control_freq
 
@@ -58,7 +60,7 @@ class MujocoEnv:
 
         self._mj_state = None
 
-    def step(self, action):
+    def step(self, action: np.ndarray | dict[str, np.ndarray]):
         """ 
         This method will be called with one-step in mujoco
         :param action: Input action
@@ -120,9 +122,28 @@ class MujocoEnv:
 
     def _set_init_qpos(self):
         """ Set or reset init joint position when called env reset func. """
-        for j in range(len(self.robot.joint_index)):
-            self.mj_data.joint(self.robot.joint_index[j]).qpos = self.robot.init_qpos[j]
+        # if isinstance(self.robot.init_qpos, np.ndarray) and self.robot.agent_num != 1:
+
+        self.set_joint_qpos(self.robot.init_qpos)
         mujoco.mj_forward(self.mj_model, self.mj_data)
+
+    def set_joint_qpos(self, qpos: np.ndarray):
+        """ Set joint position. """
+        if self.robot.agent_num == 1:
+            qpos = qpos.reshape(1, self.robot.jnt_num)
+        for mani, joint_indexes in enumerate(self.robot.joint_index):
+            assert qpos.shape[1] == self.robot.jnt_num
+            for j, joint_index in enumerate(joint_indexes):
+                self.mj_data.joint(joint_index).qpos = qpos[mani, j]
+
+    def set_joint_ctrl(self, torque: np.ndarray):
+        """ Set joint torque. """
+        if self.robot.agent_num == 1:
+            torque = torque.reshape(1, self.robot.jnt_num)
+        for mani, actuator_indexes in enumerate(self.robot.actuator_index):
+            assert torque.shape[1] == self.robot.jnt_num
+            for j, joint_index in enumerate(actuator_indexes):
+                self.mj_data.actuator(joint_index).ctrl = torque[mani, j]
 
     def set_object_pose(self, obj_joint_name: str = None, obj_pose: np.ndarray = None):
         """ Set pose of the object. """

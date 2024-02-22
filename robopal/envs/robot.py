@@ -43,23 +43,32 @@ class RobotEnv(MujocoEnv):
             interpolator_config={'dof': self.robot.jnt_num, 'control_timestep': self.control_timestep}
         )
 
-        self.kdl_solver = self.controller.kdl_solver  # shallow copy
+        self.kd_solver = self.controller.kd_solver  # shallow copy
 
-        self.n_substeps = int(self.control_timestep / self.model_timestep)
-        if self.n_substeps == 0:
+        # check the control frequency
+        self._n_substeps = int(self.control_timestep / self.model_timestep)
+        if self._n_substeps == 0:
             raise ValueError("Control frequency is too low. Checkout you are not in renderer mode."
                              "Current Model-Timestep:{}".format(self.model_timestep))
 
+        # memorize the initial position and rotation
+        self.init_pos, self.init_rot_quat = self.kd_solver.fk(self.robot.get_arm_qpos(), rot_format='quaternion')
+
     def inner_step(self, action):
-        if self.controller.name == 'JNTNONE':
-            qpos = self.controller.step_controller(action)
-            for i in range(self.robot.jnt_num):
-                self.mj_data.joint(self.robot.joint_index[i]).qpos = qpos[i]
-        else:
-            torque = self.controller.step_controller(action)
-            # Send torque to simulation
-            for i in range(self.robot.jnt_num):
-                self.mj_data.actuator(self.robot.actuator_index[i]).ctrl = torque[i]
+        joint_inputs = self.controller.step_controller(action)
+        # Send joint_inputs to simulation
+        self.set_joint_ctrl(joint_inputs)
+
+    def step(self, action: np.ndarray | dict[str, np.ndarray]):
+        if self.is_interpolate:
+            self.controller.step_interpolator(action)
+        # low-level control
+        for i in range(self._n_substeps):
+            super().step(action)
+
+    def reset(self):
+        self.controller.reset()
+        super().reset()
 
     def gripper_ctrl(self, actuator_name: str = None, gripper_action: int = 1):
         """ Gripper control.
@@ -69,20 +78,9 @@ class RobotEnv(MujocoEnv):
         """
         self.mj_data.actuator(actuator_name).ctrl = -40 if gripper_action == 0 else 40
 
-    def step(self, action):
-        if self.is_interpolate:
-            self.controller.step_interpolator(action)
-        # high-level control
-        for i in range(self.n_substeps):
-            # low-level control
-            super().step(action)
-
-    def reset(self):
-        if self.is_interpolate:
-            self.controller.reset_interpolator(self.robot.arm_qpos, self.robot.arm_qvel)
-        super().reset()
-
     @property
     def dt(self):
-        "Time of each upper step in the environment."
-        return self.n_substeps * self.mj_model.opt.timestep
+        """
+        Time of each upper step in the environment.
+        """
+        return self._n_substeps * self.mj_model.opt.timestep

@@ -1,18 +1,11 @@
 import numpy as np
-import logging
 
-from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
+from robopal.envs import ManipulateEnv
 import robopal.commons.transform as trans
 from robopal.robots.diana_med import DianaGrasp
 
-logging.basicConfig(level=logging.INFO)
 
-
-class PickAndPlaceEnv(PosCtrlEnv):
-    """ Reference: https://robotics.farama.org/envs/fetch/pick_and_place/#
-    The control frequency of the robot is of f = 10 Hz. This is achieved by applying the same action
-    in 100 subsequent simulator step (with a time step of dt = 0.001 s) before returning the control to the robot.
-    """
+class PickAndPlaceEnv(ManipulateEnv):
 
     def __init__(self,
                  robot=DianaGrasp(),
@@ -42,59 +35,11 @@ class PickAndPlaceEnv(PosCtrlEnv):
         self.min_action = -1.0
 
         self.max_episode_steps = 50
-        self._timestep = 0
 
-        self.goal_pos = None
-
-    def action_scale(self, action):
-        pos_offset = 0.1 * action[:3]
-        actual_pos_action = self.kdl_solver.fk(self.robot.arm_qpos)[0] + pos_offset
-
-        pos_max_bound = np.array([0.6, 0.2, 0.37])
-        pos_min_bound = np.array([0.3, -0.2, 0.12])
-        actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
-
-        # Map to target action space bounds
-        grip_max_bound = 0.02
-        grip_min_bound = -0.01
-        gripper_ctrl = (action[3] + 1) * (grip_max_bound - grip_min_bound) / 2 + grip_min_bound
-        return actual_pos_action, gripper_ctrl
-
-    def step(self, action) -> tuple:
-        """ Take one step in the environment.
-
-        :param action:  The action space is 4-dimensional, with the first 3 dimensions corresponding to the desired
-        position of the block in Cartesian coordinates, and the last dimension corresponding to the
-        desired gripper opening (0 for closed, 1 for open).
-        :return: obs, reward, terminated, truncated, info
-        """
-        self._timestep += 1
-
-        actual_pos_action, gripper_ctrl = self.action_scale(action)
-        # take one step
-        self.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = gripper_ctrl
-        self.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = gripper_ctrl
-
-        super().step(actual_pos_action[:3])
-
-        obs = self._get_obs()
-        reward = self.compute_rewards(obs['achieved_goal'], obs['desired_goal'])
-        terminated = False
-        truncated = True if self._timestep >= self.max_episode_steps else False
-        info = self._get_info()
-
-        if self.render_mode == 'human':
-            self.render()
-
-        return obs, reward, terminated, truncated, info
-
-    def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, info: dict = None):
-        """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
-        target position, and 0 if the block is in the final target position (the block is considered to have
-        reached the goal if the Euclidean distance between both is lower than 0.05 m).
-        """
-        d = self.goal_distance(achieved_goal, desired_goal)
-        return -(d > 0.05).astype(np.float64)
+        self.pos_max_bound = np.array([0.6, 0.2, 0.37])
+        self.pos_min_bound = np.array([0.3, -0.2, 0.12])
+        self.grip_max_bound = 0.02
+        self.grip_min_bound = -0.01
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -131,36 +76,11 @@ class PickAndPlaceEnv(PosCtrlEnv):
         return {
             'observation': obs.copy(),
             'achieved_goal': object_pos.copy(),  # block position
-            'desired_goal': self.goal_pos.copy()
+            'desired_goal': self.get_site_pos('goal_site').copy()
         }
 
     def _get_info(self) -> dict:
-        return {'is_success': self._is_success(self.get_body_pos('green_block'), self.goal_pos)}
-
-    def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray) -> np.ndarray:
-        """ Compute whether the achieved goal successfully achieved the desired goal.
-        """
-        d = self.goal_distance(achieved_goal, desired_goal)
-        return (d < 0.05).astype(np.float32)
-
-    @staticmethod
-    def goal_distance(goal_a, goal_b):
-        assert goal_a.shape == goal_b.shape
-        return np.linalg.norm(goal_a - goal_b, axis=-1)
-
-    def reset(self, seed=None):
-        super().reset()
-        self._timestep = 0
-        # set new goal
-        self.goal_pos = self.get_site_pos('goal_site')
-
-        obs = self._get_obs()
-        info = self._get_info()
-
-        if self.render_mode == 'human':
-            self.render()
-
-        return obs, info
+        return {'is_success': self._is_success(self.get_body_pos('green_block'), self.get_site_pos('goal_site'), th=0.02)}
 
     def reset_object(self):
         random_x_pos = np.random.uniform(0.35, 0.55)
@@ -184,8 +104,8 @@ class PickAndPlaceEnv(PosCtrlEnv):
 
 if __name__ == "__main__":
     env = PickAndPlaceEnv()
-    obs, _ = env.reset()
-    for t in range(int(1e6)):
+    env.reset()
+    for t in range(int(1e5)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
         s_, r, terminated, truncated, info = env.step(action)
         if truncated:

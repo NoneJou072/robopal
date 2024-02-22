@@ -1,10 +1,11 @@
 import logging
 import sys
 from queue import Queue
+from collections import deque
+
 import numpy as np
 import mujoco
 from mujoco import viewer
-from collections import deque
 
 import robopal.commons.cv_utils as cv
 
@@ -23,12 +24,6 @@ class MjRenderer:
             self.enable_camera_viewer = False
         self.camera_name = camera_name
 
-        # Set up mujoco viewer
-        self.viewer = None
-        if render_mode is not None:
-            self._init_renderer()
-            self.traj = deque(maxlen=200)  # used for rendering trajectory
-
         # keyboard flag
         self.render_paused = True
         self.exit_flag = False
@@ -36,7 +31,13 @@ class MjRenderer:
         self._image = None
         self.image_queue = Queue(3)
 
-        self.image_renderer = mujoco.Renderer(self.mj_model)
+        # Set up mujoco viewer
+        self.viewer = None
+        self.image_renderer = None
+        if self.render_mode in ["human", "rgb_array", "depth"]:
+            self._init_renderer()
+            self.image_renderer = mujoco.Renderer(self.mj_model)
+            self.traj = deque(maxlen=200)  # used for rendering trajectory
 
     def key_callback(self, keycode):
         if keycode == 32:  # space
@@ -94,9 +95,12 @@ class MjRenderer:
         """ close the environment. """
         if self.enable_camera_viewer:
             cv.close_cv_window()
-        if self.viewer is not None:
+        if isinstance(self.viewer, viewer.Handle) and self.viewer.is_running():
             self.viewer.close()
-        sys.exit(0)
+            del self.viewer
+            self.viewer = None
+        logging.info("Environment has closed!")
+        sys.exit()
 
     def set_renderer_config(self):
         """ Setup mujoco global config while using viewer as renderer.

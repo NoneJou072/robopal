@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import pinocchio as pin
 import robopal.commons.transform as trans
@@ -9,16 +11,17 @@ class PinSolver:
     def __init__(self, urdf_path: str):
         # Load the urdf model
         urdf_path = urdf_path
-        self.model = pin.buildModelFromUrdf(urdf_path)
-        print('model name: ' + self.model.name)
+
         # Create data required by the algorithms
+        self.model = pin.buildModelFromUrdf(urdf_path)
         self.data = self.model.createData()
-        NQ = self.model.nq
-        NV = self.model.nv
-        print('Dimension of the configuration vector representation: ' + str(NQ))
-        print('Dimension of the velocity: ' + str(NV))
-        self.JOINT_NUM = self.model.nq
-        print(f"pinocchio model {self.model.name} init!")
+
+        self._JOINT_NUM = self.model.nq
+
+        logging.info('Model name in Pinocchio: ' + self.model.name)
+        logging.info('Dimension of the configuration vector representation: ' + str(self._JOINT_NUM))
+        logging.info('Dimension of the velocity: ' + str(self.model.nv))
+        logging.info(f"Pinocchio model init!")
 
     def fk(self, q: np.ndarray, rot_format: str = 'matrix'):
         """ Perform the forward kinematics over the kinematic tree
@@ -116,7 +119,7 @@ class PinSolver:
         :param q: joint position
         :return: Jacobian
         """
-        return pin.computeJointJacobian(self.model, self.data, q, self.JOINT_NUM).copy()
+        return pin.computeJointJacobian(self.model, self.data, q, self._JOINT_NUM).copy()
 
     def get_joint_jac_pinv(self, q: np.ndarray) -> np.ndarray:
         """ Computes the full model Jacobian_pinv of a specific joint frame expressed in the local frame.

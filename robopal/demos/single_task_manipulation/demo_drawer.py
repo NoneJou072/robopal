@@ -1,17 +1,10 @@
 import numpy as np
-import logging
 
-from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
+from robopal.envs import ManipulateEnv
 from robopal.robots.diana_med import DianaDrawer
 
-logging.basicConfig(level=logging.INFO)
 
-
-class DrawerEnv(PosCtrlEnv):
-    """
-    The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
-    in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
-    """
+class DrawerEnv(ManipulateEnv):
 
     def __init__(self,
                  robot=DianaDrawer(),
@@ -41,61 +34,9 @@ class DrawerEnv(PosCtrlEnv):
         self.min_action = -1.0
 
         self.max_episode_steps = 50
-        self._timestep = 0
 
-        self.goal_pos = None
-
-    def action_scale(self, action):
-        pos_offset = 0.1 * action[:3]
-        actual_pos_action = self.kdl_solver.fk(self.robot.arm_qpos)[0] + pos_offset
-
-        pos_max_bound = np.array([0.65, 0.2, 0.4])
-        pos_min_bound = np.array([0.3, -0.2, 0.14])
-        actual_pos_action = actual_pos_action.clip(pos_min_bound, pos_max_bound)
-
-        # Map to target action space bounds
-        grip_max_bound = 0.02
-        grip_min_bound = -0.02
-        gripper_ctrl = (action[3] + 1) * (grip_max_bound - grip_min_bound) / 2 + grip_min_bound
-        return actual_pos_action, gripper_ctrl
-
-    def step(self, action) -> tuple:
-        """ Take one step in the environment.
-
-        :param action:  The action space is 4-dimensional, with the first 3 dimensions corresponding to the desired
-        position of the block in Cartesian coordinates, and the last dimension corresponding to the
-        desired gripper opening (0 for closed, 1 for open).
-        :return: obs, reward, terminated, truncated, info
-        """
-        self._timestep += 1
-
-        actual_pos_action, gripper_ctrl = self.action_scale(action)
-        # take one step
-        self.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = gripper_ctrl
-        self.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = gripper_ctrl
-
-        super().step(actual_pos_action[:3])
-
-        obs = self._get_obs()
-        achieved_goal = obs['achieved_goal']
-        desired_goal = obs['desired_goal']
-        reward = self.compute_rewards(achieved_goal, desired_goal)
-        terminated = False
-        truncated = True if self._timestep >= self.max_episode_steps else False
-        info = self._get_info()
-
-        if self.render_mode == 'human':
-            self.render()
-
-        return obs, reward, terminated, truncated, info
-
-    def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, info: dict = None):
-        """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
-        target position, and 0 if the block is in the final target position (the block is considered to have
-        reached the goal if the Euclidean distance between both is lower than 0.05 m).
-        """
-        d = self.goal_distance(achieved_goal, desired_goal)
-        return -(d > 0.05).astype(np.float64)
+        self.pos_max_bound = np.array([0.65, 0.2, 0.4])
+        self.pos_min_bound = np.array([0.3, -0.2, 0.14])
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -127,49 +68,22 @@ class DrawerEnv(PosCtrlEnv):
         return {
             'observation': obs.copy(),
             'achieved_goal': object_pos.copy(),  # handle position
-            'desired_goal': self.goal_pos.copy()
+            'desired_goal': self.get_site_pos('drawer_goal').copy()
         }
 
     def _get_info(self) -> dict:
-        return {'is_success': self._is_success(self.get_site_pos('drawer'), self.goal_pos)}
-
-    def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray) -> np.ndarray:
-        """ Compute whether the achieved goal successfully achieved the desired goal.
-        """
-        d = self.goal_distance(achieved_goal, desired_goal)
-        return (d < 0.02).astype(np.float32)
-
-    @staticmethod
-    def goal_distance(goal_a, goal_b):
-        assert goal_a.shape == goal_b.shape
-        return np.linalg.norm(goal_a - goal_b, axis=-1)
-
-    def reset(self, seed=None):
-        super().reset()
-        self._timestep = 0
-        # set new goal
-        self.goal_pos = self.get_site_pos('drawer_goal')
-
-        obs = self._get_obs()
-        info = self._get_info()
-
-        if self.render_mode == 'human':
-            self.render()
-
-        return obs, info
+        return {'is_success': self._is_success(self.get_site_pos('drawer'), self.get_site_pos('drawer_goal'), th=0.02)}
 
     def reset_object(self):
-        random_goal_x_pos = np.random.uniform(0.46, 0.56)
-        goal_pos = np.array([random_goal_x_pos, 0.0, 0.478])
+        goal_pos = np.array([0.0, np.random.uniform(-0.2, -0.1), 0.05])
         site_id = self.get_site_id('drawer_goal')
         self.mj_model.site_pos[site_id] = goal_pos
 
 
 if __name__ == "__main__":
-
     env = DrawerEnv()
     env.reset()
-    for t in range(int(1e6)):
+    for t in range(int(1e5)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
         s_, r, terminated, truncated, _ = env.step(action)
         if truncated:

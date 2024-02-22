@@ -11,11 +11,11 @@ SCENES_DIR_PATH = path.join(ASSETS_PATH, 'scenes')
 
 class XMLSplicer:
     def __init__(self,
-                 name='robot',
-                 scene='default',
-                 chassis=None,
-                 manipulator=None,
-                 gripper=None,
+                 name: str = 'robot',
+                 scene: str = 'default',
+                 chassis: str | list[str] = None,
+                 manipulator: str | list[str] = None,
+                 gripper: str | list[str] = None,
                  **kwargs,
                  ):
         self.xml_name = name
@@ -117,6 +117,9 @@ class XMLSplicer:
                     if value == body.attrib['name'] and key != 'mesh':
                         element.attrib[key] = '{}_{}'.format(id, element.attrib[key])
 
+        for geom in node.findall('.//geom[@name]'):
+            geom.attrib['name'] = '{}_{}'.format(id, geom.attrib['name'])
+
         for default in node.findall('.//default'):
             if 'class' in default.attrib:
                 for geom in node.findall('.//geom'):
@@ -156,20 +159,29 @@ class XMLSplicer:
         for actuator in node.findall('.//actuator/*[@name]'):
             actuator.set('name', '{}_{}'.format(id, actuator.attrib['name']))
 
-    def add_node_from_xml(self, attached_node: str = 'worldbody', xml_path: str = None):
+    def add_node_from_xml(self, node: str = 'worldbody', xml_path: str = None):
         """ Add node from xml file. The attached node is the parent node of the new node.
-        :param attached_node: the parent node of the new node
+        :param node: the parent node of the new node
         :param xml_path: the path of the xml file
         """
         if xml_path is None:
             raise ValueError("Please checkout your xml path.")
-        if attached_node == 'worldbody':
-            parent_element = self.root.find('worldbody')
-        else:
-            parent_element = self.root.find(f'.//body[@name=\'{attached_node}\']')
         new_tree = ET.parse(xml_path)
-        new_node = new_tree.getroot().find('worldbody').find('body')
-        parent_element.append(new_node)
+
+        if node == 'worldbody':
+            parent_element = self.root.find('worldbody')
+            new_node = new_tree.getroot().find('worldbody').find('body')
+        elif node == 'asset':
+            parent_element = self.root.find('asset')
+            new_node = new_tree.getroot().find('asset').findall('*')
+        else:
+            parent_element = self.root.find(f'.//body[@name=\'{node}\']')
+            new_node = new_tree.getroot().find('worldbody').find('body')
+        if isinstance(new_node, list):
+            for node in new_node:
+                parent_element.append(node)
+        else:
+            parent_element.append(new_node)
 
     def set_node_attrib(self, node: str, name: str, attrib: dict):
         """ Set node attribute.
@@ -261,6 +273,7 @@ class XMLSplicer:
         :param gripper: gripper name
         :param kwargs:
         """
+        # Check the scene.
         if isinstance(scene, str):
             if scene.endswith('.xml'):
                 scene_path = scene
@@ -271,17 +284,32 @@ class XMLSplicer:
             raise ValueError("Must have scene.xml to generate the world.")
 
         if isinstance(chassis, str):
-            chassis_path = path.join(CHASSISES_DIR_PATH, chassis, '{}.xml'.format(chassis))
-            self.add_component_from_xml(chassis_path, goal_body=(0, 'worldbody'))
+            chassis = [chassis]
+        if isinstance(chassis, list):
+            for ch_id, ch_name in enumerate(chassis):
+                if ch_name.endswith('.xml'):
+                    chassis_path = ch_name
+                else:
+                    chassis_path = path.join(CHASSISES_DIR_PATH, ch_name, '{}.xml'.format(ch_name))
+                self.add_component_from_xml(chassis_path, goal_body=(ch_id, 'worldbody'))
 
         if isinstance(manipulator, str):
-            if manipulator.endswith('.xml'):
-                manipulator_path = manipulator
-            else:
-                manipulator_path = path.join(MANIPULATORS_DIR_PATH, manipulator, '{}.xml'.format(manipulator))
-            self.add_component_from_xml(manipulator_path,
-                                        goal_body=(0, '0_mount_base_link') if chassis is not None else (0, 'worldbody'))
-            if isinstance(gripper, str):
-                for goal_body in enumerate(kwargs['g2m_body']):
-                    gripper_path = path.join(GRIPPERS_DIR_PATH, gripper, '{}.xml'.format(gripper))
-                    self.add_component_from_xml(gripper_path, goal_body=goal_body)
+            manipulator = [manipulator]
+        if isinstance(manipulator, list):
+            for mani_id, mani_name in enumerate(manipulator):
+                if mani_name.endswith('.xml'):
+                    manipulator_path = mani_name
+                else:
+                    manipulator_path = path.join(MANIPULATORS_DIR_PATH, mani_name, '{}.xml'.format(mani_name))
+                self.add_component_from_xml(manipulator_path,
+                                            goal_body=(mani_id, f'{mani_id}_mount_base_link') if chassis is not None else (mani_id, 'worldbody'))
+
+            if gripper is not None:
+                assert kwargs['g2m_body'] is not None, "Please specify the g2m_body for the gripper."
+                g2m_body = kwargs['g2m_body'] if isinstance(kwargs['g2m_body'], list) else [kwargs['g2m_body']]
+                if isinstance(gripper, str):
+                    gripper = [gripper]
+                if isinstance(gripper, list):
+                    for goal_body, g in zip(enumerate(g2m_body), gripper):
+                        gripper_path = path.join(GRIPPERS_DIR_PATH, g, '{}.xml'.format(g))
+                        self.add_component_from_xml(gripper_path, goal_body=goal_body)

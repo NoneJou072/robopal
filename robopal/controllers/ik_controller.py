@@ -1,34 +1,30 @@
 import numpy as np
 
-from robopal.envs.robot import RobotEnv
-import robopal.commons.transform as T
-from robopal.controllers.ik_controller import JntIK
+from robopal.commons.pin_utils import PinSolver
+import robopal.commons.transform as trans
 
 
-class PosCtrlEnv(RobotEnv):
-    def __init__(self,
-                 robot=None,
-                 control_freq=200,
-                 enable_camera_viewer=False,
-                 controller='JNTIMP',
-                 is_interpolate=False,
-                 is_pd=False,
-                 render_mode='human',
-                 ):
-        super().__init__(
-            robot=robot,
-            control_freq=control_freq,
-            enable_camera_viewer=enable_camera_viewer,
-            controller=controller,
-            is_interpolate=is_interpolate,
-            render_mode=render_mode,
-        )
+class JntIK:
+    """
+    ik
+    """
+
+    def __init__(
+            self,
+            robot,
+            is_pd=False,
+            **kwargs
+    ):
+        self.name = 'CARTIMP'
+        self.dofs = 7
+        self.robot = robot
+
         self.p_cart = 0.2
         self.d_cart = 0.01
         self.p_quat = 0.2
         self.d_quat = 0.01
+
         self.is_pd = is_pd
-        self.vel_des = np.zeros(3)
 
     def compute_pd_increment(self, p_goal: np.ndarray,
                              p_cur: np.ndarray,
@@ -40,7 +36,7 @@ class PosCtrlEnv(RobotEnv):
         quat_incre = self.p_quat * (r_goal - r_cur)
         return pos_incre, quat_incre
 
-    def step_controller(self, action: np.ndarray):
+    def step_controller(self, action):
         if len(action) not in (3, 7):
             raise ValueError("Invalid action length.")
         if not self.is_pd:
@@ -58,11 +54,3 @@ class PosCtrlEnv(RobotEnv):
             r_goal = T.quat_2_mat(r_cur + r_incre)
 
         return self.kd_solver.ik(p_goal, r_goal, q_init=self.robot.get_arm_qpos())
-
-    def step(self, action: np.ndarray | dict[str, np.ndarray]):
-        if self.robot.agent_num == 1:
-            inputs = self.step_controller(action)
-        else:
-            inputs = {agent: self.step_controller(action[agent]) for agent in self.robot.agents}
-
-        super().step(inputs)
