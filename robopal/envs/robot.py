@@ -66,9 +66,9 @@ class RobotEnv(MujocoEnv):
         for i in range(self._n_substeps):
             super().step(action)
 
-    def reset(self):
+    def reset(self, seed=None, options=None):
         self.controller.reset()
-        super().reset()
+        super().reset(seed, options)
 
     def gripper_ctrl(self, actuator_name: str = None, gripper_action: int = 1):
         """ Gripper control.

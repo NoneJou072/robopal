@@ -28,9 +28,9 @@ class GymWrapper(gym.Env):
 
     def reset(self, seed=None, options=None):
         # following line to seed self.np_random
-        super().reset(seed=seed)
+        super().reset(seed=seed, options=options)
 
-        return self.env.reset(seed=seed)
+        return self.env.reset(seed=seed, options=options)
 
     def render(self, mode="human"):
         self.env.render()

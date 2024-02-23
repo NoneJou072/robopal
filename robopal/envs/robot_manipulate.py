@@ -1,8 +1,9 @@
+import mujoco
 import numpy as np
 import logging
 
 from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
-from robopal.robots.diana_med import DianaDrawer
+import robopal.commons.transform as T
 
 logging.basicConfig(level=logging.INFO)
 
@@ -111,8 +112,11 @@ class ManipulateEnv(PosCtrlEnv):
     def _get_info(self) -> dict:
         return {}
 
-    def reset(self, seed=None):
-        super().reset()
+    def reset(self, seed=None, options=None):
+        options = options or {}
+        options['disable_reset_render'] = True
+        super().reset(seed, options)
+        self.set_random_init_position()
         self._timestep = 0
         obs = self._get_obs()
         info = self._get_info()
@@ -120,3 +124,12 @@ class ManipulateEnv(PosCtrlEnv):
 
     def reset_object(self):
         pass
+
+    def set_random_init_position(self):
+        """ Set the initial position of the end effector to a random position within the workspace.
+        """
+        random_pos = np.random.uniform(self.pos_min_bound, self.pos_max_bound)
+        init_rot = T.quat_2_mat(self.init_rot_quat)
+        qpos = self.kd_solver.ik(random_pos, init_rot, q_init=self.robot.get_arm_qpos())
+        self.set_joint_qpos(qpos)
+        mujoco.mj_forward(self.mj_model, self.mj_data)
