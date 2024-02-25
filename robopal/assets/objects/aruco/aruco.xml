@@ -1,4 +1,8 @@
 <mujoco>
+    <asset>
+        <texture name="aruco" type='2d' file="textures/aruco.png"/>
+        <material name="aruco" texture='aruco' texrepeat='1 1' texuniform='false'/>
+    </asset>
     <worldbody>
         <body name="aruco">
             <joint name="aruco_x" pos="0 0 0" axis="1 0 0" type="slide" />

@@ -7,7 +7,6 @@ ASSET_DIR = os.path.join(os.path.dirname(__file__), '../assets')
 
 class DianaMed(BaseArm):
     """ DianaMed robot base class. """
-
     def __init__(self,
                  scene='default',
                  manipulator='DianaMed',
@@ -34,7 +33,6 @@ class DianaMed(BaseArm):
 
 class DualDianaMed(BaseArm):
     """ Dual DianaMed robots base class. """
-
     def __init__(self,
                  scene='default',
                  manipulator=['DianaMed', 'DianaMed'],
@@ -64,22 +62,15 @@ class DualDianaMed(BaseArm):
 
 
 class DianaAruco(DianaMed):
-    """ DianaMed robot class. """
-
     def __init__(self):
         super().__init__(scene='default',
                          gripper='Swab_gripper', )
 
     def add_assets(self):
-        self.mjcf_generator.add_texture('aruco', type='2d',
-                                        file=os.path.join(ASSET_DIR, 'textures/aruco.png'))
-        self.mjcf_generator.add_material('aruco', texture='aruco', texrepeat='1 1', texuniform='false')
-        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/aruco/aruco.xml')
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/aruco/aruco.xml')
 
 
 class DianaCollide(DianaMed):
-    """ DianaMed robot class. """
-
     def add_assets(self):
         self.mjcf_generator.add_geom(node='worldbody', name='obstacle_box', pos='0.9 0.2 0.3',
                                      size='0.4 0.05 0.2', type='box')
@@ -87,7 +78,6 @@ class DianaCollide(DianaMed):
 
 class DianaCalib(DianaMed):
     """ DianaMed for Camera Calibration. """
-
     def add_assets(self):
         # link chessboard to the end
         self.mjcf_generator.add_texture('chessboard', type='2d',
@@ -108,16 +98,13 @@ class DianaCalib(DianaMed):
 
 
 class DianaGrasp(DianaMed):
-    """ DianaMed robot class. """
-
     def __init__(self):
         super().__init__(scene='grasping',
                          gripper='rethink_gripper',
                          mount='top_point')
 
     def add_assets(self):
-        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/green_cube.xml')
-        self.mjcf_generator.set_node_attrib('body', 'green_block', {'pos': '0.5 0.0 0.46'})
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')
 
         goal_site = """<site name="goal_site" pos="0.4 0.0 0.5" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />"""
         self.mjcf_generator.add_node_from_str('worldbody', goal_site)
@@ -129,16 +116,14 @@ class DianaGrasp(DianaMed):
 
 
 class DianaGraspMultiObjs(DianaGrasp):
-    """ DianaMed robot class. """
-
     def add_assets(self):
-        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/red_cube.xml')
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/red_cube.xml')
         self.mjcf_generator.set_node_attrib('body', 'red_block', {'pos': '0.5 -0.1 0.46'})
 
-        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/green_cube.xml')
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')
         self.mjcf_generator.set_node_attrib('body', 'green_block', {'pos': '0.5 0.0 0.46'})
 
-        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/blue_cube.xml')
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/blue_cube.xml')
         self.mjcf_generator.set_node_attrib('body', 'blue_block', {'pos': '0.5 0.1 0.46'})
 
         r_goal_site = """<site name="red_goal" pos="0.4 0.0 0.5" size="0.015 0.015 0.015" rgba="1 0 0 1" type="sphere" />"""
@@ -152,8 +137,6 @@ class DianaGraspMultiObjs(DianaGrasp):
 
 
 class DianaDrawer(DianaMed):
-    """ DianaMed robot class. """
-
     def __init__(self):
         super().__init__(scene='grasping',
                          # manipulator='/home/mhming/zhr/robopal/robopal/assets/models/manipulators/DianaMed/DianaMed_POS.xml',
@@ -162,7 +145,7 @@ class DianaDrawer(DianaMed):
 
     def add_assets(self):
         # add cupboard
-        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cupboard/cupboard.xml')
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cupboard/cupboard.xml')
 
     @property
     def init_qpos(self):
@@ -171,13 +154,11 @@ class DianaDrawer(DianaMed):
 
 
 class DianaDrawerCube(DianaDrawer):
-    """ DianaMed robot class. """
-
     def add_assets(self):
         super(DianaDrawerCube, self).add_assets()
 
         # add cube with random position
-        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cube/green_cube.xml')
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')
         self.mjcf_generator.set_node_attrib('body', 'green_block', {'pos': '0.5 0.0 0.46'})
 
         goal_site = """<site name="cube_goal" pos="0.59 0.0 0.478" size="0.01 0.01 0.01" rgba="1 0 0 1" type="sphere" />"""
@@ -190,17 +171,29 @@ class DianaDrawerCube(DianaDrawer):
 
 
 class DianaCabinet(DianaMed):
-    """ DianaMed robot class. """
-
     def __init__(self):
         super().__init__(scene='grasping',
                          gripper='rethink_gripper',
                          mount='top_point')
 
     def add_assets(self):
-        self.mjcf_generator.add_mesh('cabinet_door', 'objects/cabinet/kapak mab 27.stl', scale='0.0045 0.005 0.0035')
-        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cabinet/cabinet.xml')
-        self.mjcf_generator.add_node_from_xml('worldbody', ASSET_DIR + '/objects/cabinet/beam.xml')
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cabinet/cabinet.xml')
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cabinet/beam.xml')
+
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return np.array([-0.71325374, 0.07279728, -0.72080385, 2.5239552, -0.07686951, -0.67930021, 0.05372948])
+
+
+class DianaAssemble(DianaMed):
+    def __init__(self):
+        super().__init__(scene='grasping',
+                         gripper='rethink_gripper',
+                         mount='top_point')
+
+    def add_assets(self):
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/motor/motor.xml')
 
     @property
     def init_qpos(self):

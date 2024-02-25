@@ -1,4 +1,7 @@
 <mujoco>
+    <asset>
+        <mesh name="cabinet_door" file="objects/cabinet/kapak mab 27.stl" scale='0.0045 0.005 0.0035' />
+    </asset>
     <worldbody>
         <body name="cabinet" pos="0.75 0 0.46">
             <geom type="box" pos="0.00 0 0.0" size="0.12 0.2 0.01" rgba="0.68 0.68 0.68 1"/>
