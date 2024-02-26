@@ -1,20 +1,51 @@
-import argparse
 import numpy as np
-import logging
 
 from robopal.robots.diana_med import DianaAssemble
-from robopal.envs import RobotEnv, PosCtrlEnv
+from robopal.envs import PosCtrlEnv
 
 env = PosCtrlEnv(
     robot=DianaAssemble(),
     render_mode='human',
-    control_freq=200,
+    control_freq=100,
     is_interpolate=False,
     is_pd=False
 )
-action = np.array([0.33, -0.39, 0.66, 1, 0, 0, 0])
-
 env.reset()
-for t in range(int(1e6)):
+
+action = np.array([0.525, 0.13, 0.16, 1, 0, 0, 0])
+for t in range(int(5e2)):
+    env.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = 0.03
+    env.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = 0.03
     env.step(action)
+
+action = np.array([0.525, 0.13, 0.12, 1, 0, 0, 0])
+for t in range(int(5e2)):
+    env.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = 0.03
+    env.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = 0.03
+    env.step(action)
+
+action = np.array([0.525, 0.13, 0.12, 1, 0, 0, 0])
+for t in range(int(5e2)):
+    env.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = -0.02
+    env.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = -0.02
+    env.step(action)
+
+action = np.array([0.525, 0.13, 0.25, 1, 0, 0, 0])
+for t in range(int(5e2)):
+    env.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = -0.02
+    env.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = -0.02
+    env.step(action)
+
+action = np.array([0.525, -0.112, 0.25, 1, 0, 0, 0])
+for t in range(int(1e3)):
+    env.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = -0.02
+    env.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = -0.02
+    env.step(action)
+
+action = np.array([0.525, -0.112, 0.2, 1, 0, 0, 0])
+for t in range(int(1e4)):
+    env.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = -0.02
+    env.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = -0.02
+    env.step(action)
+
 env.close()

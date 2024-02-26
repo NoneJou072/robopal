@@ -7,17 +7,12 @@
     <worldbody>
         <body name="cover" pos="0.5 0.1 0.46">
             <freejoint/>
-<!--            <geom type="mesh" euler="1.57 0 0" name="cover" mesh="cover"/>-->
-            <geom type="box" size="0.01 0.02 0.01" pos="0 0 0"/>
-            <geom type="box" size="0.01 0.01 0.01" pos="0.02 0.01 0"/>
-            <geom type="box" size="0.01 0.02 0.01" pos="0.04 0 0"/>
-            <geom type="box" size="0.01 0.01 0.01" pos="0.02 -0.02 0"/>
         </body>
 
         <body name="shell" pos="0.5 0.0 0.42">
             <geom type="mesh" name="shell" euler="1.57 0 0" contype="0" conaffinity="0" group="1" mesh="shell"/>
 <!--            collision-->
-            <geom name="shell_coli" type="cylinder" pos="0.031 -0.111 0.05" size="0.005 0.06" rgba="0 0.5 0 0.9"/>
+            <geom name="shell_coli" type="cylinder" pos="0.031 -0.111 0.05" size="0.003 0.06" rgba="0 0.5 0 0.9"/>
         </body>
 
     </worldbody>

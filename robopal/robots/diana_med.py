@@ -194,6 +194,9 @@ class DianaAssemble(DianaMed):
 
     def add_assets(self):
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/motor/motor.xml')
+        for i in range(63):
+            self.mjcf_generator.add_mesh(f'decomp{i}', ASSET_DIR + f'/objects/motor/output/decomp{i}.obj', scale='0.001 0.001 0.001')
+            self.mjcf_generator.add_geom(node='cover', mesh=f'decomp{i}', type='mesh', group='1', friction="0.3 0.005 0.001")
 
     @property
     def init_qpos(self):
