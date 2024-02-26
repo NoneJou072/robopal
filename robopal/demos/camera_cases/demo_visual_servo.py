@@ -122,4 +122,3 @@ if __name__ == "__main__":
     env.reset()
     for t in range(int(1e6)):
         env.step()
-        env.render()

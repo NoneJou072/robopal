@@ -64,10 +64,7 @@ class DrawerCubeEnv(ManipulateEnv):
             np.zeros(3)
         )
 
-        # drawer state
-        if self.TASK_FLAG == 1:
-            obs[11:20] = np.zeros(9)
-        else:
+        if self.TASK_FLAG == 0:
             obs[11:14] = (  # handle position in global coordinates
                 handle_pos := self.get_site_pos('drawer')
             )
@@ -77,11 +74,11 @@ class DrawerCubeEnv(ManipulateEnv):
             obs[17:20] = (  # velocity with respect to the gripper
                     handle_velp - end_vel
             )
-
-        # block state
-        if self.TASK_FLAG == 0:
             obs[20:35] = np.zeros(15)
-        else:
+
+        # drawer state
+        if self.TASK_FLAG == 1:
+            obs[11:20] = np.zeros(9)
             obs[20:23] = (  # block position in global coordinates
                 block_pos := self.get_body_pos('green_block')
             )
@@ -142,12 +139,6 @@ class DrawerCubeEnv(ManipulateEnv):
             random_y_pos = np.random.uniform(-0.15, 0.15)
             self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
             self.set_site_pose('cube_goal', np.array([0.59, 0.0, 0.478]))
-        elif self.TASK_FLAG == 2:
-            self.mj_data.joint('drawer:joint').qpos[0] = 0.14
-            self.set_object_pose('green_block:joint', np.array([0.59, 0.0, 0.478, 1.0, 0.0, 0.0, 0.0]))
-            random_x_pos = np.random.uniform(0.35, 0.4)
-            random_y_pos = np.random.uniform(-0.15, 0.15)
-            self.set_site_pose('cube_goal', np.array([random_x_pos, random_y_pos, 0.46]))
 
 
 if __name__ == "__main__":

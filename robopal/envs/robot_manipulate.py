@@ -81,9 +81,6 @@ class ManipulateEnv(PosCtrlEnv):
         truncated = True if self._timestep >= self.max_episode_steps else False
         info = self._get_info()
 
-        if self.render_mode == 'human':
-            self.render()
-
         return obs, reward, terminated, truncated, info
 
     def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, **kwargs):

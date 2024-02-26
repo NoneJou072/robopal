@@ -13,7 +13,7 @@ class GymWrapper(gym.Env):
         )
 
         self.action_space = spaces.Box(
-            low = env.min_action, high = env.max_action, shape = self.env.action_dim, dtype="float64"
+            low=env.min_action, high=env.max_action, shape=self.env.action_dim, dtype="float64"
         )
 
         self.max_episode_steps = env.max_episode_steps
@@ -46,9 +46,9 @@ class GoalEnvWrapper(GymWrapper):
         super(GoalEnvWrapper, self).__init__(env)
         self.observation_space = spaces.Dict(
             dict(
-                observation = spaces.Box(low=-np.inf, high=np.inf, shape=self.env.obs_dim, dtype="float64"),
-                desired_goal = spaces.Box(low=-np.inf, high=np.inf, shape=self.env.goal_dim, dtype="float64"),
-                achieved_goal = spaces.Box(low=-np.inf, high=np.inf, shape=self.env.goal_dim, dtype="float64"),
+                observation=spaces.Box(low=-np.inf, high=np.inf, shape=self.env.obs_dim, dtype="float64"),
+                desired_goal=spaces.Box(low=-np.inf, high=np.inf, shape=self.env.goal_dim, dtype="float64"),
+                achieved_goal=spaces.Box(low=-np.inf, high=np.inf, shape=self.env.goal_dim, dtype="float64"),
             )
         )
 

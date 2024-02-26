@@ -34,7 +34,7 @@ class BaseArm:
         manipulator = [manipulator] if isinstance(manipulator, str) else manipulator
         self.agent_num = len(manipulator)
         self.agents = [f'arm{i}' for i in range(self.agent_num)]
-        logging.info(f'Agents: {self.agents}')
+        logging.info(f'Activated agents: {self.agents}')
 
         self._scene = scene
         self._chassis = chassis
