@@ -88,9 +88,10 @@ class DrawerCubeEnv(ManipulateEnv):
             )
             block_velp = self.get_body_xvelp('green_block') * self.dt
             obs[29:32] = (  # velocity with respect to the gripper
-                block_velp - end_vel
+                block_velp # - end_vel
             )
-            obs[32:35] = self.get_body_xvelr('green_block') * self.dt
+            # obs[32:35] = self.get_body_xvelr('green_block') * self.dt
+            obs[32:35] = np.zeros(3)
 
         return {
             'observation': obs.copy(),
@@ -126,19 +127,13 @@ class DrawerCubeEnv(ManipulateEnv):
         }
 
     def reset_object(self):
-        if self.TASK_FLAG == 0:
-            # reset object position
-            random_x_pos = np.random.uniform(0.35, 0.4)
-            random_y_pos = np.random.uniform(-0.15, 0.15)
-            self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
-            self.set_site_pose('cube_goal', np.array([0.59, 0.0, 0.478]))
-        elif self.TASK_FLAG == 1:
+        if self.TASK_FLAG == 1:
             self.mj_data.joint('drawer:joint').qpos[0] = 0.14
-            # reset object position
-            random_x_pos = np.random.uniform(0.35, 0.4)
-            random_y_pos = np.random.uniform(-0.15, 0.15)
-            self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
-            self.set_site_pose('cube_goal', np.array([0.59, 0.0, 0.478]))
+        # reset object position
+        random_x_pos = np.random.uniform(0.35, 0.4)
+        random_y_pos = np.random.uniform(-0.15, 0.15)
+        self.set_object_pose('green_block:joint', np.array([0.35, 0, 0.46, 1.0, 0.0, 0.0, 0.0]))
+        self.set_site_pose('cube_goal', np.array([0.59, 0.0, 0.478]))
 
 
 if __name__ == "__main__":
