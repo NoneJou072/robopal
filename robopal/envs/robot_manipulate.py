@@ -76,21 +76,22 @@ class ManipulateEnv(PosCtrlEnv):
         super().step(actual_pos_action[:3])
 
         obs = self._get_obs()
-        reward = self.compute_rewards(obs['achieved_goal'], obs['desired_goal'], th=0.05)
+        reward = self.compute_rewards(obs['achieved_goal'], obs['desired_goal'], th=0.02)
         terminated = False
         truncated = True if self._timestep >= self.max_episode_steps else False
         info = self._get_info()
 
         return obs, reward, terminated, truncated, info
 
-    def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, **kwargs):
+    def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, info: dict = None, **kwargs):
         """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
         target position, and 0 if the block is in the final target position (the block is considered to have
         reached the goal if the Euclidean distance between both is lower than 0.05 m).
         """
-        assert 'th' in kwargs.keys()
         d = goal_distance(achieved_goal, desired_goal)
-        return -(d >= kwargs['th']).astype(np.float64)
+        if kwargs:
+            return -(d >= kwargs['th']).astype(np.float64)
+        return -(d >= 0.02).astype(np.float64)
 
     def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, th=0.02) -> np.ndarray:
         """ Compute whether the achieved goal successfully achieved the desired goal.

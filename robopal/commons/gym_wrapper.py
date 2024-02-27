@@ -58,5 +58,5 @@ class GoalEnvWrapper(GymWrapper):
     def reset(self, seed=None, options=None):
         return super().reset(seed=seed, options=options)
 
-    def compute_reward(self, achieved_goal, desired_goal, **kwargs):
-        return self.env.compute_rewards(achieved_goal, desired_goal, **kwargs)
+    def compute_reward(self, achieved_goal, desired_goal, info: dict = None, **kwargs):
+        return self.env.compute_rewards(achieved_goal, desired_goal, info, **kwargs)

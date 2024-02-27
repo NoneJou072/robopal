@@ -22,11 +22,7 @@ class TensorboardCallback(BaseCallback):
 
 log_dir = "log/"
 
-env = PickAndPlaceEnv(
-    render_mode="human",
-    control_freq=10,
-    controller='JNTIMP',
-)
+env = PickAndPlaceEnv(render_mode=None)
 env = GoalEnvWrapper(env)
 
 # Initialize the model
@@ -38,13 +34,14 @@ model = TQC(
     replay_buffer_kwargs=dict(
         n_sampled_goal=4,
         goal_selection_strategy="future",
+        copy_info_dict=True,
     ),
     verbose=1,
     tensorboard_log=log_dir,
-    batch_size=1024,
+    batch_size=256,
     gamma=0.95,
     tau=0.05,
-    policy_kwargs=dict(n_critics=2, net_arch=[512, 512, 512]),
+    policy_kwargs=dict(n_critics=2, net_arch=[256, 256])
 )
 
 # Train the model
