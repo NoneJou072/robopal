@@ -25,12 +25,12 @@ for pos in reversed(path):
     print(pos)
     current_pos, _ = env.kd_solver.fk(env.robot.get_arm_qpos())
     while np.linalg.norm(current_pos - pos) > 0.02:
+        env.renderer.set_renderer_config()
+        env.renderer.add_visual_point(path)
+
         env.step(np.concatenate([pos, [1, 0, 0, 0]]))
         current_pos, _ = env.kd_solver.fk(env.robot.get_arm_qpos())
 
-        env.renderer.set_renderer_config()
-        env.renderer.add_visual_point(path)
-        env.render()
 print("finished.")
 
 for t in range(int(1e4)):

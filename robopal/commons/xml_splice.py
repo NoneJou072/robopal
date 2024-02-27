@@ -159,7 +159,7 @@ class XMLSplicer:
         for actuator in node.findall('.//actuator/*[@name]'):
             actuator.set('name', '{}_{}'.format(id, actuator.attrib['name']))
 
-    def add_node_from_xml(self, node: str = 'worldbody', xml_path: str = None):
+    def add_node_from_xml(self, xml_path: str = None):
         """ Add node from xml file. The attached node is the parent node of the new node.
         :param node: the parent node of the new node
         :param xml_path: the path of the xml file
@@ -168,20 +168,16 @@ class XMLSplicer:
             raise ValueError("Please checkout your xml path.")
         new_tree = ET.parse(xml_path)
 
-        if node == 'worldbody':
-            parent_element = self.root.find('worldbody')
-            new_node = new_tree.getroot().find('worldbody').find('body')
-        elif node == 'asset':
-            parent_element = self.root.find('asset')
-            new_node = new_tree.getroot().find('asset').findall('*')
-        else:
-            parent_element = self.root.find(f'.//body[@name=\'{node}\']')
-            new_node = new_tree.getroot().find('worldbody').find('body')
-        if isinstance(new_node, list):
-            for node in new_node:
-                parent_element.append(node)
-        else:
-            parent_element.append(new_node)
+        for node_type in ['worldbody', 'asset']:
+            new_node = new_tree.getroot().find(node_type)
+            if new_node is not None:
+                parent_element = self.root.find(node_type)
+                new_node = new_node.findall('*')
+                if isinstance(new_node, list):
+                    for node in new_node:
+                        parent_element.append(node)
+                else:
+                    parent_element.append(new_node)
 
     def set_node_attrib(self, node: str, name: str, attrib: dict):
         """ Set node attribute.

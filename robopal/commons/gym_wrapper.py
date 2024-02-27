@@ -13,7 +13,7 @@ class GymWrapper(gym.Env):
         )
 
         self.action_space = spaces.Box(
-            low = env.min_action, high = env.max_action, shape = self.env.action_dim, dtype="float64"
+            low=env.min_action, high=env.max_action, shape=self.env.action_dim, dtype="float64"
         )
 
         self.max_episode_steps = env.max_episode_steps
@@ -28,9 +28,9 @@ class GymWrapper(gym.Env):
 
     def reset(self, seed=None, options=None):
         # following line to seed self.np_random
-        super().reset(seed=seed)
+        super().reset(seed=seed, options=options)
 
-        return self.env.reset(seed=seed)
+        return self.env.reset(seed=seed, options=options)
 
     def render(self, mode="human"):
         self.env.render()
@@ -46,9 +46,9 @@ class GoalEnvWrapper(GymWrapper):
         super(GoalEnvWrapper, self).__init__(env)
         self.observation_space = spaces.Dict(
             dict(
-                observation = spaces.Box(low=-np.inf, high=np.inf, shape=self.env.obs_dim, dtype="float64"),
-                desired_goal = spaces.Box(low=-np.inf, high=np.inf, shape=self.env.goal_dim, dtype="float64"),
-                achieved_goal = spaces.Box(low=-np.inf, high=np.inf, shape=self.env.goal_dim, dtype="float64"),
+                observation=spaces.Box(low=-np.inf, high=np.inf, shape=self.env.obs_dim, dtype="float64"),
+                desired_goal=spaces.Box(low=-np.inf, high=np.inf, shape=self.env.goal_dim, dtype="float64"),
+                achieved_goal=spaces.Box(low=-np.inf, high=np.inf, shape=self.env.goal_dim, dtype="float64"),
             )
         )
 
@@ -58,5 +58,5 @@ class GoalEnvWrapper(GymWrapper):
     def reset(self, seed=None, options=None):
         return super().reset(seed=seed, options=options)
 
-    def compute_reward(self, achieved_goal, desired_goal, **kwargs):
-        return self.env.compute_rewards(achieved_goal, desired_goal, **kwargs)
+    def compute_reward(self, achieved_goal, desired_goal, info: dict = None, **kwargs):
+        return self.env.compute_rewards(achieved_goal, desired_goal, info, **kwargs)

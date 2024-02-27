@@ -49,5 +49,4 @@ if isinstance(env, RobotEnv):
     env.reset()
     for t in range(int(1e4)):
         env.step(actions)
-        env.render()
     env.close()

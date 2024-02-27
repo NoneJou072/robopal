@@ -54,11 +54,21 @@ class RobotEnv(MujocoEnv):
         # memorize the initial position and rotation
         self.init_pos, self.init_rot_quat = self.kd_solver.fk(self.robot.get_arm_qpos(), rot_format='quaternion')
 
+    def auto_render(func):
+        """ Automatically render the scene. """
+        def wrapper(self, *args, **kwargs):
+            ret = func(self, *args, **kwargs)
+            self.render()
+            return ret
+
+        return wrapper
+
     def inner_step(self, action):
         joint_inputs = self.controller.step_controller(action)
         # Send joint_inputs to simulation
         self.set_joint_ctrl(joint_inputs)
 
+    @auto_render
     def step(self, action: np.ndarray | dict[str, np.ndarray]):
         if self.is_interpolate:
             self.controller.step_interpolator(action)
@@ -66,9 +76,9 @@ class RobotEnv(MujocoEnv):
         for i in range(self._n_substeps):
             super().step(action)
 
-    def reset(self):
+    def reset(self, seed=None, options=None):
         self.controller.reset()
-        super().reset()
+        super().reset(seed, options)
 
     def gripper_ctrl(self, actuator_name: str = None, gripper_action: int = 1):
         """ Gripper control.

@@ -1,0 +1,19 @@
+<mujoco>
+    <asset>
+        <mesh name="cover" file="objects/motor/cover.STL" scale='0.001 0.001 0.001'/>
+        <mesh name="shell" file="objects/motor/shell2.STL" scale='0.001 0.001 0.001'/>
+    </asset>
+
+    <worldbody>
+        <body name="cover" pos="0.5 0.1 0.46">
+            <freejoint/>
+        </body>
+
+        <body name="shell" pos="0.5 0.0 0.42">
+            <geom type="mesh" name="shell" euler="1.57 0 0" contype="0" conaffinity="0" group="1" mesh="shell"/>
+<!--            collision-->
+            <geom name="shell_coli" type="cylinder" pos="0.031 -0.111 0.05" size="0.003 0.06" rgba="0 0.5 0 0.9"/>
+        </body>
+
+    </worldbody>
+</mujoco>

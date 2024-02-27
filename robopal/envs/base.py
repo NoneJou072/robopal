@@ -1,6 +1,6 @@
 import abc
 import logging
-import math
+from typing import Any
 
 import mujoco
 import numpy as np
@@ -82,13 +82,20 @@ class MujocoEnv:
         """
         raise NotImplementedError
 
-    def reset(self):
+    def reset(
+        self,
+        seed: int | None = None,
+        options: dict[str, Any] | None = None,
+    ):
         """ Reset the simulate environment, in order to execute next episode. """
         mujoco.mj_resetData(self.mj_model, self.mj_data)
         self.reset_object()
         self._set_init_qpos()
         mujoco.mj_forward(self.mj_model, self.mj_data)
 
+        if isinstance(options, dict):
+            if "disable_reset_render" in options and options["disable_reset_render"]:
+                return
         if self.render_mode in ["human", "rgb_array", "depth"]:
             self.render()
 
