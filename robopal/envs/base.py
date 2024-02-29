@@ -12,16 +12,17 @@ from robopal.robots.base import BaseArm
 class MujocoEnv:
     """ This environment is the base class.
 
-    :param robot(str): Load xml file from xml_path to build the mujoco model.
-    :param render_mode(str): Choose if use the renderer to render the scene or not.
-    :param camera_name(str): Choose the camera.
-    :param control_freq(int): Upper-layer control frequency.
-    Note that high frequency will cause high time-lag.
-    :param enable_camera_viewer(bool): Use camera or not.
+        :param robot(str): Load xml file from xml_path to build the mujoco model
+        :param render_mode(str): Choose if you use the renderer to render the scene or not
+        :param camera_name(str): Choose the camera
+        :param control_freq(int): Upper-layer control frequency
+        Note that high frequency will cause high time-lag
+        :param enable_camera_view(bool): Use camera or not
     """
 
     metadata = {
         "render_modes": [
+            None,
             "human",
             "rgb_array",
             "depth",
@@ -29,15 +30,15 @@ class MujocoEnv:
         ],
     }
 
-    def __init__(self,
-                 robot=None,
-                 control_freq=200,
-                 enable_camera_viewer=False,
-                 camera_name=None,
-                 render_mode='human',
-                 ):
-        if not isinstance(robot, BaseArm):
-            raise ValueError("Please select a robot config.")
+    def __init__(
+        self,
+        robot=None,
+        control_freq=200,
+        enable_camera_viewer=False,
+        camera_name=None,
+        render_mode='human',
+    ):
+        assert isinstance(robot, BaseArm), "Please select a robot config file."
         self.robot = robot
         self.agents = self.robot.agents
 
@@ -51,7 +52,7 @@ class MujocoEnv:
         self.model_timestep = 0
         self.control_timestep = 0
 
-        assert render_mode is None or render_mode in self.metadata["render_modes"]
+        assert render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
         self.renderer = MjRenderer(self.mj_model, self.mj_data, self.render_mode,
                                    enable_camera_viewer, camera_name)
@@ -97,7 +98,7 @@ class MujocoEnv:
             if "disable_reset_render" in options and options["disable_reset_render"]:
                 return
         if self.render_mode in ["human", "rgb_array", "depth"]:
-            self.render()
+            self.render(self.render_mode)
 
     def reset_object(self):
         """ Set pose of the object. """
@@ -106,7 +107,7 @@ class MujocoEnv:
     def render(self, mode="human"):
         """ render one frame in mujoco """
         if self.render_mode in ["human", "rgb_array", "depth"]:
-            self.renderer.render()
+            self.renderer.render(mode)
 
     def close(self):
         """ close the environment. """
