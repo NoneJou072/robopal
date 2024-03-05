@@ -1,6 +1,6 @@
 import numpy as np
 
-from robopal.envs import ManipulateEnv
+from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
 from robopal.robots.diana_med import DianaDrawer
 
 

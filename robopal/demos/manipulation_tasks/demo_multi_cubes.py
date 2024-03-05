@@ -1,6 +1,6 @@
 import numpy as np
 
-from robopal.envs import ManipulateEnv
+from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
 import robopal.commons.transform as trans
 from robopal.robots.diana_med import DianaGraspMultiObjs
 
@@ -36,12 +36,13 @@ class MultiCubes(ManipulateEnv):
 
         self.max_episode_steps = 50
 
-        self.TASK_FLAG = 0
+        self.task_name = ['reach', 'red', 'green', 'blue']
+        self.task = 'red'
 
         self.pos_max_bound = np.array([0.68, 0.25, 0.28])
         self.pos_min_bound = np.array([0.3, -0.25, 0.13])
         self.grip_max_bound = 0.02
-        self.grip_min_bound = -0.02
+        self.grip_min_bound = -0.01
 
         self.red_init_pos = None
         self.green_init_pos = None
@@ -58,62 +59,39 @@ class MultiCubes(ManipulateEnv):
         obs = np.zeros(self.obs_dim)
 
         # gripper state
-        obs[0:3] = (  # gripper position in global coordinates
-            end_pos := self.get_site_pos('0_grip_site')
-        )
-        obs[3:6] = (  # gripper linear velocity
-            end_vel := self.get_site_xvelp('0_grip_site') * self.dt
-        )
-        obs[6] = self.mj_data.joint('0_r_finger_joint').qpos[0]
-        obs[7] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
+        obs[0:8] = np.concatenate((
+            end_pos := self.get_site_pos('0_grip_site'),  # gripper position in global coordinates
+            self.get_site_xvelp('0_grip_site') * self.dt,  # gripper linear velocity
+            self.mj_data.joint('0_r_finger_joint').qpos,
+            self.mj_data.joint('0_r_finger_joint').qvel * self.dt
+        ))
 
         # red block state
-        if self.TASK_FLAG == 0:
-            obs[8:11] = (  # block position
-                red_block_pos := self.get_body_pos('red_block')
-            )
-            obs[11:14] = (  # distance between the block and the end
-                end_pos - red_block_pos
-            )
-            obs[14:17] = (  # block rotation
-                trans.mat_2_euler(self.get_body_rotm('red_block'))
-            )
-            red_block_velp = self.get_body_xvelp('red_block') * self.dt
-            obs[17:20] = (  # velocity with respect to the gripper
-                red_block_velp - end_vel
-            )
+        if self.task == 'red':
+            obs[8:20] = np.concatenate((
+                red_block_pos := self.get_body_pos('red_block'),  # block position
+                end_pos - red_block_pos,  # distance between the block and the end
+                trans.mat_2_euler(self.get_body_rotm('red_block')),  # block rotation
+                self.get_body_xvelp('red_block') * self.dt,  # velocity with respect to the gripper
+            ))
 
         # green block state
-        if self.TASK_FLAG == 1:
-            obs[20:23] = (  # block position
-                green_block_pos := self.get_body_pos('green_block')
-            )
-            obs[23:26] = (  # distance between the block and the end
-                end_pos - green_block_pos
-            )
-            obs[26:29] = (  # block rotation
-                trans.mat_2_euler(self.get_body_rotm('green_block'))
-            )
-            green_block_velp = self.get_body_xvelp('green_block') * self.dt
-            obs[29:32] = (  # velocity with respect to the gripper
-                green_block_velp - end_vel
-            )
+        if self.task == 'green':
+            obs[20:32] = np.concatenate((
+                green_block_pos := self.get_body_pos('green_block'),  # block position
+                end_pos - green_block_pos,  # distance between the block and the end
+                trans.mat_2_euler(self.get_body_rotm('green_block')),  # block rotation
+                self.get_body_xvelp('green_block') * self.dt,  # velocity with respect to the gripper
+            ))
 
         # blue block state
-        if self.TASK_FLAG == 2:
-            obs[32:35] = (  # block position
-                blue_block_pos := self.get_body_pos('blue_block')
-            )
-            obs[35:38] = (  # distance between the block and the end
-                end_pos - blue_block_pos
-            )
-            obs[38:41] = (  # block rotation
-                trans.mat_2_euler(self.get_body_rotm('blue_block'))
-            )
-            blue_block_velp = self.get_body_xvelp('blue_block') * self.dt
-            obs[41:44] = (  # velocity with respect to the gripper
-                blue_block_velp - end_vel
-            )
+        if self.task == 'blue':
+            obs[32:44] = np.concatenate((
+                blue_block_pos := self.get_body_pos('blue_block'),  # block position
+                end_pos - blue_block_pos,  # distance between the block and the end
+                trans.mat_2_euler(self.get_body_rotm('blue_block')),  # block rotation
+                self.get_body_xvelp('blue_block') * self.dt,  # velocity with respect to the gripper
+            ))
 
         return {
             'observation': obs.copy(),
@@ -131,23 +109,23 @@ class MultiCubes(ManipulateEnv):
         return achieved_goal.copy()
 
     def _get_desired_goal(self):
-        if self._is_success(self.get_body_pos('red_block'), self.get_site_pos('red_goal'), th=0.02) == 0:
+        if self.task == 'red':
             return np.concatenate([
-                self.get_body_pos('red_block'),
+                self.red_init_pos,
                 self.get_site_pos('red_goal'),
                 self.green_init_pos,
                 self.blue_init_pos,
             ], axis=0).copy()
-        elif self._is_success(self.get_body_pos('green_block'), self.get_site_pos('green_goal'), th=0.02) == 0:
+        elif self.task == 'green':
             return np.concatenate([
-                self.get_body_pos('green_block'),
+                self.green_init_pos,
                 self.get_site_pos('red_goal'),
                 self.get_site_pos('green_goal'),
                 self.blue_init_pos,
             ], axis=0).copy()
-        else:
+        elif self.task == 'blue':
             return np.concatenate([
-                self.get_body_pos('blue_block'),
+                self.blue_init_pos,
                 self.get_site_pos('red_goal'),
                 self.get_site_pos('green_goal'),
                 self.get_site_pos('blue_goal'),
@@ -159,6 +137,9 @@ class MultiCubes(ManipulateEnv):
             'is_green_success': self._is_success(self.get_body_pos('green_block'), self.get_site_pos('green_goal'), th=0.02),
             'is_blue_success': self._is_success(self.get_body_pos('blue_block'), self.get_site_pos('blue_goal'), th=0.02)
         }
+
+    def reset(self, seed=None, options=None):
+        return super().reset(seed, options)
 
     def reset_object(self):
         # set the position of the red, green, and blue blocks
@@ -203,11 +184,11 @@ class MultiCubes(ManipulateEnv):
         blue_goal = np.array([green_goal[0], green_goal[1], green_goal[2] + 0.04])
         self.set_site_pose('blue_goal', blue_goal)
 
-        if self.TASK_FLAG == 0:
+        if self.task == 'red':
             pass
-        elif self.TASK_FLAG == 1:
+        elif self.task == 'green':
             self.set_object_pose('red_block:joint', np.array([red_goal[0], red_goal[1], red_goal[2], 1.0, 0.0, 0.0, 0.0]))
-        elif self.TASK_FLAG == 2:
+        elif self.task == 'blue':
             self.set_object_pose('red_block:joint', np.array([red_goal[0], red_goal[1], red_goal[2], 1.0, 0.0, 0.0, 0.0]))
             self.set_object_pose('green_block:joint', np.array([red_goal[0], red_goal[1], red_goal[2] + 0.04, 1.0, 0.0, 0.0, 0.0]))
 
