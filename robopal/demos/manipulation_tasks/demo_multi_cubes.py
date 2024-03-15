@@ -168,9 +168,9 @@ class MultiCubes(ManipulateEnv):
         # red goal
         random_goal_x_pos = np.random.uniform(0.4, 0.55)
         random_goal_y_pos = np.random.uniform(-0.15, 0.15)
-        while np.linalg.norm(np.array([r_random_x_pos, r_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.06 \
-            or np.linalg.norm(np.array([g_random_x_pos, g_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.06 \
-            or np.linalg.norm(np.array([b_random_x_pos, b_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.06:
+        while np.linalg.norm(np.array([r_random_x_pos, r_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.1 \
+            or np.linalg.norm(np.array([g_random_x_pos, g_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.1 \
+            or np.linalg.norm(np.array([b_random_x_pos, b_random_y_pos]) - np.array([random_goal_x_pos, random_goal_y_pos])) < 0.1:
             random_goal_x_pos = np.random.uniform(0.4, 0.55)
             random_goal_y_pos = np.random.uniform(-0.15, 0.15)
         red_goal = np.array([random_goal_x_pos, random_goal_y_pos, 0.44])

@@ -34,7 +34,6 @@ class VisualServo(RobotEnv):
 
     def aruco_detection(self, marker_size):
         cv_image = self.renderer.render_pixels_from_camera(cam=self.camera_name, enable_depth=False)
-        print(cv_image)
         if cv_image is not None:
             corners, marker_ids, _ = self.detector.detectMarkers(cv_image)
             if marker_ids is not None:
@@ -100,10 +99,11 @@ class VisualServo(RobotEnv):
                 V_camera = np.zeros(6)
         else:
             V_camera = np.zeros(6)
-
+        V_camera = np.zeros(6)
         jac_pinv = self.kd_solver.get_full_jac_pinv(self.robot.get_arm_qpos())
         V_dian = np.dot(jac_pinv, V_camera).reshape(-1)
         action = gain * V_dian + self.robot.get_arm_qpos()
+        print(self.robot.get_arm_qpos())
         return super().step(action)
 
 
@@ -112,7 +112,7 @@ if __name__ == "__main__":
 
     env = VisualServo(
         robot=DianaAruco(),
-        render_mode=None,
+        render_mode='human',
         control_freq=200,
         controller='JNTIMP',
         enable_camera_viewer=True,
