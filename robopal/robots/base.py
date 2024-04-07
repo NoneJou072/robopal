@@ -51,8 +51,8 @@ class BaseArm:
         self.robot_model = mujoco.MjModel.from_xml_path(filename=xml_path, assets=None)
         self.robot_data = mujoco.MjData(self.robot_model)
 
-        self.joint_index = [[]]
-        self.actuator_index = [[]]
+        self.joint_index = dict([])
+        self.actuator_index = dict([])
 
     def _construct_mjcf_data(self) -> RobotGenerator:
         return RobotGenerator(
@@ -64,7 +64,7 @@ class BaseArm:
         )
 
     @property
-    def init_qpos(self) -> np.ndarray:
+    def init_qpos(self) -> dict[str, np.array]:
         """ Robot's init joint position. """
         raise NotImplementedError
 
@@ -76,28 +76,28 @@ class BaseArm:
     @property
     def jnt_num(self) -> int | dict[str, int]:
         """ Number of joints. """
-        return len(self.joint_index[0])
+        return len(self.joint_index[self.agents[0]])
 
-    def get_arm_qpos(self, agent_index: int = 0) -> np.ndarray:
+    def get_arm_qpos(self, agent: str = 'arm0') -> np.ndarray:
         """ Get arm joint position of the specified agent.
 
-        :param agent_index: agent name
+        :param agent: agent name
         :return: joint position
         """
-        return np.array([self.robot_data.joint(j).qpos[0] for j in self.joint_index[agent_index]])
+        return np.array([self.robot_data.joint(j).qpos[0] for j in self.joint_index[agent]])
 
-    def get_arm_qvel(self, agent_index: int = 0) -> np.ndarray:
+    def get_arm_qvel(self, agent: str = 'arm0') -> np.ndarray:
         """ Get arm joint velocity of the specified agent.
 
-        :param agent_index: agent name
+        :param agent: agent name
         :return: joint position
         """
-        return np.array([self.robot_data.joint(j).qvel[0] for j in self.joint_index[agent_index]])
+        return np.array([self.robot_data.joint(j).qvel[0] for j in self.joint_index[agent]])
 
-    def get_arm_qacc(self, agent_index: int = 0) -> np.ndarray:
+    def get_arm_qacc(self, agent: str = 'arm0') -> np.ndarray:
         """ Get arm joint accelerate of the specified agent.
 
-        :param agent_index: agent name
+        :param agent: agent name
         :return: joint position
         """
-        return np.array([self.robot_data.joint(j).qacc[0] for j in self.joint_index[agent_index]])
+        return np.array([self.robot_data.joint(j).qacc[0] for j in self.joint_index[agent]])

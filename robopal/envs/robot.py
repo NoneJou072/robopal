@@ -66,7 +66,11 @@ class RobotEnv(MujocoEnv):
     def inner_step(self, action):
         joint_inputs = self.controller.step_controller(action)
         # Send joint_inputs to simulation
-        self.set_joint_ctrl(joint_inputs)
+        if isinstance(joint_inputs, np.ndarray):
+            self.set_joint_ctrl(joint_inputs)
+        else:
+            for agent in self.robot.agents:
+                self.set_joint_ctrl(joint_inputs[agent], agent)
 
     @auto_render
     def step(self, action: np.ndarray | dict[str, np.ndarray]):

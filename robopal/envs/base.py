@@ -130,28 +130,21 @@ class MujocoEnv:
 
     def _set_init_qpos(self):
         """ Set or reset init joint position when called env reset func. """
-        # if isinstance(self.robot.init_qpos, np.ndarray) and self.robot.agent_num != 1:
-
-        self.set_joint_qpos(self.robot.init_qpos)
+        for agent in self.robot.agents:
+            self.set_joint_qpos(self.robot.init_qpos[agent], agent)
         mujoco.mj_forward(self.mj_model, self.mj_data)
 
-    def set_joint_qpos(self, qpos: np.ndarray):
+    def set_joint_qpos(self, qpos: np.ndarray, agent: str = 'arm0'):
         """ Set joint position. """
-        if self.robot.agent_num == 1:
-            qpos = qpos.reshape(1, self.robot.jnt_num)
-        for mani, joint_indexes in enumerate(self.robot.joint_index):
-            assert qpos.shape[1] == self.robot.jnt_num
-            for j, joint_index in enumerate(joint_indexes):
-                self.mj_data.joint(joint_index).qpos = qpos[mani, j]
+        assert qpos.shape[0] == self.robot.jnt_num
+        for j, per_joint_index in enumerate(self.robot.joint_index[agent]):
+            self.mj_data.joint(per_joint_index).qpos = qpos[j]
 
-    def set_joint_ctrl(self, torque: np.ndarray):
+    def set_joint_ctrl(self, torque: np.ndarray, agent: str = 'arm0'):
         """ Set joint torque. """
-        if self.robot.agent_num == 1:
-            torque = torque.reshape(1, self.robot.jnt_num)
-        for mani, actuator_indexes in enumerate(self.robot.actuator_index):
-            assert torque.shape[1] == self.robot.jnt_num
-            for j, joint_index in enumerate(actuator_indexes):
-                self.mj_data.actuator(joint_index).ctrl = torque[mani, j]
+        assert torque.shape[0] == self.robot.jnt_num
+        for j, per_actuator_index in enumerate(self.robot.actuator_index[agent]):
+            self.mj_data.actuator(per_actuator_index).ctrl = torque[j]
 
     def set_object_pose(self, obj_joint_name: str = None, obj_pose: np.ndarray = None):
         """ Set pose of the object. """
@@ -239,6 +232,14 @@ class MujocoEnv:
         jacr = self.get_body_jacr(name)
         xvelr = np.dot(jacr, self.mj_data.qvel)
         return xvelr.copy()
+
+    def get_camera_pos(self, name: str):
+        """ Get camera position from camera name.
+
+        :param name: camera name
+        :return: camera position
+        """
+        return self.mj_data.cam(name).pos.copy()
 
     def get_site_id(self, name: str):
         """ Get site id from site name.

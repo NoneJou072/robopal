@@ -12,10 +12,10 @@ parser.add_argument('--ctrl', default='CARTIK', type=str,
                     help='JSC for task space controller or OSC for joint space controller')
 args = parser.parse_args()
 
-if args.ctrl not in ['JNTIMP', 'JNTNONE', 'JNTVEL', 'CARTIMP', 'CARTIK']:
+if args.ctrl not in ['JNTIMP', 'CARTIK']:
     raise ValueError('Invalid controller')
 
-if args.ctrl in ['JNTIMP', 'JNTNONE', 'JNTVEL', 'CARTIMP']:
+if args.ctrl == 'JNTIMP':
     env = RobotEnv(
         robot=DualDianaMed(),
         render_mode='human',
@@ -24,14 +24,8 @@ if args.ctrl in ['JNTIMP', 'JNTNONE', 'JNTVEL', 'CARTIMP']:
         controller=args.ctrl,
     )
 
-    if args.ctrl == 'JNTIMP':
-        action = np.array([0.33, -0.4, 0.67, 0.33, -0.4, 0.67, 0])
-
-    elif args.ctrl == 'JNTVEL':
-        action = np.array([0.01, -0.01, 0.0, 0.0, 0.01, 0.01, 0])
-
-    else:  # args.ctrl == 'CARTIMP'
-        action = np.array([0.33, -0.39, 0.66, 1.0, 0.0, 0.0, 0])
+    actions = [np.array([0.33, -0.4, 0.67, 0.33, -0.4, 0.67, 0]),
+               np.array([0.33, -0.4, 0.67, 0.33, -0.4, 0.67, 0])]
 
 else:  # args.ctrl == 'CARTIK'
     env = PosCtrlEnv(
@@ -41,9 +35,10 @@ else:  # args.ctrl == 'CARTIK'
         is_interpolate=False,
         is_pd=False
     )
-    action = np.array([0.33, -0.39, 0.66, 1, 0, 0, 0])
+    actions = [np.array([0.3, 0.3, 0.4, 1, 0, 0, 0]),
+               np.array([0.4, -0.4, 0.6, 1, 0, 0, 0])]
 
-actions = {agent: action for agent in env.agents}
+actions = {agent: actions[id] for id, agent in enumerate(env.agents)}
 
 if isinstance(env, RobotEnv):
     env.reset()
