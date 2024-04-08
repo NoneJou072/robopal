@@ -8,7 +8,7 @@ from robopal.envs import RobotEnv, PosCtrlEnv
 logging.basicConfig(level=logging.INFO)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--ctrl', default='CARTIMP', type=str,
+parser.add_argument('--ctrl', default='JNTIMP', type=str,
                     help='JSC for task space controller or OSC for joint space controller')
 args = parser.parse_args()
 
@@ -27,7 +27,7 @@ if args.ctrl in ['JNTIMP', 'JNTVEL', 'CARTIMP']:
         action = np.array([0.3, -0.4, 0.7, 0.3, -0.4, 0.7, 0])
 
     elif args.ctrl == 'JNTVEL':
-        action = np.array([0., -0.00, 0.0, 0.0, 0.0, 0.0, 0])
+        action = np.array([0.1, -0.00, 0.0, 0.0, 0.0, 0.0, 0])
 
     elif args.ctrl == 'CARTIMP':
         action = np.array([0.33, -0.39, 0.66, 1.0, 0.0, 0.0, 0])
