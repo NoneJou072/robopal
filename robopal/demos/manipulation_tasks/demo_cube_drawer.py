@@ -1,6 +1,6 @@
 import numpy as np
 
-from robopal.envs import ManipulateEnv
+from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
 import robopal.commons.transform as trans
 from robopal.robots.diana_med import DianaDrawerCube
 
@@ -50,19 +50,16 @@ class DrawerCubeEnv(ManipulateEnv):
         between the block and the gripper, and the last dimension corresponding to the current gripper opening.
         """
         obs = np.zeros(self.obs_dim)
+
         # gripper state
-        obs[0:3] = (  # gripper position in global coordinates
-            end_pos := self.get_site_pos('0_grip_site')
-        )
-        obs[3:6] = (  # gripper linear velocity
-            end_vel := self.get_site_xvelp('0_grip_site') * self.dt
-        )
-        obs[6] = self.mj_data.joint('0_r_finger_joint').qpos[0]
-        obs[7] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
-        obs[8:11] = (  # gripper rotation
-            # trans.mat_2_euler(self.get_site_rotm('0_grip_site'))
-            np.zeros(3)
-        )
+        obs[0:8] = np.concatenate((
+            # gripper position in global coordinates
+            end_pos := self.get_site_pos('0_grip_site'),
+            # gripper linear velocity
+            end_vel := self.get_site_xvelp('0_grip_site') * self.dt,
+            self.mj_data.joint('0_r_finger_joint').qpos,
+            self.mj_data.joint('0_r_finger_joint').qvel * self.dt
+        ))
 
         if self.TASK_FLAG == 0:
             obs[11:14] = (  # handle position in global coordinates
@@ -72,13 +69,11 @@ class DrawerCubeEnv(ManipulateEnv):
             # velocity with respect to the gripper
             handle_velp = self.get_site_xvelp('drawer') * self.dt
             obs[17:20] = (  # velocity with respect to the gripper
-                    handle_velp - end_vel
+                handle_velp - end_vel
             )
-            obs[20:35] = np.zeros(15)
 
         # drawer state
         if self.TASK_FLAG == 1:
-            obs[11:20] = np.zeros(9)
             obs[20:23] = (  # block position in global coordinates
                 block_pos := self.get_body_pos('green_block')
             )
@@ -90,8 +85,6 @@ class DrawerCubeEnv(ManipulateEnv):
             obs[29:32] = (  # velocity with respect to the gripper
                 block_velp # - end_vel
             )
-            # obs[32:35] = self.get_body_xvelr('green_block') * self.dt
-            obs[32:35] = np.zeros(3)
 
         return {
             'observation': obs.copy(),
@@ -132,7 +125,7 @@ class DrawerCubeEnv(ManipulateEnv):
         # reset object position
         random_x_pos = np.random.uniform(0.35, 0.4)
         random_y_pos = np.random.uniform(-0.15, 0.15)
-        self.set_object_pose('green_block:joint', np.array([0.35, 0, 0.46, 1.0, 0.0, 0.0, 0.0]))
+        self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.44, 1.0, 0.0, 0.0, 0.0]))
         self.set_site_pose('cube_goal', np.array([0.59, 0.0, 0.478]))
 
 

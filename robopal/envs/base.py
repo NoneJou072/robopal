@@ -12,16 +12,17 @@ from robopal.robots.base import BaseArm
 class MujocoEnv:
     """ This environment is the base class.
 
-    :param robot(str): Load xml file from xml_path to build the mujoco model.
-    :param render_mode(str): Choose if use the renderer to render the scene or not.
-    :param camera_name(str): Choose the camera.
-    :param control_freq(int): Upper-layer control frequency.
-    Note that high frequency will cause high time-lag.
-    :param enable_camera_viewer(bool): Use camera or not.
+        :param robot(str): Load xml file from xml_path to build the mujoco model
+        :param render_mode(str): Choose if you use the renderer to render the scene or not
+        :param camera_name(str): Choose the camera
+        :param control_freq(int): Upper-layer control frequency
+        Note that high frequency will cause high time-lag
+        :param enable_camera_view(bool): Use camera or not
     """
 
     metadata = {
         "render_modes": [
+            None,
             "human",
             "rgb_array",
             "depth",
@@ -29,15 +30,15 @@ class MujocoEnv:
         ],
     }
 
-    def __init__(self,
-                 robot=None,
-                 control_freq=200,
-                 enable_camera_viewer=False,
-                 camera_name=None,
-                 render_mode='human',
-                 ):
-        if not isinstance(robot, BaseArm):
-            raise ValueError("Please select a robot config.")
+    def __init__(
+        self,
+        robot=None,
+        control_freq=200,
+        enable_camera_viewer=False,
+        camera_name=None,
+        render_mode='human',
+    ):
+        assert isinstance(robot, BaseArm), "Please select a robot config file."
         self.robot = robot
         self.agents = self.robot.agents
 
@@ -51,7 +52,7 @@ class MujocoEnv:
         self.model_timestep = 0
         self.control_timestep = 0
 
-        assert render_mode is None or render_mode in self.metadata["render_modes"]
+        assert render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
         self.renderer = MjRenderer(self.mj_model, self.mj_data, self.render_mode,
                                    enable_camera_viewer, camera_name)
@@ -96,14 +97,13 @@ class MujocoEnv:
         if isinstance(options, dict):
             if "disable_reset_render" in options and options["disable_reset_render"]:
                 return
-        if self.render_mode in ["human", "rgb_array", "depth"]:
-            self.render()
+        self.render()
 
     def reset_object(self):
         """ Set pose of the object. """
         pass
 
-    def render(self, mode="human"):
+    def render(self):
         """ render one frame in mujoco """
         if self.render_mode in ["human", "rgb_array", "depth"]:
             self.renderer.render()
@@ -129,28 +129,21 @@ class MujocoEnv:
 
     def _set_init_qpos(self):
         """ Set or reset init joint position when called env reset func. """
-        # if isinstance(self.robot.init_qpos, np.ndarray) and self.robot.agent_num != 1:
-
-        self.set_joint_qpos(self.robot.init_qpos)
+        for agent in self.robot.agents:
+            self.set_joint_qpos(self.robot.init_qpos[agent], agent)
         mujoco.mj_forward(self.mj_model, self.mj_data)
 
-    def set_joint_qpos(self, qpos: np.ndarray):
+    def set_joint_qpos(self, qpos: np.ndarray, agent: str = 'arm0'):
         """ Set joint position. """
-        if self.robot.agent_num == 1:
-            qpos = qpos.reshape(1, self.robot.jnt_num)
-        for mani, joint_indexes in enumerate(self.robot.joint_index):
-            assert qpos.shape[1] == self.robot.jnt_num
-            for j, joint_index in enumerate(joint_indexes):
-                self.mj_data.joint(joint_index).qpos = qpos[mani, j]
+        assert qpos.shape[0] == self.robot.jnt_num
+        for j, per_joint_index in enumerate(self.robot.joint_index[agent]):
+            self.mj_data.joint(per_joint_index).qpos = qpos[j]
 
-    def set_joint_ctrl(self, torque: np.ndarray):
+    def set_joint_ctrl(self, torque: np.ndarray, agent: str = 'arm0'):
         """ Set joint torque. """
-        if self.robot.agent_num == 1:
-            torque = torque.reshape(1, self.robot.jnt_num)
-        for mani, actuator_indexes in enumerate(self.robot.actuator_index):
-            assert torque.shape[1] == self.robot.jnt_num
-            for j, joint_index in enumerate(actuator_indexes):
-                self.mj_data.actuator(joint_index).ctrl = torque[mani, j]
+        assert torque.shape[0] == self.robot.jnt_num
+        for j, per_actuator_index in enumerate(self.robot.actuator_index[agent]):
+            self.mj_data.actuator(per_actuator_index).ctrl = torque[j]
 
     def set_object_pose(self, obj_joint_name: str = None, obj_pose: np.ndarray = None):
         """ Set pose of the object. """
@@ -238,6 +231,14 @@ class MujocoEnv:
         jacr = self.get_body_jacr(name)
         xvelr = np.dot(jacr, self.mj_data.qvel)
         return xvelr.copy()
+
+    def get_camera_pos(self, name: str):
+        """ Get camera position from camera name.
+
+        :param name: camera name
+        :return: camera position
+        """
+        return self.mj_data.cam(name).pos.copy()
 
     def get_site_id(self, name: str):
         """ Get site id from site name.

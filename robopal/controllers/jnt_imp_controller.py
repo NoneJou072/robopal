@@ -66,22 +66,18 @@ class JntImpedance(object):
         tau = np.dot(M, acc_desire) + coriolis_gravity
         return tau
 
-    def step_controller(self, action: np.ndarray) -> np.ndarray:
-        ret = np.zeros(shape=(self.robot.agent_num, self.dofs))
+    def step_controller(self, action: np.ndarray) -> np.ndarray | dict[str, np.ndarray]:
+        ret = dict()
         if isinstance(action, np.ndarray):
             action = {self.robot.agents[0]: action}
-        action = np.array(list(action.values()))
-        for agent_index, act in enumerate(action):
+        for agent, act in action.items():
             torque = self.compute_jnt_torque(
                 q_des=act,
                 v_des=np.zeros(self.dofs),
-                q_cur=self.robot.get_arm_qpos(agent_index),
-                v_cur=self.robot.get_arm_qvel(agent_index),
+                q_cur=self.robot.get_arm_qpos(agent),
+                v_cur=self.robot.get_arm_qvel(agent),
             )
-            if self.robot.agent_num == 1:
-                ret = torque
-            else:
-                ret[agent_index] = torque
+            ret[agent] = torque
         return ret
 
     def _init_interpolator(self, cfg: dict):

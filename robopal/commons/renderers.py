@@ -13,31 +13,37 @@ logging.basicConfig(level=logging.INFO)
 
 
 class MjRenderer:
-    def __init__(self, mj_model, mj_data, render_mode,
-                 enable_camera_viewer=False, camera_name='0_cam'):
+    def __init__(
+        self,
+        mj_model,
+        mj_data,
+        render_mode: str | None = 'human',
+        enable_camera_view=False,
+        camera_name='0_cam'
+    ):
+
         self.mj_model = mj_model
         self.mj_data = mj_data
 
         self.render_mode = render_mode
-        self.enable_camera_viewer = enable_camera_viewer
-        if cv.CV_FLAG is False:
-            self.enable_camera_viewer = False
+        self.enable_camera_view = enable_camera_view if cv.CV_FLAG else False
         self.camera_name = camera_name
 
         # keyboard flag
         self.render_paused = True
         self.exit_flag = False
 
+        # Set up mujoco viewer
+        self.viewer = None
+        if self.render_mode in ["human", "rgb_array", "depth"]:
+            self._init_renderer()
+
+        # image renderer
+        self.image_renderer = mujoco.Renderer(self.mj_model)
         self._image = None
         self.image_queue = Queue(3)
 
-        # Set up mujoco viewer
-        self.viewer = None
-        self.image_renderer = None
-        if self.render_mode in ["human", "rgb_array", "depth"]:
-            self._init_renderer()
-            self.image_renderer = mujoco.Renderer(self.mj_model)
-            self.traj = deque(maxlen=200)  # used for rendering trajectory
+        self.traj = deque(maxlen=200)  # used for rendering trajectory
 
     def key_callback(self, keycode):
         if keycode == 32:  # space
@@ -69,21 +75,22 @@ class MjRenderer:
             self.viewer = viewer.launch_passive(self.mj_model, self.mj_data,
                                                 key_callback=self.key_callback, show_left_ui=False, show_right_ui=True)
             self.set_renderer_config()
-            if self.enable_camera_viewer:
+            if self.enable_camera_view:
                 cv.init_cv_window()
         else:
             raise ValueError('Invalid renderer name.')
 
     def render(self):
-        """ render mujoco """
-        if self.viewer is not None and self.render_paused is True and self.render_mode in ["human", "rgb_array", "depth"]:
+        """ render per frame in glfw.
+        """
+        if self.render_paused and self.render_mode in ["human", "rgb_array", "depth"]:
             if self.viewer.is_running() and self.exit_flag is False:
                 self.viewer: viewer.Handle
                 self.viewer.sync()
             else:
                 self.close()
 
-            if self.enable_camera_viewer:
+            if self.enable_camera_view:
                 enable_depth = True if self.render_mode == 'depth' else False
                 image = self.render_pixels_from_camera(self.camera_name, enable_depth=enable_depth)
                 self.image_queue.put(image)
@@ -93,7 +100,7 @@ class MjRenderer:
 
     def close(self):
         """ close the environment. """
-        if self.enable_camera_viewer:
+        if self.enable_camera_view:
             cv.close_cv_window()
         if isinstance(self.viewer, viewer.Handle) and self.viewer.is_running():
             self.viewer.close()

@@ -22,13 +22,13 @@ class DianaMed(BaseArm):
             g2m_body='0_link7',
             urdf_path=os.path.join(ASSET_DIR, "models/manipulators/DianaMed/DianaMed.urdf"),
         )
-        self.joint_index = [['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7']]
-        self.actuator_index = [['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7']]
+        self.joint_index = {self.agents[0]: ['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7']}
+        self.actuator_index = {self.agents[0]: ['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7']}
 
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])
+        return {self.agents[0]: np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])}
 
 
 class DualDianaMed(BaseArm):
@@ -49,16 +49,16 @@ class DualDianaMed(BaseArm):
             g2m_body=g2m_body,
             urdf_path=os.path.join(ASSET_DIR, "models/manipulators/DianaMed/DianaMed.urdf"),
         )
-        self.joint_index = [['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7'],
-                            ['1_j1', '1_j2', '1_j3', '1_j4', '1_j5', '1_j6', '1_j7']]
-        self.actuator_index = [['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7'],
-                               ['1_a1', '1_a2', '1_a3', '1_a4', '1_a5', '1_a6', '1_a7']]
+        self.joint_index = {self.agents[0]: ['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7'],
+                            self.agents[1]: ['1_j1', '1_j2', '1_j3', '1_j4', '1_j5', '1_j6', '1_j7']}
+        self.actuator_index = {self.agents[0]: ['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7'],
+                               self.agents[1]: ['1_a1', '1_a2', '1_a3', '1_a4', '1_a5', '1_a6', '1_a7']}
 
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return np.array([[0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0],
-                         [0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0]])
+        return {self.agents[0]: np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0]),
+                self.agents[1]: np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])}
 
 
 class DianaAruco(DianaMed):
@@ -112,7 +112,7 @@ class DianaGrasp(DianaMed):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return np.array([0.02167871, -0.16747492, 0.00730963, 2.5573341, -0.00401727, -0.42203728, -0.01099269])
+        return {self.agents[0]: np.array([0.02167871, -0.16747492, 0.00730963, 2.5573341, -0.00401727, -0.42203728, -0.01099269])}
 
 
 class DianaGraspMultiObjs(DianaGrasp):
@@ -139,7 +139,6 @@ class DianaGraspMultiObjs(DianaGrasp):
 class DianaDrawer(DianaMed):
     def __init__(self):
         super().__init__(scene='grasping',
-                         # manipulator='/home/mhming/zhr/robopal/robopal/assets/models/manipulators/DianaMed/DianaMed_POS.xml',
                          gripper='rethink_gripper',
                          mount='top_point')
 
@@ -150,7 +149,7 @@ class DianaDrawer(DianaMed):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return np.array([-0.51198529, -0.44737435, -0.50879166, 2.3063219, 0.46514545, -0.48916244, -0.37233289])
+        return {self.agents[0]: np.array([-0.51198529, -0.44737435, -0.50879166, 2.3063219, 0.46514545, -0.48916244, -0.37233289])}
 
 
 class DianaDrawerCube(DianaDrawer):
@@ -167,7 +166,7 @@ class DianaDrawerCube(DianaDrawer):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return np.array([-0.64551607, -0.29859465, -0.66478589, 2.3211311, 0.3205733, -0.61377277, -0.26366202])
+        return {self.agents[0]: np.array([-0.64551607, -0.29859465, -0.66478589, 2.3211311, 0.3205733, -0.61377277, -0.26366202])}
 
 
 class DianaCabinet(DianaMed):
@@ -183,7 +182,7 @@ class DianaCabinet(DianaMed):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return np.array([-0.71325374, 0.07279728, -0.72080385, 2.5239552, -0.07686951, -0.67930021, 0.05372948])
+        return {self.agents[0]: np.array([-0.71325374, 0.07279728, -0.72080385, 2.5239552, -0.07686951, -0.67930021, 0.05372948])}
 
 
 class DianaAssemble(DianaMed):
@@ -201,4 +200,4 @@ class DianaAssemble(DianaMed):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return np.array([-0.71325374, 0.07279728, -0.72080385, 2.5239552, -0.07686951, -0.67930021, 0.05372948])
+        return {self.agents[0]: np.array([-0.71325374, 0.07279728, -0.72080385, 2.5239552, -0.07686951, -0.67930021, 0.05372948])}

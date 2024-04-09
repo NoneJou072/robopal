@@ -31,8 +31,6 @@ class JntVelController:
         self.last_err = np.zeros(robot.jnt_num)
         self.err_buffer = deque(maxlen=5)
 
-        print("Jnt_Impedance Initialized!")
-
     def set_jnt_params(self, p: np.ndarray, d: np.ndarray):
         self.k_p = p
         self.k_d = d
@@ -76,3 +74,6 @@ class JntVelController:
             v_cur=self.robot.get_arm_qvel(),
         )
         return torque
+
+    def reset(self):
+        pass

@@ -1,6 +1,6 @@
 <mujoco model="empty_floor">
   <compiler angle="radian"/>
-  <size memory="1000M"/>
+  <size memory="4000M"/>
   <option timestep="0.001" gravity="0 0 -9.81" integrator="implicitfast" impratio="10">
       <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable"/>
   </option>
@@ -10,9 +10,9 @@
     <global azimuth="120" elevation="-20"/>
   </visual>
 
-  <default>
-    <geom solref="0.01 1" solimp=".95 .99 .0001" condim="1"/>
-  </default>
+<!--  <default>-->
+<!--    <geom solref="0.01 1" solimp=".95 .99 .0001" condim="1"/>-->
+<!--  </default>-->
 
   <asset>
     <mesh name="table" file="../objects/table/table.STL" scale="1.0 1.0 0.66"/>

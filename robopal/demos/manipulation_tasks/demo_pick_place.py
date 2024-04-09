@@ -1,6 +1,6 @@
 import numpy as np
 
-from robopal.envs import ManipulateEnv
+from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
 import robopal.commons.transform as trans
 from robopal.robots.diana_med import DianaGrasp
 
@@ -56,7 +56,7 @@ class PickAndPlaceEnv(ManipulateEnv):
             object_pos := self.get_body_pos('green_block')
         )
         obs[6:9] = (  # Relative block position with respect to gripper position in globla coordinates.
-            object_rel_pos := end_pos - object_pos
+            end_pos - object_pos
         )
         obs[9:12] = (  # block rotation
             trans.mat_2_euler(self.get_body_rotm('green_block'))
@@ -66,7 +66,7 @@ class PickAndPlaceEnv(ManipulateEnv):
         )
         object_velp = self.get_body_xvelp('green_block') * self.dt
         obs[15:18] = (  # velocity with respect to the gripper
-            object2end_velp := object_velp - end_vel
+            object_velp - end_vel
         )
 
         obs[18:21] = self.get_body_xvelr('green_block') * self.dt

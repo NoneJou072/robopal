@@ -89,3 +89,6 @@ class CartImpedance:
         tau = np.dot(inertial, sum) + coriolis_gravity
 
         return tau
+
+    def reset(self):
+        pass

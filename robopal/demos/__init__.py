@@ -1,6 +1,3 @@
-from robopal.demos.single_task_manipulation.demo_drawer import DrawerEnv
-from robopal.demos.multi_task_manipulation.demo_cube_drawer import DrawerCubeEnv
-
 # register(
 #     id='PickAndPlace-v1',
 #     entry_point='robopal.demos:GoalEnvWrapper',

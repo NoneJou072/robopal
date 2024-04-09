@@ -24,10 +24,10 @@ if args.ctrl in ['JNTIMP', 'JNTVEL', 'CARTIMP']:
     )
 
     if args.ctrl == 'JNTIMP':
-        action = np.array([0.33116, -0.39768533, 0.66947228, 0.33116, -0.39768533, 0.66947228, 0])
+        action = np.array([0.3, -0.4, 0.7, 0.3, -0.4, 0.7, 0])
 
     elif args.ctrl == 'JNTVEL':
-        action = np.array([0.01, -0.01, 0.0, 0.0, 0.01, 0.01, 0])
+        action = np.array([0.1, -0.00, 0.0, 0.0, 0.0, 0.0, 0])
 
     elif args.ctrl == 'CARTIMP':
         action = np.array([0.33, -0.39, 0.66, 1.0, 0.0, 0.0, 0])

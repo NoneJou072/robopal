@@ -131,3 +131,4 @@ class ManipulateEnv(PosCtrlEnv):
         qpos = self.kd_solver.ik(random_pos, init_rot, q_init=self.robot.get_arm_qpos())
         self.set_joint_qpos(qpos)
         mujoco.mj_forward(self.mj_model, self.mj_data)
+        self.render()

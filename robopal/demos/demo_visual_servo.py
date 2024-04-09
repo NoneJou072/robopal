@@ -8,7 +8,7 @@ import robopal.commons.cv_utils as cv
 class VisualServo(RobotEnv):
     def __init__(self,
                  robot=None,
-                 render_mode='human',
+                 render_mode: str | None = 'human',
                  control_freq=200,
                  controller='JNTIMP',
                  is_interpolate=False,
@@ -26,7 +26,7 @@ class VisualServo(RobotEnv):
         )
         self.camera_name = camera_name
         self.camera_intrinsic_matrix = cv.get_cam_intrinsic()
-        print(self.camera_intrinsic_matrix)
+
         self.distCoeffs = np.zeros(5)
         aruco_parameters = cv2.aruco.DetectorParameters()
         aruco_dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_100)
@@ -34,7 +34,6 @@ class VisualServo(RobotEnv):
 
     def aruco_detection(self, marker_size):
         cv_image = self.renderer.render_pixels_from_camera(cam=self.camera_name, enable_depth=False)
-
         if cv_image is not None:
             corners, marker_ids, _ = self.detector.detectMarkers(cv_image)
             if marker_ids is not None:
@@ -100,10 +99,11 @@ class VisualServo(RobotEnv):
                 V_camera = np.zeros(6)
         else:
             V_camera = np.zeros(6)
-
+        V_camera = np.zeros(6)
         jac_pinv = self.kd_solver.get_full_jac_pinv(self.robot.get_arm_qpos())
         V_dian = np.dot(jac_pinv, V_camera).reshape(-1)
         action = gain * V_dian + self.robot.get_arm_qpos()
+        print(self.robot.get_arm_qpos())
         return super().step(action)
 
 
@@ -115,7 +115,6 @@ if __name__ == "__main__":
         render_mode='human',
         control_freq=200,
         controller='JNTIMP',
-        is_interpolate=False,
         enable_camera_viewer=True,
         camera_name='0_cam'
     )

@@ -2,7 +2,6 @@ import numpy as np
 
 from robopal.envs.robot import RobotEnv
 import robopal.commons.transform as T
-from robopal.controllers.ik_controller import JntIK
 
 
 class PosCtrlEnv(RobotEnv):
@@ -40,29 +39,29 @@ class PosCtrlEnv(RobotEnv):
         quat_incre = self.p_quat * (r_goal - r_cur)
         return pos_incre, quat_incre
 
-    def step_controller(self, action: np.ndarray):
+    def step_controller(self, action: np.ndarray, agent: str = 'arm0'):
         if len(action) not in (3, 7):
             raise ValueError("Invalid action length.")
         if not self.is_pd:
             p_goal = action[:3]
             r_goal = T.quat_2_mat(self.init_rot_quat if len(action) == 3 else action[3:])
         else:
-            p_cur, r_cur = self.kd_solver.fk(self.robot.get_arm_qpos(), rot_format='quaternion')
+            p_cur, r_cur = self.kd_solver.fk(self.robot.get_arm_qpos(agent), rot_format='quaternion')
 
             r_target = self.init_rot_quat if len(action) == 3 else action[3:]
-            pd_cur = self.kd_solver.get_end_vel(self.robot.get_arm_qpos(), self.robot.get_arm_qvel())
+            pd_cur = self.kd_solver.get_end_vel(self.robot.get_arm_qpos(agent), self.robot.get_arm_qvel())
             p_incre, r_incre = self.compute_pd_increment(p_goal=action[:3], p_cur=p_cur,
                                                          r_goal=r_target, r_cur=r_cur,
                                                          pd_goal=self.vel_des, pd_cur=pd_cur[:3])
             p_goal = p_incre + p_cur
             r_goal = T.quat_2_mat(r_cur + r_incre)
 
-        return self.kd_solver.ik(p_goal, r_goal, q_init=self.robot.get_arm_qpos())
+        return self.kd_solver.ik(p_goal, r_goal, q_init=self.robot.get_arm_qpos(agent))
 
     def step(self, action: np.ndarray | dict[str, np.ndarray]):
         if self.robot.agent_num == 1:
             inputs = self.step_controller(action)
         else:
-            inputs = {agent: self.step_controller(action[agent]) for agent in self.robot.agents}
+            inputs = {agent: self.step_controller(action[agent], agent) for agent in self.robot.agents}
 
         super().step(inputs)
