@@ -58,7 +58,7 @@ class RobotEnv(MujocoEnv):
         """ Automatically render the scene. """
         def wrapper(self, *args, **kwargs):
             ret = func(self, *args, **kwargs)
-            self.render(mode=self.render_mode)
+            self.render()
             return ret
 
         return wrapper

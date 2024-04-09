@@ -24,8 +24,8 @@ if args.ctrl == 'JNTIMP':
         controller=args.ctrl,
     )
 
-    actions = [np.array([0.33, -0.4, 0.67, 0.33, -0.4, 0.67, 0]),
-               np.array([0.33, -0.4, 0.67, 0.33, -0.4, 0.67, 0])]
+    actions = [np.array([0.3, -0.4, 0.7, 0.3, -0.4, 0.7, 0]),
+               np.array([0.3, -0.4, 0.7, 0.3, -0.4, 0.7, 0])]
 
 else:  # args.ctrl == 'CARTIK'
     env = PosCtrlEnv(

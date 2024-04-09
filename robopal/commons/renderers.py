@@ -80,8 +80,8 @@ class MjRenderer:
         else:
             raise ValueError('Invalid renderer name.')
 
-    def render(self, mode='human'):
-        """ render mujoco
+    def render(self):
+        """ render per frame in glfw.
         """
         if self.render_paused and self.render_mode in ["human", "rgb_array", "depth"]:
             if self.viewer.is_running() and self.exit_flag is False:

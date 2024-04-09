@@ -9,7 +9,7 @@ from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
 from robopal.robots.diana_med import DualDianaMed
 
 
-class DualArmEnv(ParallelEnv, PosCtrlEnv):
+class BimanualPettingStyleEnv(ParallelEnv, PosCtrlEnv):
     """The metadata holds environment constants.
 
     The "name" metadata allows the environment to be pretty printed.
@@ -94,7 +94,7 @@ class DualArmEnv(ParallelEnv, PosCtrlEnv):
     def render(self):
         """ Renders the environment.
         """
-        super(PosCtrlEnv).render()
+        PosCtrlEnv.render(self)
 
     # Observation space should be defined here.
     # lru_cache allows observation and action spaces to be memoized, reducing clock cycles required to get each agent's space.

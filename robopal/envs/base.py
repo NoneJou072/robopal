@@ -97,17 +97,16 @@ class MujocoEnv:
         if isinstance(options, dict):
             if "disable_reset_render" in options and options["disable_reset_render"]:
                 return
-        if self.render_mode in ["human", "rgb_array", "depth"]:
-            self.render(self.render_mode)
+        self.render()
 
     def reset_object(self):
         """ Set pose of the object. """
         pass
 
-    def render(self, mode="human"):
+    def render(self):
         """ render one frame in mujoco """
         if self.render_mode in ["human", "rgb_array", "depth"]:
-            self.renderer.render(mode)
+            self.renderer.render()
 
     def close(self):
         """ close the environment. """
