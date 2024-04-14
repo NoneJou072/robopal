@@ -2,7 +2,7 @@
   <compiler angle="radian"/>
   <size memory="4000M"/>
   <option timestep="0.001" gravity="0 0 -9.81" integrator="implicitfast" impratio="10">
-      <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable"/>
+      <flag contact="enable" energy="enable" gravity="enable"/>
   </option>
 
   <visual>
