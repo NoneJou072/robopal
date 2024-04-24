@@ -2,6 +2,7 @@ import logging
 import sys
 from queue import Queue
 from collections import deque
+from typing import Union, List
 
 import numpy as np
 import mujoco
@@ -17,7 +18,7 @@ class MjRenderer:
         self,
         mj_model,
         mj_data,
-        render_mode: str | None = 'human',
+        render_mode: Union[str, None] = 'human',
         enable_camera_view=False,
         camera_name='0_cam'
     ):
@@ -118,7 +119,7 @@ class MjRenderer:
         with self.viewer.lock():
             self.viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(self.mj_data.time % 2)
 
-    def add_visual_point(self, pos: np.ndarray | list[np.ndarray]):
+    def add_visual_point(self, pos: Union[np.ndarray, List[np.ndarray]]):
         """ Render the trajectory from deque above,
             you can push the cartesian position into this deque.
 

@@ -2,6 +2,7 @@ import math
 import logging
 import random
 import copy
+from typing import Union, List
 from dataclasses import dataclass, field
 
 import mujoco
@@ -407,7 +408,7 @@ class RRT:
         return False
 
 
-def rrt_star(start, end, sim) -> list[list] | None:
+def rrt_star(start, end, sim) -> Union[List[list], None]:
     show_animation = True
     play_area = [0.1, 1.0, -0.65, 0.65, 0.1, 0.75]
     # Set Initial parameters

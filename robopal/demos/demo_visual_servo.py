@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+
 from robopal.envs.robot import RobotEnv
 import robopal.commons.transform as trans
 import robopal.commons.cv_utils as cv
@@ -8,7 +9,7 @@ import robopal.commons.cv_utils as cv
 class VisualServo(RobotEnv):
     def __init__(self,
                  robot=None,
-                 render_mode: str | None = 'human',
+                 render_mode='human',
                  control_freq=200,
                  controller='JNTIMP',
                  is_interpolate=False,

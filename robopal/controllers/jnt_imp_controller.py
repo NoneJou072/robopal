@@ -1,3 +1,4 @@
+from typing import Union, Dict
 import numpy as np
 
 from robopal.commons.pin_utils import PinSolver
@@ -66,7 +67,7 @@ class JntImpedance(object):
         tau = np.dot(M, acc_desire) + coriolis_gravity
         return tau
 
-    def step_controller(self, action: np.ndarray) -> np.ndarray | dict[str, np.ndarray]:
+    def step_controller(self, action: np.ndarray) -> Union[np.ndarray, Dict[str, np.ndarray]]:
         ret = dict()
         if isinstance(action, np.ndarray):
             action = {self.robot.agents[0]: action}

@@ -58,7 +58,7 @@ class PosCtrlEnv(RobotEnv):
 
         return self.kd_solver.ik(p_goal, r_goal, q_init=self.robot.get_arm_qpos(agent))
 
-    def step(self, action: np.ndarray | dict[str, np.ndarray]):
+    def step(self, action):
         if self.robot.agent_num == 1:
             inputs = self.step_controller(action)
         else:

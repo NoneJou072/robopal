@@ -1,5 +1,6 @@
 import abc
 import logging
+from typing import Union, List, Dict
 
 import mujoco
 import numpy as np
@@ -23,10 +24,10 @@ class BaseArm:
     def __init__(self,
                  name: str = None,
                  scene: str = 'default',
-                 chassis: str | list[str] = None,
-                 manipulator: str | list[str] = None,
-                 gripper: str | list[str] = None,
-                 g2m_body: str | list[str] = None,
+                 chassis: Union[str, List[str]] = None,
+                 manipulator: Union[str, List[str]] = None,
+                 gripper: Union[str, List[str]] = None,
+                 g2m_body: Union[str, List[str]] = None,
                  urdf_path: str = None,
                  ):
         self.name = name
@@ -64,7 +65,7 @@ class BaseArm:
         )
 
     @property
-    def init_qpos(self) -> dict[str, np.array]:
+    def init_qpos(self) -> Dict[str, np.array]:
         """ Robot's init joint position. """
         raise NotImplementedError
 
@@ -74,7 +75,7 @@ class BaseArm:
         pass
 
     @property
-    def jnt_num(self) -> int | dict[str, int]:
+    def jnt_num(self) -> Union[int, Dict[str, int]]:
         """ Number of joints. """
         return len(self.joint_index[self.agents[0]])
 

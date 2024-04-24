@@ -1,3 +1,4 @@
+from typing import Union, List
 import xml.etree.ElementTree as ET
 from os import path
 
@@ -13,9 +14,9 @@ class XMLSplicer:
     def __init__(self,
                  name: str = 'robot',
                  scene: str = 'default',
-                 chassis: str | list[str] = None,
-                 manipulator: str | list[str] = None,
-                 gripper: str | list[str] = None,
+                 chassis: Union[str, List[str]] = None,
+                 manipulator: Union[str, List[str]] = None,
+                 gripper: Union[str, List[str]] = None,
                  **kwargs,
                  ):
         self.xml_name = name

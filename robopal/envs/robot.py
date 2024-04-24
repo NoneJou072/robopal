@@ -1,3 +1,5 @@
+from typing import Union, Dict
+
 import numpy as np
 
 from robopal.envs.base import MujocoEnv
@@ -73,7 +75,7 @@ class RobotEnv(MujocoEnv):
                 self.set_joint_ctrl(joint_inputs[agent], agent)
 
     @auto_render
-    def step(self, action: np.ndarray | dict[str, np.ndarray]):
+    def step(self, action: Union[np.ndarray, Dict[str, np.ndarray]]):
         if self.is_interpolate:
             self.controller.step_interpolator(action)
         # low-level control

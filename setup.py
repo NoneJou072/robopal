@@ -13,7 +13,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/NoneJou072/robopal",
-    python_requires=">=3.9",
+    python_requires=">=3.8",
     include_package_data=True,
     install_requires=[
         'numpy>=1.23.5',
