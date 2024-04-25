@@ -6,7 +6,7 @@ import mujoco
 import numpy as np
 
 from robopal.commons.renderers import MjRenderer
-from robopal.robots.base import BaseArm
+from robopal.robots.base import BaseRobot
 
 
 class MujocoEnv:
@@ -38,7 +38,7 @@ class MujocoEnv:
         camera_name: str = None,
         render_mode: str = 'human',
     ):
-        assert isinstance(robot, BaseArm), "Please select a robot config file."
+        assert isinstance(robot, BaseRobot), "Please select a robot config file."
         self.robot = robot
         self.agents = self.robot.agents
 
@@ -103,7 +103,7 @@ class MujocoEnv:
         """ Set pose of the object. """
         pass
 
-    def render(self):
+    def render(self) -> Union[None, np.ndarray]:
         """ render one frame in mujoco """
         if self.render_mode in ["human", "rgb_array", "depth"]:
             self.renderer.render()
@@ -136,14 +136,14 @@ class MujocoEnv:
     def set_joint_qpos(self, qpos: np.ndarray, agent: str = 'arm0'):
         """ Set joint position. """
         assert qpos.shape[0] == self.robot.jnt_num
-        for j, per_joint_index in enumerate(self.robot.joint_index[agent]):
-            self.mj_data.joint(per_joint_index).qpos = qpos[j]
+        for j, per_arm_joint_names in enumerate(self.robot.arm_joint_names[agent]):
+            self.mj_data.joint(per_arm_joint_names).qpos = qpos[j]
 
     def set_joint_ctrl(self, torque: np.ndarray, agent: str = 'arm0'):
         """ Set joint torque. """
         assert torque.shape[0] == self.robot.jnt_num
-        for j, per_actuator_index in enumerate(self.robot.actuator_index[agent]):
-            self.mj_data.actuator(per_actuator_index).ctrl = torque[j]
+        for j, per_arm_actuator_names in enumerate(self.robot.arm_actuator_names[agent]):
+            self.mj_data.actuator(per_arm_actuator_names).ctrl = torque[j]
 
     def set_object_pose(self, obj_joint_name: str = None, obj_pose: np.ndarray = None):
         """ Set pose of the object. """

@@ -26,8 +26,8 @@
 ### 环境要求
 
 * **Windows** / **Linux** (recommended)
-* [MuJoCo-3.0.1](http://mujoco.org/)
-* Python 3.9 +
+* [MuJoCo-3.1.2+](http://mujoco.org/)
+* Python 3.8 +
 * [Pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 2.6.20 +
 
 ### 二进制安装

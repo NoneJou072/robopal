@@ -17,7 +17,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'numpy>=1.23.5',
-        'mujoco>=3.0.0',
+        'mujoco>=3.1.2',
         'gymnasium'
     ],
     extras_require={

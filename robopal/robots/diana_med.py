@@ -5,7 +5,7 @@ from robopal.robots.base import *
 ASSET_DIR = os.path.join(os.path.dirname(__file__), '../assets')
 
 
-class DianaMed(BaseArm):
+class DianaMed(BaseRobot):
     """ DianaMed robot base class. """
     def __init__(self,
                  scene='default',
@@ -22,8 +22,8 @@ class DianaMed(BaseArm):
             g2m_body='0_link7',
             urdf_path=os.path.join(ASSET_DIR, "models/manipulators/DianaMed/DianaMed.urdf"),
         )
-        self.joint_index = {self.agents[0]: ['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7']}
-        self.actuator_index = {self.agents[0]: ['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7']}
+        self.arm_joint_names = {self.agents[0]: ['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7']}
+        self.arm_actuator_names = {self.agents[0]: ['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7']}
 
     @property
     def init_qpos(self):
@@ -31,7 +31,7 @@ class DianaMed(BaseArm):
         return {self.agents[0]: np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])}
 
 
-class DualDianaMed(BaseArm):
+class DualDianaMed(BaseRobot):
     """ Dual DianaMed robots base class. """
     def __init__(self,
                  scene='default',
@@ -49,9 +49,9 @@ class DualDianaMed(BaseArm):
             g2m_body=g2m_body,
             urdf_path=os.path.join(ASSET_DIR, "models/manipulators/DianaMed/DianaMed.urdf"),
         )
-        self.joint_index = {self.agents[0]: ['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7'],
+        self.arm_joint_names = {self.agents[0]: ['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7'],
                             self.agents[1]: ['1_j1', '1_j2', '1_j3', '1_j4', '1_j5', '1_j6', '1_j7']}
-        self.actuator_index = {self.agents[0]: ['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7'],
+        self.arm_actuator_names = {self.agents[0]: ['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7'],
                                self.agents[1]: ['1_a1', '1_a2', '1_a3', '1_a4', '1_a5', '1_a6', '1_a7']}
 
     @property

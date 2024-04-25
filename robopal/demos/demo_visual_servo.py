@@ -81,7 +81,7 @@ class VisualServo(RobotEnv):
             error_R = trans.mat_2_vec(R_cd_c).reshape(3, 1)
 
             error = np.concatenate([T_cd_c, error_R], axis=0)
-            print(np.linalg.norm(error))
+
             if np.linalg.norm(error) > 0.01:
                 Lin_v = -var_lambda * np.matmul(R_c_cd, T_cd_c)
                 Ang_v = -var_lambda * error_R
@@ -100,11 +100,11 @@ class VisualServo(RobotEnv):
                 V_camera = np.zeros(6)
         else:
             V_camera = np.zeros(6)
-        V_camera = np.zeros(6)
+
         jac_pinv = self.kd_solver.get_full_jac_pinv(self.robot.get_arm_qpos())
         V_dian = np.dot(jac_pinv, V_camera).reshape(-1)
         action = gain * V_dian + self.robot.get_arm_qpos()
-        print(self.robot.get_arm_qpos())
+
         return super().step(action)
 
 
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     env = VisualServo(
         robot=DianaAruco(),
         render_mode='human',
-        control_freq=200,
+        control_freq=100,
         controller='JNTIMP',
         enable_camera_viewer=True,
         camera_name='0_cam'

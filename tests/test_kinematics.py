@@ -2,15 +2,9 @@ import logging
 import numpy as np
 import mujoco
 import pinocchio as pin
-try:
-    from robopal.envs.robot import RobotEnv
-    from robopal.robots.diana_med import DianaMed
-except ImportError:
-    pass
-try:
-    from KDL_utils import KDL_utils
-except ImportError:
-    pass
+
+from robopal.envs.robot import RobotEnv
+from robopal.robots.diana_med import DianaMed
 
 
 class TestKinematics:
@@ -33,11 +27,6 @@ class TestKinematics:
     def compute_jacobian_pinocchio(self):
         print("-------------------------<pinocchio>------------------------")
         print(self.env.kd_solver.get_full_jac(self.qpos))
-
-    def compute_jacobian_kdl(self):
-        self.kd_solver = KDL_utils(self.urdf_path)
-        print("-------------------------<kdl>------------------------")
-        print(self.kd_solver.getJac(self.qpos))
 
     def get_joint_transform(self):
         print("-------------------------<joint transform>------------------------")
