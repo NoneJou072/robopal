@@ -3,11 +3,11 @@
 
 # **ROBOPAL**
 
-![License](https://img.shields.io/badge/license-MIT-yellow?style=flat-square) 
+![License](https://img.shields.io/badge/license-Apache2.0-yellow?style=flat-square) 
 ![GitHub Repo stars](https://img.shields.io/github/stars/NoneJou072/robopal?style=flat-square&logo=github)
 ![Language](https://img.shields.io/badge/language-python-brightgreen?style=flat-square)
 [![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen?style=flat-square)](https://robopal.readthedocs.io/zh/latest/index.html)
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11078757.svg)](https://doi.org/10.5281/zenodo.11078757)
 </div>
 
 **robopal** 是一个基于 [MuJoCo](http://mujoco.org/) 动力学引擎与 [Pinocchio](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/index.html) 机器人动力学库搭建的多平台开源机器人仿真框架，主要用于机械臂的深度强化学习训练与控制算法验证。框架内提供了多种控制方案与底层环境，
@@ -56,5 +56,4 @@ $ conda install pinocchio
    ```
 
 ## Contribute
-这个项目是我在学习过程中所搭建的仿真框架，目前还有很多不足之处，欢迎大家提出建议和意见，也欢迎对这个项目有兴趣的一起来完善。
-目前对该框架的近期规划是，加入双臂控制，并充分利用 Mujoco 的各种特性，加入更多新颖的任务环境。
+这个仿真框架目前还有很多不足之处，欢迎大家提出建议和意见，也欢迎对这个项目有兴趣的一起来完善。

@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Zhou"
+  given-names: "Haoran"
+  orcid: "https://orcid.org/0009-0000-1824-1994"
+- family-names: "Huang"
+  given-names: "Yichao"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+- family-names: "Zhao"
+  given-names: "Yuhan"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+- family-names: "Lu"
+  given-names: "Yang"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+title: "robopal: A Simulation Framework based Mujoco"
+version: 0.3.1
+doi: 10.5281/zenodo.11078757
+date-released: 2024-04-28
+url: "https://github.com/NoneJou072/robopal"
