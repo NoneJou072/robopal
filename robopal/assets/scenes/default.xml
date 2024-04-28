@@ -1,8 +1,10 @@
 <mujoco model="empty_floor">
   <compiler angle="radian"/>
-  <option timestep="0.0005" gravity="0 0 -9.81">
+
+  <option timestep="0.001" gravity="0 0 -9.81">
       <flag contact="enable" energy="enable" gravity="enable"/>
   </option>
+  
   <asset>
     <texture type="skybox" builtin="gradient" rgb1="0.68 0.68 0.68" rgb2="0.3 0.3 0.3" width="512" height="3072"/>
     <texture name="groundplane" type="2d" builtin="checker" mark="edge"  rgb1="0.68 0.68 0.68" rgb2="0.8 0.8 0.8"

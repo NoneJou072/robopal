@@ -40,7 +40,8 @@ class JntVelController:
             q_des: np.ndarray,
             v_des: np.ndarray,
             q_cur: np.ndarray,
-            v_cur: np.array,
+            v_cur: np.ndarray,
+            agent: str = 'arm0'
     ):
         """ robot的关节空间控制的计算公式
             Compute desired torque with robot dynamics modeling:

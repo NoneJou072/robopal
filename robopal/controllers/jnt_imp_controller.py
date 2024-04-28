@@ -22,8 +22,8 @@ class JntImpedance(object):
         self.kj = np.zeros(self.dofs)
 
         self.set_jnt_params(
-            b=600.0 * np.ones(self.dofs),
-            k=1000.0 * np.ones(self.dofs),
+            b=60.0 * np.ones(self.dofs),
+            k=300.0 * np.ones(self.dofs),
         )
 
         # choose interpolator
@@ -43,8 +43,9 @@ class JntImpedance(object):
             q_des: np.ndarray,
             v_des: np.ndarray,
             q_cur: np.ndarray,
-            v_cur: np.array,
-    ):
+            v_cur: np.ndarray,
+            agent: str = 'arm0'
+    ) -> np.ndarray:
         """ robot的关节空间控制的计算公式
             Compute desired torque with robot dynamics modeling:
             > M(q)qdd + C(q, qd)qd + G(q) + tau_F(qd) = tau_ctrl + tau_env
@@ -77,6 +78,7 @@ class JntImpedance(object):
                 v_des=np.zeros(self.dofs),
                 q_cur=self.robot.get_arm_qpos(agent),
                 v_cur=self.robot.get_arm_qvel(agent),
+                agent=agent
             )
             ret[agent] = torque
         return ret
