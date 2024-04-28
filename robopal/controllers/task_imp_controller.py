@@ -2,6 +2,7 @@ import numpy as np
 
 from robopal.commons.pin_utils import PinSolver
 import robopal.commons.transform as trans
+from robopal.robots.base import BaseRobot
 
 
 def orientation_error(desired: np.ndarray, current: np.ndarray) -> np.ndarray:
@@ -39,7 +40,7 @@ class CartImpedance:
     ):
         self.name = 'CARTIMP'
         self.dofs = 7
-        self.robot = robot
+        self.robot: BaseRobot = robot
         self.kd_solver = PinSolver(robot.urdf_path)
 
         # hyper-parameters of impedance

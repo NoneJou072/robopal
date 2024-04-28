@@ -6,7 +6,7 @@ with open("README.md", "r", encoding='UTF-8') as fh:
 setup(
     name='robopal',
     packages=[package for package in find_packages() if package.startswith("robopal")],
-    version='0.3.0',
+    version='0.3.1',
     author="Haoran Zhou, Yichao Huang, Yuhan Zhao, Yang Lu",
     author_email="jou072@126.com",
     description="robopal: A Simulation Framework based Mujoco",

@@ -2,7 +2,7 @@ from typing import Union, Dict
 import numpy as np
 
 from robopal.commons.pin_utils import PinSolver
-from robopal.robots.base import BaseArm
+from robopal.robots.base import BaseRobot
 
 
 class JntImpedance(object):
@@ -14,7 +14,7 @@ class JntImpedance(object):
     ):
         self.name = 'JNTIMP'
         self.dofs = robot.jnt_num
-        self.robot: BaseArm = robot
+        self.robot: BaseRobot = robot
         self.kd_solver = PinSolver(robot.urdf_path)
 
         # hyperparameters of impedance controller
