@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 import pinocchio as pin
-import robopal.commons.transform as trans
+import robopal.commons.transform as T
 
 
 class PinSolver:
@@ -19,9 +19,9 @@ class PinSolver:
         self._JOINT_NUM = self.model.nq
 
         logging.info('Model name in Pinocchio: ' + self.model.name)
-        logging.info('Dimension of the configuration vector representation: ' + str(self._JOINT_NUM))
-        logging.info('Dimension of the velocity: ' + str(self.model.nv))
-        logging.info(f"Pinocchio model init!")
+        logging.info('Dimension of the joint position: ' + str(self._JOINT_NUM))
+        logging.info('Dimension of the joint velocity: ' + str(self.model.nv))
+        logging.info(f"Pinocchio model has init.")
 
     def fk(self, q: np.ndarray, rot_format: str = 'matrix'):
         """ Perform the forward kinematics over the kinematic tree
@@ -34,17 +34,18 @@ class PinSolver:
         if rot_format == 'matrix':
             return self.data.oMi[-1].translation.copy(), self.data.oMi[-1].rotation.copy()
         elif rot_format == 'quaternion':
-            return self.data.oMi[-1].translation.copy(), trans.mat_2_quat(self.data.oMi[-1].rotation.copy())
+            return self.data.oMi[-1].translation.copy(), T.mat_2_quat(self.data.oMi[-1].rotation.copy())
 
     def ik(self, pos: np.ndarray, rot: np.ndarray, q_init: np.ndarray) -> np.ndarray:
         """ Position the end effector of a manipulator robot to a given pose (position and orientation)
             The method employs a simple Jacobian-based iterative algorithm, which is called closed-loop inverse kinematics (CLIK).
 
         :param pos: desired position
-        :param rot: desired rotation
+        :param rot: desired quaternion
         :param q_init: initial joint position
         :return: joint position
         """
+        rot = T.quat_2_mat(rot)
         oM_des = pin.SE3(rot, pos)
         q = q_init
 

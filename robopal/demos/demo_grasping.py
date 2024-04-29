@@ -24,7 +24,7 @@ class GraspingEnv(PosCtrlEnv):
             is_interpolate=is_interpolate,
             is_pd=is_pd,
         )
-
+        
 
 if __name__ == "__main__":
     env = GraspingEnv()

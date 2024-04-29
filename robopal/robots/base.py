@@ -1,6 +1,7 @@
 import abc
 import logging
 from typing import Union, List, Dict
+import copy
 
 import mujoco
 import numpy as np
@@ -51,6 +52,8 @@ class BaseRobot:
         xml_path = self.mjcf_generator.save_and_load_xml()
         self.robot_model = mujoco.MjModel.from_xml_path(filename=xml_path, assets=None)
         self.robot_data = mujoco.MjData(self.robot_model)
+        # deepcopy for computing kinematics.
+        self.kine_data: mujoco.MjData = copy.deepcopy(self.robot_data)
 
         # robot infos
         self._arm_joint_names = dict()
@@ -61,6 +64,10 @@ class BaseRobot:
         self._gripper_joint_indexes = dict()
         self._gripper_actuator_names = dict()
         self._gripper_actuator_indexes = dict()
+        self.base_link_name = dict()
+        self.end_name = dict()
+        # Bounds at the joint limits.
+        self.mani_joint_bounds = dict()
 
     def _construct_mjcf_data(self) -> RobotGenerator:
         return RobotGenerator(
@@ -87,6 +94,11 @@ class BaseRobot:
         for agent, names in names.items():
             index = [mujoco.mj_name2id(self.robot_model, mujoco.mjtObj.mjOBJ_JOINT, name) for name in names]
             self._arm_joint_indexes[agent] = index
+            
+        self.mani_joint_bounds = {agent: (
+            self.robot_model.jnt_range[self.arm_joint_indexes[agent], 0], 
+            self.robot_model.jnt_range[self.arm_joint_indexes[agent], 1]
+        ) for agent in self.agents}
 
     @property
     def arm_actuator_names(self) -> Dict[str, np.ndarray]:
@@ -159,3 +171,25 @@ class BaseRobot:
 
     def get_coriolis_gravity_compensation(self, agent: str = 'arm0') -> np.ndarray:
         return self.robot_data.qfrc_bias[self.arm_joint_indexes[agent]]
+    
+    def get_end_xpos(self, agent: str = 'arm0') -> np.ndarray:
+        return self.robot_data.body(self.end_name[agent]).xpos.copy()
+
+    def get_end_xquat(self, agent: str = 'arm0') -> np.ndarray:
+        return self.robot_data.body(self.end_name[agent]).xquat.copy()
+
+    def get_end_xmat(self, agent: str = 'arm0') -> np.ndarray:
+        return self.robot_data.body(self.end_name[agent]).xmat.copy().reshape(3, 3)
+    
+    def get_end_xvel(self, agent: str = 'arm0') -> np.ndarray:
+        return self.robot_data.body(self.end_name[agent]).xvel.copy()
+
+    def get_base_xpos(self, agent: str = 'arm0') -> np.ndarray:
+        return self.robot_data.body(self.base_link_name[agent]).xpos.copy()
+
+    def get_base_xquat(self, agent: str = 'arm0') -> np.ndarray:
+        return self.robot_data.body(self.base_link_name[agent]).xquat.copy()
+
+    def get_base_xmat(self, agent: str = 'arm0') -> np.ndarray:
+        return self.robot_data.body(self.base_link_name[agent]).xmat.copy().reshape(3, 3)
+    

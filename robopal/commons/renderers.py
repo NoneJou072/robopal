@@ -34,10 +34,14 @@ class MjRenderer:
         self.render_paused = True
         self.exit_flag = False
 
-        # Set up mujoco viewer
+        # Set up sync mujoco viewer
         self.viewer = None
         if self.render_mode in ["human", "rgb_array", "depth"]:
             self._init_renderer()
+        elif self.render_mode is None:
+            pass
+        else:
+            raise ValueError(f'{self.render_mode} is not a valid mode.')
 
         # image renderer
         self.image_renderer = mujoco.Renderer(self.mj_model)
@@ -74,7 +78,8 @@ class MjRenderer:
         elif self.render_mode in ["human", "rgb_array", "depth"]:
             # This function does not block, allowing user code to continue execution.
             self.viewer = viewer.launch_passive(self.mj_model, self.mj_data,
-                                                key_callback=self.key_callback, show_left_ui=False, show_right_ui=True)
+                                                key_callback=self.key_callback, 
+                                                show_left_ui=False, show_right_ui=True)
             self.set_renderer_config()
             if self.enable_camera_view:
                 cv.init_cv_window()
@@ -98,6 +103,10 @@ class MjRenderer:
                 if self.image_queue.full():
                     self.image_queue.get()
                 cv.show_image(image)
+            
+            if self.render_mode in ["rgb_array", "depth"]:
+                return image
+        return
 
     def close(self):
         """ close the environment. """

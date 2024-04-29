@@ -59,7 +59,8 @@ class VisualServo(RobotEnv):
 
         kdl_hand2cam_f = trans.make_transform(hand2cam_p, hand2cam_M)
 
-        base2hand_p, base2hand_r = self.kd_solver.fk(self.robot.get_arm_qpos())
+        base2hand_p = env.robot.get_end_xpos()
+        base2hand_r = env.robot.get_end_xmat()
         kdl_base2hand_f = trans.make_transform(base2hand_p, base2hand_r)
 
         kdl_base2cam_f = kdl_base2hand_f @ kdl_hand2cam_f

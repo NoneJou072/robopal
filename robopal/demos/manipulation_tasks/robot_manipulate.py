@@ -53,7 +53,8 @@ class ManipulateEnv(PosCtrlEnv):
         """
         Map to target action space bounds
         """
-        actual_pos_action = self.kd_solver.fk(self.robot.get_arm_qpos())[0] + self.pos_ratio * action[:3]
+        current_pos, _ = self.controller.forward_kinematics(self.robot.get_arm_qpos())
+        actual_pos_action = current_pos + self.pos_ratio * action[:3]
         actual_pos_action = actual_pos_action.clip(self.pos_min_bound, self.pos_max_bound)
         gripper_ctrl = (action[3] + 1) * (self.grip_max_bound - self.grip_min_bound) / 2 + self.grip_min_bound
         return actual_pos_action, gripper_ctrl
@@ -69,6 +70,7 @@ class ManipulateEnv(PosCtrlEnv):
         self._timestep += 1
 
         actual_pos_action, gripper_ctrl = self.action_scale(action)
+
         # take one step
         self.mj_data.actuator('0_gripper_l_finger_joint').ctrl[0] = gripper_ctrl
         self.mj_data.actuator('0_gripper_r_finger_joint').ctrl[0] = gripper_ctrl
@@ -126,9 +128,9 @@ class ManipulateEnv(PosCtrlEnv):
     def set_random_init_position(self):
         """ Set the initial position of the end effector to a random position within the workspace.
         """
-        random_pos = np.random.uniform(self.pos_min_bound, self.pos_max_bound)
-        init_rot = T.quat_2_mat(self.init_rot_quat)
-        qpos = self.kd_solver.ik(random_pos, init_rot, q_init=self.robot.get_arm_qpos())
-        self.set_joint_qpos(qpos)
-        mujoco.mj_forward(self.mj_model, self.mj_data)
-        self.render()
+        for agent in self.robot.agents:
+            random_pos = np.random.uniform(self.pos_min_bound, self.pos_max_bound)
+            qpos = self.ik(random_pos, self.init_quat[agent], q_init=self.robot.get_arm_qpos(agent))
+            self.set_joint_qpos(qpos, agent)
+            mujoco.mj_forward(self.mj_model, self.mj_data)
+            self.render()

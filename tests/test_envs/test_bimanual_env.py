@@ -27,7 +27,7 @@ if args.ctrl == 'JNTIMP':
     actions = [np.array([0.3, -0.4, 0.7, 0.3, -0.4, 0.7, 0]),
                np.array([0.3, -0.4, 0.7, 0.3, -0.4, 0.7, 0])]
 
-else:  # args.ctrl == 'CARTIK'
+elif args.ctrl == 'CARTIK':
     env = PosCtrlEnv(
         robot=DualDianaMed(),
         render_mode='human',
@@ -35,8 +35,10 @@ else:  # args.ctrl == 'CARTIK'
         is_interpolate=False,
         is_pd=False
     )
-    actions = [np.array([0.3, 0.3, 0.4, 1, 0, 0, 0]),
+    actions = [np.array([0.3, 0.4, 0.4, 1, 0, 0, 0]),
                np.array([0.4, -0.4, 0.6, 1, 0, 0, 0])]
+else:
+    raise ValueError('Invaild controller.')
 
 actions = {agent: actions[id] for id, agent in enumerate(env.agents)}
 

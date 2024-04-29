@@ -12,7 +12,7 @@ if __name__ == "__main__":
     options = {}
 
     # Choose controller
-    options['ctrl'] = 'JNTIMP'
+    options['ctrl'] = 'JNTVEL'
 
     assert options['ctrl'] in ['JNTIMP', 'JNTVEL', 'CARTIMP', 'CARTIK'], 'Invalid controller'
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
             action = np.array([0.3, -0.4, 0.7, 0.3, -0.4, 0.7, 0])
 
         elif options['ctrl'] == 'JNTVEL':
-            action = np.array([0.01, -0.01, 0.0, 0.0, 0.01, 0.01, 0])
+            action = np.array([0.00, 0.1, 0.0, 0.0, 0., 0., 0])
 
         elif options['ctrl'] == 'CARTIMP':
             action = np.array([0.33, -0.39, 0.66, 1.0, 0.0, 0.0, 0])
@@ -48,6 +48,7 @@ if __name__ == "__main__":
 
     if isinstance(env, RobotEnv):
         env.reset()
-        for t in range(int(1e4)):
+        for t in range(int(2e4)):
             env.step(action)
+            print(env.mj_data.ctrl[0])
         env.close()

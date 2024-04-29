@@ -2,24 +2,25 @@ from typing import Union, Dict
 import numpy as np
 
 from robopal.commons.pin_utils import PinSolver
-from robopal.robots.base import BaseRobot
+from robopal.controllers.base_controller import BaseController
 
 
-class JntImpedance(object):
+class JntImpedance(BaseController):
     def __init__(
             self,
             robot,
             is_interpolate=False,
             interpolator_config: dict = None
     ):
+        super().__init__(robot)
+
         self.name = 'JNTIMP'
         self.dofs = robot.jnt_num
-        self.robot: BaseRobot = robot
         self.kd_solver = PinSolver(robot.urdf_path)
 
         # hyperparameters of impedance controller
-        self.Bj = np.zeros(self.dofs)
-        self.kj = np.zeros(self.dofs)
+        self.B = np.zeros(self.dofs)
+        self.K = np.zeros(self.dofs)
 
         self.set_jnt_params(
             b=60.0 * np.ones(self.dofs),
@@ -35,8 +36,8 @@ class JntImpedance(object):
 
     def set_jnt_params(self, b: np.ndarray, k: np.ndarray):
         """ Used for changing the parameters. """
-        self.Bj = b
-        self.kj = k
+        self.B = b
+        self.K = k
 
     def compute_jnt_torque(
             self,
@@ -59,13 +60,11 @@ class JntImpedance(object):
         if self.interpolator is not None:
             q_des, v_des = self.interpolator.update_state()
 
-        M = self.kd_solver.get_inertia_mat(q_cur)
-        C = self.kd_solver.get_coriolis_mat(q_cur, v_cur)
-        g = self.kd_solver.get_gravity_mat(q_cur)
-        coriolis_gravity = C[-1] + g
+        M = self.robot.get_mass_matrix(agent)
+        compensation = self.robot.get_coriolis_gravity_compensation(agent)
 
-        acc_desire = self.kj * (q_des - q_cur) + self.Bj * (v_des - v_cur)
-        tau = np.dot(M, acc_desire) + coriolis_gravity
+        acc_desire = self.K * (q_des - q_cur) + self.B * (v_des - v_cur)
+        tau = np.dot(M, acc_desire) + compensation
         return tau
 
     def step_controller(self, action: np.ndarray) -> Union[np.ndarray, Dict[str, np.ndarray]]:

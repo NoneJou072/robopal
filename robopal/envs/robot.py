@@ -3,7 +3,7 @@ from typing import Union, Dict
 import numpy as np
 
 from robopal.envs.base import MujocoEnv
-from robopal.controllers import controllers
+from robopal.controllers import controllers, BaseController
 
 
 class RobotEnv(MujocoEnv):
@@ -39,7 +39,7 @@ class RobotEnv(MujocoEnv):
 
         # choose controller
         assert controller in controllers, f"Not supported controller, you can choose from {controllers.keys()}"
-        self.controller = controllers[controller](
+        self.controller: BaseController = controllers[controller](
             self.robot,
             is_interpolate=is_interpolate,
             interpolator_config={'dof': self.robot.jnt_num, 'control_timestep': self.control_timestep}
@@ -54,7 +54,10 @@ class RobotEnv(MujocoEnv):
                              "Current Model-Timestep:{}".format(self.model_timestep))
 
         # memorize the initial position and rotation
-        self.init_pos, self.init_rot_quat = self.kd_solver.fk(self.robot.get_arm_qpos(), rot_format='quaternion')
+        self.init_pos = dict()
+        self.init_quat = dict()
+        for agent in self.robot.agents:
+            self.init_pos[agent], self.init_quat[agent] = self.controller.forward_kinematics(self.robot.get_arm_qpos(agent), agent)
 
     def auto_render(func):
         """ Automatically render the scene. """
@@ -100,3 +103,4 @@ class RobotEnv(MujocoEnv):
         Time of each upper step in the environment.
         """
         return self._n_substeps * self.mj_model.opt.timestep
+    

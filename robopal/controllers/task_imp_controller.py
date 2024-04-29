@@ -1,8 +1,8 @@
 import numpy as np
 
 from robopal.commons.pin_utils import PinSolver
-import robopal.commons.transform as trans
-from robopal.robots.base import BaseRobot
+import robopal.commons.transform as T
+from robopal.controllers.base_controller import BaseController
 
 
 def orientation_error(desired: np.ndarray, current: np.ndarray) -> np.ndarray:
@@ -27,7 +27,7 @@ def orientation_error(desired: np.ndarray, current: np.ndarray) -> np.ndarray:
     return error
 
 
-class CartImpedance:
+class CartImpedance(BaseController):
     """
     Cartesian Impedance Controller in the end-effector frame
     """
@@ -38,9 +38,10 @@ class CartImpedance:
             is_interpolate=False,
             interpolator_config: dict = None
     ):
+        super().__init__(robot)
+
         self.name = 'CARTIMP'
         self.dofs = 7
-        self.robot: BaseRobot = robot
         self.kd_solver = PinSolver(robot.urdf_path)
 
         # hyper-parameters of impedance
@@ -63,12 +64,12 @@ class CartImpedance:
         action: desired_pose [x, y, z, qw, qx, qy, qz]
         """
         desired_pos = action[:3]
-        desired_ori = trans.quat_2_mat(action[3:])
+        desired_ori = T.quat_2_mat(action[3:])
         q_curr = self.robot.get_arm_qpos()
         qd_curr = self.robot.get_arm_qvel()
 
-        current_pos, current_ori = self.kd_solver.fk(q_curr)
-
+        current_pos, current_quat = self.forward_kinematics(q_curr)
+        current_ori = T.quat_2_mat(current_quat)
         J = self.kd_solver.get_full_jac(q_curr)
         J_inv = self.kd_solver.get_full_jac_pinv(q_curr)
         Jd = self.kd_solver.get_jac_dot(q_curr, qd_curr)
@@ -84,10 +85,8 @@ class CartImpedance:
         sum = self.Kc * x_error - np.dot(np.dot(Md, Jd), qd_curr) + self.Bc * v_error
         inertial = np.dot(M, J_inv)  # the inertial matrix in the end-effector frame
 
-        C = self.kd_solver.get_coriolis_mat(q_curr, qd_curr)
-        g = self.kd_solver.get_gravity_mat(q_curr)
-        coriolis_gravity = C[-1] + g
-        tau = np.dot(inertial, sum) + coriolis_gravity
+        compensation = self.robot.get_coriolis_gravity_compensation()
+        tau = np.dot(inertial, sum) + compensation
 
         return tau
 

@@ -378,10 +378,12 @@ class RRT:
         """
         TYPE_CHANGED = False
 
-        LEFT_GRIPPER_GEOMS = ['link7_collision',
-                              'link6_collision',
-                              'link5_collision',
-                              'link4_collision']
+        LEFT_GRIPPER_GEOMS = [
+            'link7_collision',
+            # 'link6_collision',
+            # 'link5_collision',
+            # 'link4_collision'
+        ]
         COLLISIONS = ['obstacle_box', ]
 
         if node is None:
@@ -389,8 +391,8 @@ class RRT:
 
         for x, y, z in zip(node.path_x, node.path_y, node.path_z):
             target_pos = np.array([x, y, z])
-            target_rot = np.eye(3)
-            qpos = sim.kd_solver.ik(target_pos, target_rot, sim.robot.get_arm_qpos())
+            target_rot = np.array([1, 0, 0, 0])
+            qpos = sim.ik(target_pos, target_rot, sim.robot.get_arm_qpos())
             sim.set_joint_qpos(qpos)
 
             mujoco.mj_forward(sim.mj_model, sim.mj_data)
