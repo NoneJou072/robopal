@@ -1,14 +1,14 @@
 import numpy as np
 
 from robopal.robots.diana_med import DianaAssemble
-from robopal.envs import PosCtrlEnv
+from robopal.envs import RobotEnv
 
-env = PosCtrlEnv(
+env = RobotEnv(
     robot=DianaAssemble(),
     render_mode='human',
     control_freq=100,
     is_interpolate=False,
-    is_pd=False
+    controller="CARTIK",
 )
 env.reset()
 

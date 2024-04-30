@@ -1,16 +1,16 @@
 import numpy as np
 
 from robopal.robots.diana_med import DianaCollide
-from robopal.envs import PosCtrlEnv
-from robopal.controllers.rrt import rrt_star
+from robopal.envs import RobotEnv
+from robopal.controllers.planners.rrt import rrt_star
 
 
-env = PosCtrlEnv(
+env = RobotEnv(
     robot=DianaCollide(),
     render_mode="human",
     control_freq=200,
     is_interpolate=False,
-    is_pd=False
+    controller="CARTIK"
 )
 env.reset()
 

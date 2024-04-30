@@ -2,7 +2,7 @@ import mujoco
 import numpy as np
 import logging
 
-from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
+from robopal.envs import RobotEnv
 import robopal.commons.transform as T
 
 logging.basicConfig(level=logging.INFO)
@@ -13,7 +13,7 @@ def goal_distance(goal_a, goal_b):
     return np.linalg.norm(goal_a - goal_b, axis=-1)
 
 
-class ManipulateEnv(PosCtrlEnv):
+class ManipulateEnv(RobotEnv):
     """
     The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
     in 50 subsequent simulator step (with a time step of dt = 0.0005 s) before returning the control to the robot.
@@ -22,11 +22,10 @@ class ManipulateEnv(PosCtrlEnv):
     def __init__(self,
                  robot=None,
                  render_mode='human',
-                 control_freq=10,
+                 control_freq=20,
                  enable_camera_viewer=False,
-                 controller='JNTIMP',
+                 controller='CARTIK',
                  is_interpolate=False,
-                 is_pd=False,
                  ):
         super().__init__(
             robot=robot,
@@ -35,7 +34,6 @@ class ManipulateEnv(PosCtrlEnv):
             enable_camera_viewer=enable_camera_viewer,
             controller=controller,
             is_interpolate=is_interpolate,
-            is_pd=is_pd,
         )
 
         self.max_episode_steps = 50
@@ -130,7 +128,7 @@ class ManipulateEnv(PosCtrlEnv):
         """
         for agent in self.robot.agents:
             random_pos = np.random.uniform(self.pos_min_bound, self.pos_max_bound)
-            qpos = self.ik(random_pos, self.init_quat[agent], q_init=self.robot.get_arm_qpos(agent))
+            qpos = self.controller.ik(random_pos, self.init_quat[agent], q_init=self.robot.get_arm_qpos(agent))
             self.set_joint_qpos(qpos, agent)
             mujoco.mj_forward(self.mj_model, self.mj_data)
             self.render()

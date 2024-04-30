@@ -1,10 +1,9 @@
-from typing import Union, Dict
 import numpy as np
 
 from robopal.controllers.base_controller import BaseController
 
 
-class JntImpedance(BaseController):
+class JointImpedanceController(BaseController):
     def __init__(
             self,
             robot,
@@ -20,8 +19,8 @@ class JntImpedance(BaseController):
         self.K = np.zeros(self.dofs)
 
         self.set_jnt_params(
-            b=60.0 * np.ones(self.dofs),
-            k=300.0 * np.ones(self.dofs),
+            b=20.0 * np.ones(self.dofs),
+            k=80.0 * np.ones(self.dofs),
         )
 
         # choose interpolator
@@ -64,7 +63,12 @@ class JntImpedance(BaseController):
         tau = np.dot(M, acc_desire) + compensation
         return tau
 
-    def step_controller(self, action: np.ndarray) -> Union[np.ndarray, Dict[str, np.ndarray]]:
+    def step_controller(self, action):
+        """ 
+
+        :param action: joint position
+        :return: joint torque
+        """
         ret = dict()
         if isinstance(action, np.ndarray):
             action = {self.robot.agents[0]: action}
@@ -77,11 +81,12 @@ class JntImpedance(BaseController):
                 agent=agent
             )
             ret[agent] = torque
+
         return ret
 
     def _init_interpolator(self, cfg: dict):
         try:
-            from robopal.controllers.interpolators import OTG
+            from robopal.controllers.planners.interpolators import OTG
         except ImportError:
             raise ImportError("Please install ruckig first: pip install ruckig")
         self.interpolator = OTG(

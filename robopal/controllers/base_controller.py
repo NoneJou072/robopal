@@ -1,3 +1,5 @@
+from typing import Union, Dict
+
 import mujoco
 import numpy as np
 import robopal.commons.transform as T
@@ -11,6 +13,13 @@ class BaseController:
         self.robot = robot
         self.dofs = robot.jnt_num
 
+    def step_controller(
+            self, action: Union[np.ndarray, Dict[str, np.ndarray]]
+    ) -> Union[np.ndarray, Dict[str, np.ndarray]]:
+        """ Step once computing for all agents.
+        """
+        raise NotImplementedError
+    
     def reset(self):
         """ reset controller. """
         pass

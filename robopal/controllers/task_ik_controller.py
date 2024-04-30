@@ -1,28 +1,23 @@
 import numpy as np
 import mujoco
 from mujoco import minimize
-from robopal.envs.robot import RobotEnv
+
+from robopal.controllers import JointImpedanceController
 import robopal.commons.transform as T
 
 
-class PosCtrlEnv(RobotEnv):
-    def __init__(self,
-                 robot=None,
-                 control_freq=200,
-                 enable_camera_viewer=False,
-                 controller='JNTIMP',
-                 is_interpolate=False,
-                 is_pd=False,
-                 render_mode='human',
-                 ):
-        super().__init__(
-            robot=robot,
-            control_freq=control_freq,
-            enable_camera_viewer=enable_camera_viewer,
-            controller=controller,
-            is_interpolate=is_interpolate,
-            render_mode=render_mode,
-        )
+class CartesianIKController(JointImpedanceController):
+
+    def __init__(
+            self, 
+            robot, 
+            is_interpolate=False, 
+            interpolator_config: dict = None,
+            is_pd = False
+    ):
+        super().__init__(robot, is_interpolate, interpolator_config)
+        
+        self.name = 'CARTIK'
 
         self.p_cart = 0.2
         self.d_cart = 0.01
@@ -40,32 +35,36 @@ class PosCtrlEnv(RobotEnv):
         pos_incre = self.p_cart * (p_goal - p_cur) + self.d_cart * (pd_goal - pd_cur)
         quat_incre = self.p_quat * (r_goal - r_cur)
         return pos_incre, quat_incre
+    
+    def step_controller(self, action):
+        """
+        :param: action: end pose
+        :return: joint torque
+        """
+        ret = dict()
 
-    def step_controller(self, action: np.ndarray, agent: str = 'arm0'):
-        assert len(action) in (3, 7), "Invalid action length."
+        if isinstance(action, np.ndarray):
+            action = {self.robot.agents[0]: action}
+        
+        for agent, act in action.items():
+            assert len(act) in (3, 7), "Invalid action length."
 
-        if not self.is_pd:
-            p_goal = action[:3]
-            r_goal = self.init_quat[agent] if len(action) == 3 else action[3:]
-        else:
-            p_cur, r_cur = self.controller.forward_kinematics(self.robot.get_arm_qpos(agent))
-            r_target = self.init_quat[agent] if len(action) == 3 else action[3:]
-            pd_cur = self.robot.get_end_xvel(agent)[:3]
-            p_incre, r_incre = self.compute_pd_increment(p_goal=action[:3], p_cur=p_cur,
-                                                         r_goal=r_target, r_cur=r_cur,
-                                                         pd_goal=self.vel_des, pd_cur=pd_cur[:3])
-            p_goal = p_incre + p_cur
-            r_goal = r_cur + r_incre
+            if not self.is_pd:
+                p_goal = act[:3]
+                r_goal = self.robot.init_quat[agent] if len(act) == 3 else act[3:]
+            else:
+                p_cur, r_cur = self.forward_kinematics(self.robot.get_arm_qpos(agent))
+                r_target = self.robot.init_quat[agent] if len(act) == 3 else act[3:]
+                pd_cur = self.robot.get_end_xvel(agent)[:3]
+                p_incre, r_incre = self.compute_pd_increment(p_goal=act[:3], p_cur=p_cur,
+                                                            r_goal=r_target, r_cur=r_cur,
+                                                            pd_goal=self.vel_des, pd_cur=pd_cur[:3])
+                p_goal = p_incre + p_cur
+                r_goal = r_cur + r_incre
+            
+            ret[agent] = self.ik(p_goal, r_goal, agent)
 
-        return self.ik(p_goal, r_goal, agent)
-
-    def step(self, action):
-        if self.robot.agent_num == 1:
-            inputs = self.step_controller(action)
-        else:
-            inputs = {agent: self.step_controller(action[agent], agent) for agent in self.robot.agents}
-
-        super().step(inputs)
+        return super().step_controller(ret)
 
     def ik(self, pos, quat, agent='arm0', q_init=None):
         del q_init
@@ -93,7 +92,7 @@ class PosCtrlEnv(RobotEnv):
         """
 
         # Position residual.
-        p_cur, r_cur = self.controller.forward_kinematics(x, agent)
+        p_cur, r_cur = self.forward_kinematics(x, agent)
         
         res_pos = p_cur - pos
 
@@ -128,13 +127,13 @@ class PosCtrlEnv(RobotEnv):
         # and that mj_kinematics has been called by ik()
 
         # Call mj_comPos (required for Jacobians).
-        mujoco.mj_comPos(self.mj_model, self.robot.kine_data)
+        mujoco.mj_comPos(self.robot.robot_model, self.robot.kine_data)
 
         # Get end-effector site Jacobian.
-        jac_pos = np.empty((3, self.mj_model.nv))
-        jac_quat = np.empty((3, self.mj_model.nv))
+        jac_pos = np.empty((3, self.robot.robot_model.nv))
+        jac_quat = np.empty((3, self.robot.robot_model.nv))
 
-        mujoco.mj_jacBody(self.mj_model, self.robot.kine_data, jac_pos, jac_quat, self.robot.kine_data.body(self.robot.end_name[agent]).id)
+        mujoco.mj_jacBody(self.robot.robot_model, self.robot.kine_data, jac_pos, jac_quat, self.robot.kine_data.body(self.robot.end_name[agent]).id)
         jac_pos = jac_pos[:, self.robot.arm_joint_indexes[agent]]
         jac_quat = jac_quat[:, self.robot.arm_joint_indexes[agent]]
         # Get Deffector, the 3x3 mju_subquat Jacobian

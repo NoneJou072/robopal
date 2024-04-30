@@ -5,7 +5,7 @@ import numpy as np
 from robopal.controllers.base_controller import BaseController
 
 
-class JntVelController(BaseController):
+class JointVelocityController(BaseController):
     def __init__(
             self,
             robot,
@@ -15,7 +15,7 @@ class JntVelController(BaseController):
         super().__init__(robot)
 
         if is_interpolate:
-            raise ValueError("JntVelController does not support interpolation")
+            raise ValueError("JointVelocityController does not support interpolation")
 
         self.name = 'JNTVEL'
 

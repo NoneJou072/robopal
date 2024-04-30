@@ -47,10 +47,12 @@ class MujocoEnv:
         self.mj_model: mujoco.MjModel = self.robot.robot_model
         self.mj_data: mujoco.MjData = self.robot.robot_data
 
+        # time infos
         self.cur_time = 0
         self.timestep = 0
         self.model_timestep = 0
         self.control_timestep = 0
+        self._n_substeps = 1
 
         assert render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
@@ -70,8 +72,7 @@ class MujocoEnv:
         if self.renderer is not None and self.renderer.render_paused:
             self.cur_time += 1
             self.inner_step(action)
-            mujoco.mj_forward(self.mj_model, self.mj_data)
-            mujoco.mj_step(self.mj_model, self.mj_data)
+            mujoco.mj_step(self.mj_model, self.mj_data, self._n_substeps)
 
     @abc.abstractmethod
     def inner_step(self, action):

@@ -65,6 +65,9 @@ class BaseRobot:
         # Bounds at the joint limits.
         self.mani_joint_bounds = dict()
 
+        self.init_quat = dict()
+        self.init_pos = dict()
+
     def _construct_mjcf_data(self) -> RobotGenerator:
         return RobotGenerator(
             scene=self._scene,

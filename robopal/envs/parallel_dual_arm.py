@@ -5,11 +5,11 @@ import numpy as np
 from gymnasium.spaces import Box
 from pettingzoo import ParallelEnv
 
-from robopal.envs.task_ik_ctrl_env import PosCtrlEnv
+from robopal.envs import RobotEnv
 from robopal.robots.diana_med import DualDianaMed
 
 
-class BimanualPettingStyleEnv(ParallelEnv, PosCtrlEnv):
+class BimanualPettingStyleEnv(ParallelEnv, RobotEnv):
     """The metadata holds environment constants.
 
     The "name" metadata allows the environment to be pretty printed.
@@ -64,7 +64,7 @@ class BimanualPettingStyleEnv(ParallelEnv, PosCtrlEnv):
         """ Takes in an action for the current agent (specified by agent_selection).
         """
         # Execute actions
-        PosCtrlEnv.step(self, actions)
+        RobotEnv.step(self, actions)
 
         # Check termination conditions
         terminations = {a: False for a in self.agents}
@@ -94,7 +94,7 @@ class BimanualPettingStyleEnv(ParallelEnv, PosCtrlEnv):
     def render(self):
         """ Renders the environment.
         """
-        PosCtrlEnv.render(self)
+        RobotEnv.render(self)
 
     # Observation space should be defined here.
     # lru_cache allows observation and action spaces to be memoized, reducing clock cycles required to get each agent's space.

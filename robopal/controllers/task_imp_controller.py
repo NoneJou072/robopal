@@ -26,7 +26,7 @@ def orientation_error(desired: np.ndarray, current: np.ndarray) -> np.ndarray:
     return error
 
 
-class CartImpedance(BaseController):
+class CartesianImpedanceController(BaseController):
     """
     Cartesian Impedance Controller in the end-effector frame
     """

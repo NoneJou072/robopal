@@ -14,7 +14,7 @@ Controllers
 Joint Position Controller
 -------------------------
 
-.. autoclass:: robopal.controllers.jnt_imp_controller.JntImpedance
+.. autoclass:: robopal.controllers.jnt_imp_controller.JointImpedanceController
 
   .. automethod:: set_goal
   .. automethod:: reset_goal
@@ -25,7 +25,7 @@ Joint Position Controller
 Joint Velocity Controller
 -------------------------
 
-.. autoclass:: robopal.controllers.jnt_vel_controller.JntVelController
+.. autoclass:: robopal.controllers.jnt_vel_controller.JointVelocityController
 
   .. automethod:: set_goal
   .. automethod:: reset_goal
@@ -34,7 +34,7 @@ Joint Velocity Controller
 Operation Space Controller
 --------------------------
 
-.. autoclass:: robopal.controllers.task_imp_controller.CartImpedance
+.. autoclass:: robopal.controllers.task_imp_controller.CartesianImpedanceController
 
   .. automethod:: set_goal
   .. automethod:: reset_goal
