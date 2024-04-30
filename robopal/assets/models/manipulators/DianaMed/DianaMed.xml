@@ -67,12 +67,12 @@
         </body>
     </worldbody>
     <actuator>
-        <motor name="a1" ctrllimited="true" ctrlrange="-400.0 400.0"  joint="j1"/>
-        <motor name="a2" ctrllimited="true" ctrlrange="-400.0 400.0"  joint="j2"/>
-        <motor name="a3" ctrllimited="true" ctrlrange="-400.0 400.0"  joint="j3"/>
-        <motor name="a4" ctrllimited="true" ctrlrange="-400.0 400.0"  joint="j4"/>
-        <motor name="a5" ctrllimited="true" ctrlrange="-400.0 400.0"  joint="j5"/>
-        <motor name="a6" ctrllimited="true" ctrlrange="-400.0 400.0"  joint="j6"/>
-        <motor name="a7" ctrllimited="true" ctrlrange="-400.0 400.0"  joint="j7"/>
+        <motor name="a1" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j1"/>
+        <motor name="a2" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j2"/>
+        <motor name="a3" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j3"/>
+        <motor name="a4" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j4"/>
+        <motor name="a5" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j5"/>
+        <motor name="a6" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j6"/>
+        <motor name="a7" ctrllimited="true" ctrlrange="-100.0 100.0"  joint="j7"/>
     </actuator>
 </mujoco>
