@@ -3,6 +3,7 @@ import numpy as np
 import logging
 
 from robopal.robots.diana_med import DianaMed
+from robopal.robots.panda import Panda
 from robopal.envs import RobotEnv, PosCtrlEnv
 
 logging.basicConfig(level=logging.INFO)
@@ -12,7 +13,7 @@ if __name__ == "__main__":
     options = {}
 
     # Choose controller
-    options['ctrl'] = 'CARTIMP'
+    options['ctrl'] = 'JNTIMP'
 
     assert options['ctrl'] in ['JNTIMP', 'JNTVEL', 'CARTIMP', 'CARTIK'], 'Invalid controller'
 

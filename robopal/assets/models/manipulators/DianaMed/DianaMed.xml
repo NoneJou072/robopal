@@ -54,6 +54,9 @@
                                         <inertial pos="0.00068467 1.5999e-05 0.020834" quat="0.000547318 0.708756 -0.000448023 0.705453" mass="0.16696" diaginertia="0.000143911 8.8902e-05 8.75358e-05"/>
                                         <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="1 1 1 1" mesh="link7"/>
                                         <geom name="link7_collision" type="mesh" rgba="1 1 1 1" mesh="link7"/>
+                                        <body name="attachment" pos="0 0 0" quat="0 1 0 0">
+                                            <site name="attachment_site"/>
+                                        </body>
                                     </body>
                                 </body>
                             </body>

@@ -43,7 +43,7 @@
     </actuator>
 
    <worldbody>
-        <body name="end_effector" pos="0 0 0" quat="0 1 0 0" childclass="robotiq2f85">
+        <body name="end_effector" pos="0 0 0" quat="1 0 0 0" childclass="robotiq2f85">
             <geom mesh="robotiq-2f-base"/>
             <geom class="robotiq_col" type="mesh" mesh="robotiq-2f-base" euler="0 0 0"/>
             <body name="robotiq_2f_85_right_driver" pos="0 0.0306011 0.054904">

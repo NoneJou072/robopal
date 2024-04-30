@@ -19,7 +19,7 @@ class DianaMed(BaseRobot):
             chassis=mount,
             manipulator=manipulator,
             gripper=gripper,
-            g2m_body='0_link7',
+            g2m_body='0_attachment',
         )
         self.arm_joint_names = {self.agents[0]: ['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7']}
         self.arm_actuator_names = {self.agents[0]: ['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7']}
@@ -39,7 +39,7 @@ class DualDianaMed(BaseRobot):
                  manipulator=['DianaMed', 'DianaMed'],
                  gripper=['rethink_gripper', 'rethink_gripper'],
                  mount=['floor_left', 'floor_right'],
-                 g2m_body=['0_link7', '1_link7']
+                 g2m_body=['0_attachment', '1_attachment']
                  ):
         super().__init__(
             name="diana_med",

@@ -5,7 +5,7 @@
         <mesh name="stick" file="meshes/stick.STL" />
     </asset>
    <worldbody>
-        <body name="end_effector">
+        <body name="end_effector" quat="0 -1 0 0">
             <inertial pos="0 0 0" quat="1 0 0 0" mass="0" diaginertia="0 0 0"/>
             <geom type="mesh" rgba="1 1 1 1" mesh="cambase" />
 
@@ -29,4 +29,3 @@
         <force name="wall_force_sensor" site="gripper_frame" cutoff="3.0"/>
     </sensor>
 </mujoco>
-
