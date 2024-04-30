@@ -37,8 +37,7 @@ if __name__ == "__main__":
     elif options['ctrl'] == 'CARTIK':
         action = np.array([0.33, -0.3, 0.5, 1, 0, 0, 0])
 
-    if isinstance(env, RobotEnv):
-        env.reset()
-        for t in range(int(2e4)):
-            env.step(action)
-        env.close()
+    env.reset()
+    for _ in range(int(2e4)):
+        env.step(action)
+    env.close()
