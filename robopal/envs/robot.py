@@ -45,8 +45,6 @@ class RobotEnv(MujocoEnv):
             interpolator_config={'dof': self.robot.jnt_num, 'control_timestep': self.control_timestep}
         )
 
-        self.kd_solver = self.controller.kd_solver  # shallow copy
-
         # check the control frequency
         self._n_substeps = int(self.control_timestep / self.model_timestep)
         if self._n_substeps == 0:

@@ -1,6 +1,5 @@
 import numpy as np
 
-from robopal.commons.pin_utils import PinSolver
 import robopal.commons.transform as T
 from robopal.controllers.base_controller import BaseController
 
@@ -41,16 +40,14 @@ class CartImpedance(BaseController):
         super().__init__(robot)
 
         self.name = 'CARTIMP'
-        self.dofs = 7
-        self.kd_solver = PinSolver(robot.urdf_path)
 
         # hyper-parameters of impedance
         self.Bc = np.zeros(6)
         self.Kc = np.zeros(6)
 
         self.set_cart_params(
-            b=np.array([200, 800, 800, 800, 800, 800], dtype=np.float32),
-            k=np.array([100, 100, 100, 100, 100, 100], dtype=np.float32)
+            b=np.array([200, 800, 800, 400, 400, 400], dtype=np.float32),
+            k=np.array([100, 100, 100, 200, 200, 200], dtype=np.float32)
         )
 
     def set_cart_params(self, b: np.ndarray, k: np.ndarray):
@@ -70,11 +67,12 @@ class CartImpedance(BaseController):
 
         current_pos, current_quat = self.forward_kinematics(q_curr)
         current_ori = T.quat_2_mat(current_quat)
-        J = self.kd_solver.get_full_jac(q_curr)
-        J_inv = self.kd_solver.get_full_jac_pinv(q_curr)
-        Jd = self.kd_solver.get_jac_dot(q_curr, qd_curr)
+        
+        J = self.robot.get_full_jac()
+        J_inv = self.robot.get_full_jac_pinv()
+        Jd = self.robot.get_jac_dot()
 
-        M = self.kd_solver.get_inertia_mat(q_curr)
+        M = self.robot.get_mass_matrix()
         Md = np.dot(J_inv.T, np.dot(M, J_inv))  # 目标质量矩阵
 
         pos_error = desired_pos - current_pos  # 位置偏差
@@ -89,6 +87,3 @@ class CartImpedance(BaseController):
         tau = np.dot(inertial, sum) + compensation
 
         return tau
-
-    def reset(self):
-        pass

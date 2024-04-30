@@ -50,7 +50,7 @@ class PosCtrlEnv(RobotEnv):
         else:
             p_cur, r_cur = self.controller.forward_kinematics(self.robot.get_arm_qpos(agent))
             r_target = self.init_quat[agent] if len(action) == 3 else action[3:]
-            pd_cur = self.kd_solver.get_end_vel(self.robot.get_arm_qpos(agent), self.robot.get_arm_qvel(agent))
+            pd_cur = self.robot.get_end_xvel(agent)[:3]
             p_incre, r_incre = self.compute_pd_increment(p_goal=action[:3], p_cur=p_cur,
                                                          r_goal=r_target, r_cur=r_cur,
                                                          pd_goal=self.vel_des, pd_cur=pd_cur[:3])

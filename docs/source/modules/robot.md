@@ -22,7 +22,6 @@ class DianaMed(BaseArm):
             manipulator=manipulator,
             gripper=gripper,
             g2m_body='0_link7',
-            urdf_path=os.path.join(ASSET_DIR, "models/manipulators/DianaMed/DianaMed.urdf"),
         )
         self.arm_joint_names = [['0_j1', '0_j2', '0_j3', '0_j4', '0_j5', '0_j6', '0_j7']]
         self.arm_actuator_names = [['0_a1', '0_a2', '0_a3', '0_a4', '0_a5', '0_a6', '0_a7']]

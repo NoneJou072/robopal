@@ -6,7 +6,7 @@ with open("README.md", "r", encoding='UTF-8') as fh:
 setup(
     name='robopal',
     packages=[package for package in find_packages() if package.startswith("robopal")],
-    version='0.3.1',
+    version='0.4.0',
     author="Haoran Zhou, Yichao Huang, Yuhan Zhao, Yang Lu",
     author_email="jou072@126.com",
     description="robopal: A Simulation Framework based Mujoco",
@@ -22,7 +22,6 @@ setup(
     ],
     extras_require={
         'planning': ['ruckig~=0.9.2'],
-        'pinocchio': ['pin~=2.6.3'],
     },
     classifiers=[
         "License :: OSI Approved :: MIT License",

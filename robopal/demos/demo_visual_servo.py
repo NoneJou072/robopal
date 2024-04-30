@@ -57,14 +57,14 @@ class VisualServo(RobotEnv):
 
         hand2cam_M = trans.euler_2_mat(hand2cam_r)
 
-        kdl_hand2cam_f = trans.make_transform(hand2cam_p, hand2cam_M)
+        hand2cam_f = trans.make_transform(hand2cam_p, hand2cam_M)
 
         base2hand_p = env.robot.get_end_xpos()
         base2hand_r = env.robot.get_end_xmat()
-        kdl_base2hand_f = trans.make_transform(base2hand_p, base2hand_r)
+        base2hand_f = trans.make_transform(base2hand_p, base2hand_r)
 
-        kdl_base2cam_f = kdl_base2hand_f @ kdl_hand2cam_f
-        np_base2cam = kdl_base2cam_f[:3, :3]
+        base2cam_f = base2hand_f @ hand2cam_f
+        np_base2cam = base2cam_f[:3, :3]
 
         cam2aruco_r, cam2aruco_p, detected_already = self.aruco_detection(marker_size)
         if detected_already:
@@ -102,7 +102,7 @@ class VisualServo(RobotEnv):
         else:
             V_camera = np.zeros(6)
 
-        jac_pinv = self.kd_solver.get_full_jac_pinv(self.robot.get_arm_qpos())
+        jac_pinv = self.robot.get_full_jac_pinv()
         V_dian = np.dot(jac_pinv, V_camera).reshape(-1)
         action = gain * V_dian + self.robot.get_arm_qpos()
 

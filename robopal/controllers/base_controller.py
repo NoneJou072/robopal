@@ -6,8 +6,14 @@ from robopal.robots.base import BaseRobot
 
 class BaseController:
 
-    def __init__(self, robot) -> None:
-        self.robot: BaseRobot = robot
+    def __init__(self, robot: BaseRobot) -> None:
+        self.name = None
+        self.robot = robot
+        self.dofs = robot.jnt_num
+
+    def reset(self):
+        """ reset controller. """
+        pass
 
     def forward_kinematics(self, q, agent='arm0'):
 

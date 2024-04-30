@@ -2,7 +2,6 @@ from collections import deque
 
 import numpy as np
 
-from robopal.commons.pin_utils import PinSolver
 from robopal.controllers.base_controller import BaseController
 
 
@@ -19,8 +18,6 @@ class JntVelController(BaseController):
             raise ValueError("JntVelController does not support interpolation")
 
         self.name = 'JNTVEL'
-        self.dofs = robot.jnt_num
-        self.kd_solver = PinSolver(robot.urdf_path)
 
         # hyperparameters of impedance controller
         self.k_p = np.zeros(self.dofs)
@@ -76,6 +73,3 @@ class JntVelController(BaseController):
             v_cur=self.robot.get_arm_qvel(),
         )
         return torque
-
-    def reset(self):
-        pass

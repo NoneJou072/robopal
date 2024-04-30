@@ -33,7 +33,7 @@ elif args.ctrl == 'CARTIK':
         render_mode='human',
         control_freq=200,
         is_interpolate=False,
-        is_pd=False
+        is_pd=True
     )
     actions = [np.array([0.3, 0.4, 0.4, 1, 0, 0, 0]),
                np.array([0.4, -0.4, 0.6, 1, 0, 0, 0])]

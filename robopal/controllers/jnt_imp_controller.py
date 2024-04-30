@@ -1,7 +1,6 @@
 from typing import Union, Dict
 import numpy as np
 
-from robopal.commons.pin_utils import PinSolver
 from robopal.controllers.base_controller import BaseController
 
 
@@ -15,8 +14,6 @@ class JntImpedance(BaseController):
         super().__init__(robot)
 
         self.name = 'JNTIMP'
-        self.dofs = robot.jnt_num
-        self.kd_solver = PinSolver(robot.urdf_path)
 
         # hyperparameters of impedance controller
         self.B = np.zeros(self.dofs)

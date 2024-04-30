@@ -17,7 +17,6 @@ class BaseRobot:
     :param manipulator(str): manipulator name
     :param gripper(str): gripper name
     :param g2m_body(str): gripper to manipulator body name
-    :param urdf_path(str): urdf file path
     :param xml_path(str): If you have specified the xml path of your local robot,
     it'll not automatically construct the xml file with input assets.
     """
@@ -29,7 +28,6 @@ class BaseRobot:
                  manipulator: Union[str, List[str]] = None,
                  gripper: Union[str, List[str]] = None,
                  g2m_body: Union[str, List[str]] = None,
-                 urdf_path: str = None,
                  ):
         self.name = name
 
@@ -43,8 +41,6 @@ class BaseRobot:
         self._manipulator = manipulator
         self._gripper = gripper
         self._g2m_body = g2m_body
-
-        self.urdf_path = urdf_path  # urdf file used for pinocchio lib
 
         self.mjcf_generator = self._construct_mjcf_data()
         self.add_assets()
@@ -182,7 +178,12 @@ class BaseRobot:
         return self.robot_data.body(self.end_name[agent]).xmat.copy().reshape(3, 3)
     
     def get_end_xvel(self, agent: str = 'arm0') -> np.ndarray:
-        return self.robot_data.body(self.end_name[agent]).xvel.copy()
+        """ Computing the end effector velocity
+
+        :param agent: agent name
+        :return: end effector velocity, 6*1, [v, w]
+        """
+        return np.dot(self.get_full_jac(agent), self.get_arm_qvel(agent))
 
     def get_base_xpos(self, agent: str = 'arm0') -> np.ndarray:
         return self.robot_data.body(self.base_link_name[agent]).xpos.copy()
@@ -192,4 +193,48 @@ class BaseRobot:
 
     def get_base_xmat(self, agent: str = 'arm0') -> np.ndarray:
         return self.robot_data.body(self.base_link_name[agent]).xmat.copy().reshape(3, 3)
+    
+    def get_full_jac(self, agent: str = 'arm0') -> np.ndarray:
+        """ Computes the full model Jacobian, expressed in the coordinate world frame.
+
+        :param agent: agent name
+        :return: Jacobian
+        """
+        bid = mujoco.mj_name2id(self.robot_model, mujoco.mjtObj.mjOBJ_BODY, self.end_name[agent])
+        jacp = np.zeros((3, self.robot_model.nv))
+        jacr = np.zeros((3, self.robot_model.nv))
+        mujoco.mj_jacBody(self.robot_model, self.robot_data, jacp, jacr, bid)
+        return np.concatenate([
+            jacp[:, self.arm_joint_indexes[agent]], 
+            jacr[:, self.arm_joint_indexes[agent]]
+        ], axis=0).copy()
+    
+    def get_full_jac_pinv(self, agent: str = 'arm0') -> np.ndarray:
+        """ Computes the full model Jacobian_pinv expressed in the coordinate world frame.
+
+        :param agent: agent name
+        :return: Jacobian_pinv
+        """
+        return np.linalg.pinv(self.get_full_jac(agent)).copy()
+    
+    def get_jac_dot(self, agent: str = 'arm0') -> np.ndarray:
+        """ Computing the Jacobian_dot in the joint frame.
+        https://github.com/google-deepmind/mujoco/issues/411#issuecomment-1211001685
+
+        :param agent: agent name
+        :return: Jacobian_dot
+        """
+        h = 1e-2
+        J = self.get_full_jac(agent)
+
+        original_qpos = self.robot_data.qpos.copy()
+        mujoco.mj_integratePos(self.robot_model, self.robot_data.qpos, self.robot_data.qvel, h)
+        mujoco.mj_comPos(self.robot_model, self.robot_data)
+        mujoco.mj_kinematics(self.robot_model, self.robot_data)
+
+        Jh = self.get_full_jac(agent)
+        self.robot_data.qpos = original_qpos
+
+        Jdot = (Jh - J) / h
+        return Jdot
     

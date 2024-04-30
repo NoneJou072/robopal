@@ -12,7 +12,7 @@ if __name__ == "__main__":
     options = {}
 
     # Choose controller
-    options['ctrl'] = 'JNTVEL'
+    options['ctrl'] = 'CARTIMP'
 
     assert options['ctrl'] in ['JNTIMP', 'JNTVEL', 'CARTIMP', 'CARTIK'], 'Invalid controller'
 
@@ -50,5 +50,4 @@ if __name__ == "__main__":
         env.reset()
         for t in range(int(2e4)):
             env.step(action)
-            print(env.mj_data.ctrl[0])
         env.close()
