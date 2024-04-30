@@ -302,11 +302,11 @@ class XMLSplicer:
                                             goal_body=(mani_id, f'{mani_id}_mount_base_link') if chassis is not None else (mani_id, 'worldbody'))
 
             if gripper is not None:
-                assert kwargs['g2m_body'] is not None, "Please specify the g2m_body for the gripper."
-                g2m_body = kwargs['g2m_body'] if isinstance(kwargs['g2m_body'], list) else [kwargs['g2m_body']]
+                assert kwargs['attached_body'] is not None, "Please specify the attached_body for the gripper."
+                attached_body = kwargs['attached_body'] if isinstance(kwargs['attached_body'], list) else [kwargs['attached_body']]
                 if isinstance(gripper, str):
                     gripper = [gripper]
                 if isinstance(gripper, list):
-                    for goal_body, g in zip(enumerate(g2m_body), gripper):
+                    for goal_body, g in zip(enumerate(attached_body), gripper):
                         gripper_path = path.join(GRIPPERS_DIR_PATH, g, '{}.xml'.format(g))
                         self.add_component_from_xml(gripper_path, goal_body=goal_body)

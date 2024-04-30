@@ -16,7 +16,7 @@ class BaseRobot:
     :param chassis(str): chassis name
     :param manipulator(str): manipulator name
     :param gripper(str): gripper name
-    :param g2m_body(str): gripper to manipulator body name
+    :param attached_body(str): gripper to manipulator body name
     :param xml_path(str): If you have specified the xml path of your local robot,
     it'll not automatically construct the xml file with input assets.
     """
@@ -27,7 +27,7 @@ class BaseRobot:
                  chassis: Union[str, List[str]] = None,
                  manipulator: Union[str, List[str]] = None,
                  gripper: Union[str, List[str]] = None,
-                 g2m_body: Union[str, List[str]] = None,
+                 attached_body: Union[str, List[str]] = None,
                  ):
         self.name = name
 
@@ -40,7 +40,7 @@ class BaseRobot:
         self._chassis = chassis
         self._manipulator = manipulator
         self._gripper = gripper
-        self._g2m_body = g2m_body
+        self._attached_body = attached_body
 
         self.mjcf_generator = self._construct_mjcf_data()
         self.add_assets()
@@ -71,7 +71,7 @@ class BaseRobot:
             chassis=self._chassis,
             manipulator=self._manipulator,
             gripper=self._gripper,
-            g2m_body=self._g2m_body
+            attached_body=self._attached_body
         )
 
     @property
