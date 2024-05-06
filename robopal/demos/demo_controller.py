@@ -35,7 +35,7 @@ if __name__ == "__main__":
     )
 
     if options['ctrl'] == 'JNTIMP':
-        action = np.array([0.3, -0.4, 0.7, 0.3, -0.4, 0.7, 0])
+        action = np.array([0.3, -0.4, 0.7, -0.3, -0.4, 0.7, 0])
 
     elif options['ctrl'] == 'JNTVEL':
         action = np.array([0.00, 0.1, 0.0, 0.0, 0., 0., 0])
