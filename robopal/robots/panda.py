@@ -10,7 +10,7 @@ class Panda(BaseRobot):
     def __init__(self,
                  scene='default',
                  manipulator='Panda',
-                 gripper='rethink_gripper',
+                 gripper=None,
                  mount=None
                  ):
         super().__init__(

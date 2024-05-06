@@ -72,10 +72,9 @@ class CartesianIKController(JointImpedanceController):
         x = self.robot.get_arm_qpos(agent)
         x_prev = x.copy()
         
-        ik_target = lambda x: self._ik_res(x, pos=pos, quat=quat, reg_target=x_prev, radius=20, reg=.1, agent=agent)
-        jac_target = lambda x, r: self._ik_jac(x, r, pos=pos, quat=quat, radius=20, reg=.1, agent=agent)
+        ik_target = lambda x: self._ik_res(x, pos=pos, quat=quat, reg_target=x_prev, radius=.2, reg=.01, agent=agent)
+        jac_target = lambda x, r: self._ik_jac(x, r, pos=pos, quat=quat, radius=.2, reg=.01, agent=agent)
         x, _ = minimize.least_squares(x, ik_target, self.robot.mani_joint_bounds[agent], jacobian=jac_target, eps=1e-5, verbose=0)
-        # x, _ = minimize.least_squares(x, ik_target, self.robot.mani_joint_bounds[agent], eps=1e-4, verbose=0)
 
         return x
     
