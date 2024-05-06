@@ -8,7 +8,7 @@ from robopal.robots.diana_med import DianaGraspMultiObjs
 class MultiCubes(ManipulateEnv):
 
     def __init__(self,
-                 robot=DianaGraspMultiObjs(),
+                 robot=DianaGraspMultiObjs,
                  render_mode='human',
                  control_freq=20,
                  enable_camera_viewer=False,

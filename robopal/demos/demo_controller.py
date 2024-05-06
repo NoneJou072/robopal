@@ -1,4 +1,3 @@
-import argparse
 import numpy as np
 import logging
 
@@ -8,17 +7,27 @@ from robopal.envs import RobotEnv
 
 logging.basicConfig(level=logging.INFO)
 
+MANIPULATORS = {
+    'DianaMed': DianaMed,
+    'Panda' : Panda,
+}
+
 if __name__ == "__main__":
 
     options = {}
+    # Choose the manipulator
+    print("available manipulator:\n DianaMed, Panda")
+    options['manipulator'] = input("Choose the manipulator:")
+    assert options['manipulator'] in MANIPULATORS.keys(), 'Invalid manipulator'
+    options['manipulator'] = MANIPULATORS[options['manipulator']]
 
-    # Choose controller
-    options['ctrl'] = 'CARTIK'
-
+    # Choose the controller
+    print("available controllers:\n JNTIMP, JNTVEL, CARTIMP, CARTIK")
+    options['ctrl'] = input("Choose the controller:")
     assert options['ctrl'] in ['JNTIMP', 'JNTVEL', 'CARTIMP', 'CARTIK'], 'Invalid controller'
 
     env = RobotEnv(
-        robot=DianaMed(),
+        robot=options['manipulator'],
         render_mode='human',
         control_freq=200,
         is_interpolate=False,

@@ -45,7 +45,7 @@ class CamCalibEnv(RobotEnv):
 if __name__ == "__main__":
 
     env = CamCalibEnv(
-        robot=DianaCalib(),
+        robot=DianaCalib,
         render_mode='human',
         control_freq=200,
         controller='JNTIMP',

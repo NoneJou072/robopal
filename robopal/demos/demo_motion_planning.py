@@ -6,7 +6,7 @@ from robopal.controllers.planners.rrt import rrt_star
 
 
 env = RobotEnv(
-    robot=DianaCollide(),
+    robot=DianaCollide,
     render_mode="human",
     control_freq=200,
     is_interpolate=False,

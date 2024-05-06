@@ -29,7 +29,7 @@ class BimanualPettingStyleEnv(ParallelEnv, RobotEnv):
         """ The init method takes in environment arguments.
         """
         super().__init__(
-            robot=DualDianaMed(),
+            robot=DualDianaMed,
             render_mode="human",
             control_freq=10,
             enable_camera_viewer=False,

@@ -24,8 +24,8 @@ class JointVelocityController(BaseController):
         self.k_d = np.zeros(self.dofs)
 
         self.set_jnt_params(
-            p=0.1 * np.ones(self.dofs),
-            d=0.003 * np.ones(self.dofs),
+            p=0.3 * np.ones(self.dofs),
+            d=0.1 * np.ones(self.dofs),
         )
 
         self.last_err = np.zeros(robot.jnt_num)

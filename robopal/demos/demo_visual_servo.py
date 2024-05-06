@@ -113,7 +113,7 @@ if __name__ == "__main__":
     from robopal.robots.diana_med import DianaAruco
 
     env = VisualServo(
-        robot=DianaAruco(),
+        robot=DianaAruco,
         render_mode='human',
         control_freq=100,
         controller='JNTIMP',

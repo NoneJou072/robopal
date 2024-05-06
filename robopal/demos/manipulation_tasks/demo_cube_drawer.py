@@ -8,7 +8,7 @@ from robopal.robots.diana_med import DianaDrawerCube
 class DrawerCubeEnv(ManipulateEnv):
 
     def __init__(self,
-                 robot=DianaDrawerCube(),
+                 robot=DianaDrawerCube,
                  render_mode='human',
                  control_freq=20,
                  enable_camera_viewer=False,

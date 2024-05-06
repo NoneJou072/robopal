@@ -18,7 +18,7 @@ if __name__ == "__main__":
     assert options['ctrl'] in ['JNTIMP', 'JNTVEL', 'CARTIMP', 'CARTIK'], 'Invalid controller'
 
     env = RobotEnv(
-        robot=DianaMed(),
+        robot=DianaMed,
         render_mode='human',
         control_freq=200,
         is_interpolate=False,
@@ -29,7 +29,7 @@ if __name__ == "__main__":
         action = np.array([0.3, -0.4, 0.7, 0.3, -0.4, 0.7, 0])
 
     elif options['ctrl'] == 'JNTVEL':
-        action = np.array([0.00, 0.1, 0.0, 0.0, 0., 0., 0])
+        action = np.array([0.1, 0.1, 0.0, 0.0, 0., 0., 0])
 
     elif options['ctrl'] == 'CARTIMP':
         action = np.array([0.33, -0.39, 0.66, 1.0, 0.0, 0.0, 0])

@@ -41,7 +41,7 @@ if __name__ == "__main__":
     from robopal.robots.diana_med import DianaMed
 
     env = VisualForceAdmit(
-        robot=DianaMed(),
+        robot=DianaMed,
         render_mode="human",
         controller=1,
         control_freq=100,

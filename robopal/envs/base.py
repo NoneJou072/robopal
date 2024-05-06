@@ -1,6 +1,6 @@
 import abc
 import logging
-from typing import Union, List, Any, Dict
+from typing import Union, List, Any, Dict, ClassVar
 
 import mujoco
 import numpy as np
@@ -32,16 +32,17 @@ class MujocoEnv:
 
     def __init__(
         self,
-        robot=None,
+        robot = None,
         control_freq: int = 200,
         enable_camera_viewer: bool = False,
         camera_name: str = None,
         render_mode: str = 'human',
     ):
-        assert isinstance(robot, BaseRobot), "Please select a robot config file."
-        self.robot = robot
-        self.agents = self.robot.agents
 
+        self.robot: BaseRobot = robot()
+        assert isinstance(self.robot, BaseRobot), "Please select a robot config file."
+        
+        self.agents = self.robot.agents
         self.control_freq = control_freq
 
         self.mj_model: mujoco.MjModel = self.robot.robot_model

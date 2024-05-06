@@ -4,7 +4,7 @@ from robopal.robots.diana_med import DianaAssemble
 from robopal.envs import RobotEnv
 
 env = RobotEnv(
-    robot=DianaAssemble(),
+    robot=DianaAssemble,
     render_mode='human',
     control_freq=100,
     is_interpolate=False,
