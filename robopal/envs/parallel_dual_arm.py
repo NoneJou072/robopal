@@ -35,7 +35,6 @@ class BimanualPettingStyleEnv(ParallelEnv, RobotEnv):
             enable_camera_viewer=False,
             controller="JNTIMP",
             is_interpolate=False,
-            is_pd=False,
         )
 
         self.obs_dim = (35,)

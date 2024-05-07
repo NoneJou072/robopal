@@ -8,6 +8,7 @@ from robopal.envs import RobotEnv
 
 logging.basicConfig(level=logging.INFO)
 
+    
 if __name__ == "__main__":
 
     options = {}
@@ -37,8 +38,16 @@ if __name__ == "__main__":
     elif options['ctrl'] == 'CARTIK':
         action = np.array([0.33, -0.3, 0.5, 1, 0, 0, 0])
 
+    def test_JNTIMP_error():
+        print(np.linalg.norm(action - env.robot.get_arm_qpos()))
+    
+    def test_CARTIK_error():
+        current_pos, current_quat = env.controller.forward_kinematics(env.robot.get_arm_qpos())
+        print(np.sum(np.abs(action[:3] - current_pos)) + np.sum(np.abs(action[3:] - current_quat)))
+
     if isinstance(env, RobotEnv):
         env.reset()
         for t in range(int(2e4)):
             env.step(action)
+            test_CARTIK_error()
         env.close()

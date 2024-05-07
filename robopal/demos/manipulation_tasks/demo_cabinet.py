@@ -13,8 +13,6 @@ class LockedCabinetEnv(ManipulateEnv):
                  control_freq=20,
                  enable_camera_viewer=False,
                  controller='CARTIK',
-                 is_interpolate=False,
-                 is_pd=False,
                  ):
         super().__init__(
             robot=robot,
@@ -22,8 +20,6 @@ class LockedCabinetEnv(ManipulateEnv):
             control_freq=control_freq,
             enable_camera_viewer=enable_camera_viewer,
             controller=controller,
-            is_interpolate=is_interpolate,
-            is_pd=is_pd,
         )
         self.name = 'LockedCabinet-v1'
 

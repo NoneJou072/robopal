@@ -13,7 +13,6 @@ class DrawerCubeEnv(ManipulateEnv):
                  control_freq=20,
                  enable_camera_viewer=False,
                  controller='CARTIK',
-                 is_interpolate=False,
                  ):
         super().__init__(
             robot=robot,
@@ -21,7 +20,6 @@ class DrawerCubeEnv(ManipulateEnv):
             control_freq=control_freq,
             enable_camera_viewer=enable_camera_viewer,
             controller=controller,
-            is_interpolate=is_interpolate,
         )
         self.name = 'DrawerBox-v1'
 
