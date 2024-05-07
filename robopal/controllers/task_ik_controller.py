@@ -72,9 +72,10 @@ class CartesianIKController(JointImpedanceController):
         x = self.robot.get_arm_qpos(agent)
         x_prev = x.copy()
         
-        ik_target = lambda x: self._ik_res(x, pos=pos, quat=quat, reg_target=x_prev, radius=.2, reg=.01, agent=agent)
-        jac_target = lambda x, r: self._ik_jac(x, r, pos=pos, quat=quat, radius=.2, reg=.01, agent=agent)
-        x, _ = minimize.least_squares(x, ik_target, self.robot.mani_joint_bounds[agent], jacobian=jac_target, eps=1e-5, verbose=0)
+        radius=.2
+        ik_target = lambda x: self._ik_res(x, pos=pos, quat=quat, reg_target=x_prev, radius=radius, reg=.01, agent=agent)
+        jac_target = lambda x, r: self._ik_jac(x, r, pos=pos, quat=quat, radius=radius, reg=.01, agent=agent)
+        x, _ = minimize.least_squares(x, ik_target, self.robot.mani_joint_bounds[agent], jacobian=jac_target, eps=1e-6, verbose=0)
 
         return x
     
@@ -125,17 +126,15 @@ class CartesianIKController(JointImpedanceController):
 
         # We can assume x has been copied into qpos
         # and that mj_kinematics has been called by ik()
-
-        # Call mj_comPos (required for Jacobians).
         mujoco.mj_comPos(self.robot.robot_model, self.robot.kine_data)
 
         # Get end-effector site Jacobian.
         jac_pos = np.empty((3, self.robot.robot_model.nv))
         jac_quat = np.empty((3, self.robot.robot_model.nv))
-
         mujoco.mj_jacBody(self.robot.robot_model, self.robot.kine_data, jac_pos, jac_quat, self.robot.kine_data.body(self.robot.end_name[agent]).id)
         jac_pos = jac_pos[:, self.robot.arm_joint_indexes[agent]]
         jac_quat = jac_quat[:, self.robot.arm_joint_indexes[agent]]
+        
         # Get Deffector, the 3x3 mju_subquat Jacobian
         effector_quat = np.empty(4)
         mujoco.mju_mat2Quat(effector_quat, self.robot.kine_data.body(self.robot.end_name[agent]).xmat)
