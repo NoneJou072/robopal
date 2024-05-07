@@ -10,7 +10,7 @@ class UR5e(BaseRobot):
     def __init__(self,
                  scene='default',
                  manipulator='UR5e',
-                 gripper=None,
+                 gripper='robotiq_gripper',
                  mount=None
                  ):
         super().__init__(
