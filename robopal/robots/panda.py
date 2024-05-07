@@ -6,7 +6,7 @@ ASSET_DIR = os.path.join(os.path.dirname(__file__), '../assets')
 
 
 class Panda(BaseRobot):
-    """ DianaMed robot base class. """
+    """ Panda robot base class. """
     def __init__(self,
                  scene='default',
                  manipulator='Panda',

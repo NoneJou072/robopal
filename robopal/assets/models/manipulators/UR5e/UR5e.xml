@@ -37,26 +37,26 @@
     <material class="ur5e" name="linkgray" rgba="0.82 0.82 0.82 1"/>
     <material class="ur5e" name="urblue" rgba="0.49 0.678 0.8 1"/>
 
-    <mesh file="base_0.obj"/>
-    <mesh file="base_1.obj"/>
-    <mesh file="shoulder_0.obj"/>
-    <mesh file="shoulder_1.obj"/>
-    <mesh file="shoulder_2.obj"/>
-    <mesh file="upperarm_0.obj"/>
-    <mesh file="upperarm_1.obj"/>
-    <mesh file="upperarm_2.obj"/>
-    <mesh file="upperarm_3.obj"/>
-    <mesh file="forearm_0.obj"/>
-    <mesh file="forearm_1.obj"/>
-    <mesh file="forearm_2.obj"/>
-    <mesh file="forearm_3.obj"/>
-    <mesh file="wrist1_0.obj"/>
-    <mesh file="wrist1_1.obj"/>
-    <mesh file="wrist1_2.obj"/>
-    <mesh file="wrist2_0.obj"/>
-    <mesh file="wrist2_1.obj"/>
-    <mesh file="wrist2_2.obj"/>
-    <mesh file="wrist3.obj"/>
+    <mesh file="meshes/base_0.obj"/>
+    <mesh file="meshes/base_1.obj"/>
+    <mesh file="meshes/shoulder_0.obj"/>
+    <mesh file="meshes/shoulder_1.obj"/>
+    <mesh file="meshes/shoulder_2.obj"/>
+    <mesh file="meshes/upperarm_0.obj"/>
+    <mesh file="meshes/upperarm_1.obj"/>
+    <mesh file="meshes/upperarm_2.obj"/>
+    <mesh file="meshes/upperarm_3.obj"/>
+    <mesh file="meshes/forearm_0.obj"/>
+    <mesh file="meshes/forearm_1.obj"/>
+    <mesh file="meshes/forearm_2.obj"/>
+    <mesh file="meshes/forearm_3.obj"/>
+    <mesh file="meshes/wrist1_0.obj"/>
+    <mesh file="meshes/wrist1_1.obj"/>
+    <mesh file="meshes/wrist1_2.obj"/>
+    <mesh file="meshes/wrist2_0.obj"/>
+    <mesh file="meshes/wrist2_1.obj"/>
+    <mesh file="meshes/wrist2_2.obj"/>
+    <mesh file="meshes/wrist3.obj"/>
   </asset>
 
   <worldbody>
@@ -111,7 +111,9 @@
                   <joint name="wrist_3_joint" class="size1"/>
                   <geom material="linkgray" mesh="wrist3" class="visual"/>
                   <geom class="eef_collision" pos="0 0.08 0" quat="1 1 0 0" size="0.04 0.02"/>
-                  <site name="attachment_site" pos="0 0.1 0" quat="-1 1 0 0"/>
+                  <body name="attachment" pos="0 0.1 0" quat="-1 1 0 0">
+                      <site name="attachment_site"/>
+                  </body>
                 </body>
               </body>
             </body>
@@ -122,13 +124,15 @@
   </worldbody>
 
   <actuator>
-    <general class="size3" name="shoulder_pan" joint="shoulder_pan_joint"/>
-    <general class="size3" name="shoulder_lift" joint="shoulder_lift_joint"/>
-    <general class="size3_limited" name="elbow" joint="elbow_joint"/>
-    <general class="size1" name="wrist_1" joint="wrist_1_joint"/>
-    <general class="size1" name="wrist_2" joint="wrist_2_joint"/>
-    <general class="size1" name="wrist_3" joint="wrist_3_joint"/>
-  </actuator>
+        <!-- Physical limits of the actuator. -->
+        <!-- Values taken from https://www.universal-robots.com/articles/ur-articles/max-joint-torques/ -->
+        <motor ctrllimited="true" ctrlrange="-150.0 150.0" joint="shoulder_pan_joint" name="actuator1"/>
+        <motor ctrllimited="true" ctrlrange="-150.0 150.0" joint="shoulder_lift_joint" name="actuator2"/>
+        <motor ctrllimited="true" ctrlrange="-150.0 150.0" joint="elbow_joint" name="actuator3"/>
+        <motor ctrllimited="true" ctrlrange="-28.0 28.0" joint="wrist_1_joint" name="actuator4"/>
+        <motor ctrllimited="true" ctrlrange="-28.0 28.0" joint="wrist_2_joint" name="actuator5"/>
+        <motor ctrllimited="true" ctrlrange="-28.0 28.0" joint="wrist_3_joint" name="actuator6"/>
+    </actuator>
 
   <keyframe>
     <key name="home" qpos="-1.5708 -1.5708 1.5708 -1.5708 -1.5708 0" ctrl="-1.5708 -1.5708 1.5708 -1.5708 -1.5708 0"/>
