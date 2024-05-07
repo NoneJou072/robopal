@@ -64,26 +64,15 @@ class MujocoEnv:
 
         self._mj_state = None
 
-    def step(self, action: Union[np.ndarray, Dict[str, np.ndarray]]):
+    def step(self, action: Union[np.ndarray, Dict[str, np.ndarray]] = None) -> Any:
         """ 
         This method will be called with one-step in mujoco
         :param action: Input action
         :return: None
         """
-        if self.renderer is not None and self.renderer.render_paused:
+        if self.renderer.render_paused:
             self.cur_time += 1
-            self.inner_step(action)
             mujoco.mj_step(self.mj_model, self.mj_data, self._n_substeps)
-
-    @abc.abstractmethod
-    def inner_step(self, action):
-        """  This method will be called with one-step in mujoco, before mujoco step.
-        For example, you can use this method to update the robot's joint position.
-
-        :param action: input actions
-        :return: None
-        """
-        raise NotImplementedError
 
     def reset(
         self,
@@ -99,7 +88,6 @@ class MujocoEnv:
         if isinstance(options, dict):
             if "disable_reset_render" in options and options["disable_reset_render"]:
                 return
-        self.render()
 
     def reset_object(self):
         """ Set pose of the object. """
@@ -141,7 +129,7 @@ class MujocoEnv:
         for j, per_arm_joint_names in enumerate(self.robot.arm_joint_names[agent]):
             self.mj_data.joint(per_arm_joint_names).qpos = qpos[j]
 
-    def set_joint_ctrl(self, torque: np.ndarray, agent: str = 'arm0'):
+    def set_actuator_ctrl(self, torque: np.ndarray, agent: str = 'arm0'):
         """ Set joint torque. """
         assert torque.shape[0] == self.robot.jnt_num
         for j, per_arm_actuator_names in enumerate(self.robot.arm_actuator_names[agent]):

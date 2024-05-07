@@ -67,34 +67,35 @@ class RobotEnv(MujocoEnv):
             self.render()
             return ret
 
-        return wrapper
-
-    def inner_step(self, action):
-        joint_inputs = self.controller.step_controller(action)
-        # Send joint_inputs to simulation
-        if isinstance(joint_inputs, np.ndarray):
-            self.set_joint_ctrl(joint_inputs)
-        else:
-            for agent in self.robot.agents:
-                self.set_joint_ctrl(joint_inputs[agent], agent)
+        return wrapper 
 
     @auto_render
     def step(self, action: Union[np.ndarray, Dict[str, np.ndarray]]):
         if self.is_interpolate:
             self.controller.step_interpolator(action)
-        super().step(action)
 
-    def reset(self, seed=None, options=None):
-        self.controller.reset()
-        super().reset(seed, options)
+        joint_inputs = self.controller.step_controller(action)
+        # Send joint_inputs to simulation
+        if isinstance(joint_inputs, np.ndarray):
+            self.set_actuator_ctrl(joint_inputs)
+        else:
+            for agent in self.robot.agents:
+                self.set_actuator_ctrl(joint_inputs[agent], agent)
 
-    def gripper_ctrl(self, actuator_name: str = None, gripper_action: int = 1):
+        super().step()
+
+    def set_gripper_ctrl(self, actuator_name: str, actuator_value: int, agent: str = "arm0"):
         """ Gripper control.
 
         :param actuator_name: Gripper actuator name.
-        :param gripper_action: Gripper action, 0 for close, 1 for open.
+        :param actuator_value: Gripper actuator value.
         """
-        self.mj_data.actuator(actuator_name).ctrl = -40 if gripper_action == 0 else 40
+        self.mj_data.actuator(actuator_name).ctrl = actuator_value
+    
+    @auto_render
+    def reset(self, seed=None, options=None):
+        self.controller.reset()
+        super().reset(seed, options)
 
     @property
     def dt(self):
