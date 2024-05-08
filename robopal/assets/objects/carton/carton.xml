@@ -1,0 +1,17 @@
+<mujoco>
+    <asset>
+        <texture file="textures/boxtype.png" type="2d" name="carton"/>
+        <material name="carton" reflectance="0.1" texrepeat="1 1" texture="carton" texuniform="false"/>
+    </asset>
+    <worldbody>
+        <body name="carton">
+            <joint name="carton:joint" type="free" damping="0.1"/>
+            <!-- <geom name="carton" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="0" contype="0" group="1"/> -->
+            <geom name="carton_front_collision" pos="0 0.1 0" size="0.1 0.003 0.1" material="carton" type="box" conaffinity="1" condim="3" contype="1" group="1" mass="0.02"/>
+            <geom name="carton_back_collision" pos="0 -0.1 0" size="0.1 0.003 0.1" material="carton" type="box" conaffinity="1" condim="3" contype="1" group="1" mass="0.02"/>
+            <geom name="carton_left_collision" pos="0.1 0 0" size="0.003 0.1 0.1" material="carton" type="box" conaffinity="1" condim="3" contype="1" group="1" mass="0.02"/>
+            <geom name="carton_right_collision" pos="-0.1 0 0" size="0.003 0.1 0.1" material="carton" type="box" conaffinity="1" condim="3" contype="1" group="1" mass="0.02"/>
+            <geom name="carton_bottom_collision" pos="0 0 -0.1" size="0.1 0.1 0.003" material="carton" type="box" conaffinity="1" condim="3" contype="1" group="1" mass="0.02"/>
+        </body>
+    </worldbody>
+</mujoco>

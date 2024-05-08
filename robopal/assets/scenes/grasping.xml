@@ -22,7 +22,7 @@
       markrgb="0.68 0.68 0.68" width="300" height="300"/>
     <material name="groundplane" reflectance="0.2" shininess="0.0" specular="0.0" texrepeat="5 5" texture="groundplane" texuniform="true"/>
 
-    <texture name="wood" type="2d" file="../textures/wood.png"/>
+    <texture name="wood" type="2d" file="wood.png"/>
     <material name="wood" texture="wood" texrepeat="1 1" texuniform="true" rgba="0.68 0.68 0.68 1"/>
   </asset>
 

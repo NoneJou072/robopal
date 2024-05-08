@@ -1,6 +1,6 @@
 <mujoco>
     <asset>
-        <texture name="aruco" type='2d' file="textures/aruco.png"/>
+        <texture name="aruco" type='2d' file="aruco.png"/>
         <material name="aruco" texture='aruco' texrepeat='1 1' texuniform='false'/>
     </asset>
     <worldbody>

@@ -4,21 +4,15 @@ and issue: https://github.com/google-deepmind/mujoco/issues/547
 -->
 
 <mujoco>
-	<compiler angle="radian" meshdir="fetch" texturedir="texture" autolimits="true"/>
+	<compiler angle="radian" autolimits="true"/>
 
 	<asset>
         <texture builtin="flat" name="texgeom" height="32" width="32" rgb1="1 1 1" type="cube"/>
         <texture builtin="flat" name="table_tex1" height="32" width="32" rgb1="1 1 1" type="cube"/>-->
 		<texture builtin="flat" name="arm_tex" height="32" width="32" rgb1="1 1 1" type="cube"/>
 
-        <texture file="../texture/factoryfloor.png" type="2d" name="floor"/>
-        <material name="floor_plane" reflectance="0.1" texrepeat="1 1" texture="floor" texuniform="true"/>
-
-        <texture file="../texture/conveyor.png" type="2d" name="conveyorbelt"/>
+        <texture file="textures/conveyor.png" type="2d" name="conveyorbelt"/>
         <material name="conveyor" reflectance="0.1" texrepeat="5 5" texture="conveyorbelt" texuniform="true"/>
-
-        <texture file="../texture/white-marble.png" type="2d" name="aluminum"/>
-        <material name="cylinder" reflectance="0.5" texrepeat="5 5" texture="aluminum" texuniform="true"/>
 
         <material name="table_mat_white" specular="0.2" shininess="0.2" reflectance="0" rgba="1 1 1 1" texture="arm_tex"/>
         <material name="pedestal_mat" specular="0.5" shininess="0.8" reflectance="0" rgba="0.925 0.835 0.655 1" texture="table_tex1"/>
@@ -28,22 +22,9 @@ and issue: https://github.com/google-deepmind/mujoco/issues/547
 
 	<worldbody>
 
-        <light pos="0 0 20"/>
-        <light directional="true" ambient="0.1 0.1 0.1" diffuse="0 0 0" specular="0 0 0" castshadow="false" pos="1.65 0 10" dir="-0.57 -0.57 -0.57" name="light0"/>
-        <light directional="true" ambient="0.05 0.05 0.05" diffuse="0 0 0" specular="0 0 0" castshadow="false" pos="2.13 1.6 2.5" name="light1"/>
-
-		<body name="floor0" pos="0 0 0">
-			<geom name="floorgeom0" pos="1.2 0 0" size="3 3 1" type="plane" condim="3" material="floor_plane"/>
-		</body>
-
 		<body pos="1.555 0.3 0.4" name="table">
 			<geom name="table" size="0.8 1 0.02" type="box" material="table_mat_white" density="20000" friction="1 0.005 0.0001"/>
 		</body>
-
-		<body name="basecylinder" pos="0 0 0">
-      		<geom pos="1.09 0.30 0.58" size="0.07 0.15" type="cylinder" friction="1 0.005 0.0001" name="basecylinder_collision"/>
-      		<geom pos="1.09 0.30 0.58" material="cylinder" size="0.072 0.16" type="cylinder" conaffinity="0" contype="0"/>
-    	</body>
 
 		<body name="conveyor_floor" pos="1.555 0.3 0.422">
 			<geom name="conveyor_floor"  size="0.2 1 0.01" type="plane" density="20000" condim="3" friction="1 1 1" material="conveyor"/>
@@ -58,10 +39,6 @@ and issue: https://github.com/google-deepmind/mujoco/issues/547
             <geom conaffinity="1" contype="1" name="Object_target" type="box" condim="3"  size="0.03 0.03 0.03" mass="0.5" rgba="0.6 0.8 0.5 1" solimp="1 1 1" solref="0.02 1"/>
 			<site name="target" pos="0 0 0" size="0.001 0.001" rgba="1 0 0 1" type="cylinder"/>
 		</body>
-
-		<body name="camera_target" pos="1.5 0.3 0.9">
-            <geom conaffinity="0" contype="0" pos="0 0 0" rgba="0 0 1 0" size="0.0475 0.0475 0.001" type="box"/>
-        </body>
 		
 		<camera fovy="80" name="third_person" pos="2.10 0.3 1.4" euler="0 0.83 1.57"/>
 

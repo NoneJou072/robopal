@@ -4,7 +4,7 @@ from os import path
 
 ASSETS_PATH = path.join(path.dirname(path.dirname(__file__)), 'assets')
 MODELS_PATH = path.join(ASSETS_PATH, 'models')
-CHASSISES_DIR_PATH = path.join(MODELS_PATH, 'mounts')
+MOUNTS_DIR_PATH = path.join(MODELS_PATH, 'mounts')
 GRIPPERS_DIR_PATH = path.join(MODELS_PATH, 'grippers')
 MANIPULATORS_DIR_PATH = path.join(MODELS_PATH, 'manipulators')
 SCENES_DIR_PATH = path.join(ASSETS_PATH, 'scenes')
@@ -14,7 +14,7 @@ class XMLSplicer:
     def __init__(self,
                  name: str = 'robot',
                  scene: str = 'default',
-                 chassis: Union[str, List[str]] = None,
+                 mount: Union[str, List[str]] = None,
                  manipulator: Union[str, List[str]] = None,
                  gripper: Union[str, List[str]] = None,
                  **kwargs,
@@ -24,7 +24,7 @@ class XMLSplicer:
         self.root = None
         self.splice_robot(
             scene=scene,
-            chassis=chassis,
+            mount=mount,
             manipulator=manipulator,
             gripper=gripper,
             **kwargs,
@@ -103,8 +103,9 @@ class XMLSplicer:
             if child.tag == 'mesh' and child.attrib['file'] is not None:
                 child.attrib['file'] = path.join(path.dirname(xml_path), child.attrib['file'])
             elif child.tag == 'texture' and 'file' in child.attrib:
-                child.attrib['file'] = path.join(path.dirname(path.dirname(xml_path)), 'textures',
-                                                 path.basename(child.attrib['file']))
+                TEXTURE_DIR_PATH = path.dirname(__file__) + '/../assets/textures'
+                child.attrib['file'] = path.join(TEXTURE_DIR_PATH,
+                                                 child.attrib['file'])
 
     def tag_rename(self, id, node: ET.Element):
         for mesh in node.findall('.//mesh[@name]'):
@@ -169,7 +170,7 @@ class XMLSplicer:
             raise ValueError("Please checkout your xml path.")
         new_tree = ET.parse(xml_path)
 
-        for node_type in ['worldbody', 'asset']:
+        for node_type in ['worldbody', 'asset', 'actuator']:
             new_node = new_tree.getroot().find(node_type)
             if new_node is not None:
                 parent_element = self.root.find(node_type)
@@ -261,11 +262,11 @@ class XMLSplicer:
         self.save_xml(output_path)
         return path.abspath(path.join(output_path, f"{self.xml_name}.xml"))
 
-    def splice_robot(self, scene=None, chassis=None, manipulator=None, gripper=None, **kwargs):
-        """ Splice the robot with the given scene, chassis, manipulator and gripper.
+    def splice_robot(self, scene=None, mount=None, manipulator=None, gripper=None, **kwargs):
+        """ Splice the robot with the given scene, mount, manipulator and gripper.
 
         :param scene: scene name
-        :param chassis: chassis name
+        :param mount: mount name
         :param manipulator: manipulator name
         :param gripper: gripper name
         :param kwargs:
@@ -280,15 +281,15 @@ class XMLSplicer:
         else:
             raise ValueError("Must have scene.xml to generate the world.")
 
-        if isinstance(chassis, str):
-            chassis = [chassis]
-        if isinstance(chassis, list):
-            for ch_id, ch_name in enumerate(chassis):
+        if isinstance(mount, str):
+            mount = [mount]
+        if isinstance(mount, list):
+            for ch_id, ch_name in enumerate(mount):
                 if ch_name.endswith('.xml'):
-                    chassis_path = ch_name
+                    mount_path = ch_name
                 else:
-                    chassis_path = path.join(CHASSISES_DIR_PATH, ch_name, '{}.xml'.format(ch_name))
-                self.add_component_from_xml(chassis_path, goal_body=(ch_id, 'worldbody'))
+                    mount_path = path.join(MOUNTS_DIR_PATH, ch_name, '{}.xml'.format(ch_name))
+                self.add_component_from_xml(mount_path, goal_body=(ch_id, 'worldbody'))
 
         if isinstance(manipulator, str):
             manipulator = [manipulator]
@@ -299,7 +300,7 @@ class XMLSplicer:
                 else:
                     manipulator_path = path.join(MANIPULATORS_DIR_PATH, mani_name, '{}.xml'.format(mani_name))
                 self.add_component_from_xml(manipulator_path,
-                                            goal_body=(mani_id, f'{mani_id}_mount_base_link') if chassis is not None else (mani_id, 'worldbody'))
+                                            goal_body=(mani_id, f'{mani_id}_mount_base_link') if mount is not None else (mani_id, 'worldbody'))
 
             if gripper is not None:
                 assert kwargs['attached_body'] is not None, "Please specify the attached_body for the gripper."

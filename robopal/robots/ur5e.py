@@ -10,13 +10,13 @@ class UR5e(BaseRobot):
     def __init__(self,
                  scene='default',
                  manipulator='UR5e',
-                 gripper='robotiq_gripper',
+                 gripper=None,
                  mount=None
                  ):
         super().__init__(
             name="ur5e",
             scene=scene,
-            chassis=mount,
+            mount=mount,
             manipulator=manipulator,
             gripper=gripper,
             attached_body='0_attachment',
@@ -29,4 +29,16 @@ class UR5e(BaseRobot):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return {self.agents[0]: np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0])}
+        return {self.agents[0]: np.array([0.0, -np.pi / 2.0, np.pi / 2.0, -np.pi / 2.0, -np.pi / 2.0, np.pi / 2.0])}
+
+
+class UR5eConveyor(UR5e):
+    def __init__(self):
+        super().__init__(scene='default',
+                         gripper='robotiq_gripper',
+                         mount='cylinder')
+
+    def add_assets(self):
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/conveyor belt/conveyor belt.xml')
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/carton/carton.xml')
+        self.mjcf_generator.set_node_attrib('body', 'carton', {'pos': '1.1 -0.3 0.53'})

@@ -16,7 +16,7 @@ class Panda(BaseRobot):
         super().__init__(
             name="diana_med",
             scene=scene,
-            chassis=mount,
+            mount=mount,
             manipulator=manipulator,
             gripper=gripper,
             attached_body='0_attachment',

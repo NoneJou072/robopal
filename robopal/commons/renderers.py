@@ -153,6 +153,13 @@ class MjRenderer:
                 rgba=np.concatenate([np.random.uniform(0, 1, 3), np.array([1])], axis=0)
             )
 
+    def visualize_site_frame(self):
+        """ Visualize frames and labels. """
+        assert self.render_mode in ["human", "rgb_array", "depth"]
+        self.viewer.opt.frame = mujoco.mjtFrame.mjFRAME_SITE
+        self.viewer.opt.label = mujoco.mjtLabel.mjLABEL_SITE
+        self.viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_TRANSPARENT] = True
+    
     def render_pixels_from_camera(self, cam='0_cam', enable_depth=True):
         self.image_renderer.update_scene(self.mj_data, camera=cam)
         if enable_depth is True:

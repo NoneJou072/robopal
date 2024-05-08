@@ -13,7 +13,7 @@ class BaseRobot:
 
     :param name(str): robot name
     :param scene(str): scene name
-    :param chassis(str): chassis name
+    :param mount(str): mount name
     :param manipulator(str): manipulator name
     :param gripper(str): gripper name
     :param attached_body(str): gripper to manipulator body name
@@ -24,7 +24,7 @@ class BaseRobot:
     def __init__(self,
                  name: str = None,
                  scene: str = 'default',
-                 chassis: Union[str, List[str]] = None,
+                 mount: Union[str, List[str]] = None,
                  manipulator: Union[str, List[str]] = None,
                  gripper: Union[str, List[str]] = None,
                  attached_body: Union[str, List[str]] = None,
@@ -37,7 +37,7 @@ class BaseRobot:
         logging.info(f'Activated agents: {self.agents}')
 
         self._scene = scene
-        self._chassis = chassis
+        self._mount = mount
         self._manipulator = manipulator
         self._gripper = gripper
         self._attached_body = attached_body
@@ -71,7 +71,7 @@ class BaseRobot:
     def _construct_mjcf_data(self) -> RobotGenerator:
         return RobotGenerator(
             scene=self._scene,
-            chassis=self._chassis,
+            mount=self._mount,
             manipulator=self._manipulator,
             gripper=self._gripper,
             attached_body=self._attached_body
