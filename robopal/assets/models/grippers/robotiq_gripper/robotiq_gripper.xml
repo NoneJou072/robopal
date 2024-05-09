@@ -19,10 +19,10 @@
             <joint damping=".1" pos="0 0 0" axis="1 0 0" limited="true"/>
             <geom rgba=".1 .1 .1 1" type="mesh" contype="0" conaffinity="0" group="1"/>
             <default class="robotiq_col">
-                <geom rgba=".3 .4 .5 1" type="mesh" contype="1" conaffinity="0" group="3"/>
+                <geom rgba=".3 .4 .5 1" type="mesh" contype="1" conaffinity="0" group="3" />
             </default>
             <default class="robotiq_pad_col">
-                <geom rgba=".3 .4 .5 1" type="mesh" contype="1" conaffinity="1" group="3" condim="4"/>
+                <geom rgba=".3 .4 .5 1" type="mesh" contype="1" conaffinity="1" group="3" condim="4" solref="0.00001 1"/>
             </default>
         </default>
     </default>

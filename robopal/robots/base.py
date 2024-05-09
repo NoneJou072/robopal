@@ -16,7 +16,7 @@ class BaseRobot:
     :param mount(str): mount name
     :param manipulator(str): manipulator name
     :param gripper(str): gripper name
-    :param attached_body(str): gripper to manipulator body name
+    :param attached_body(str): Connect the end of manipulator and gripper at this body.
     :param xml_path(str): If you have specified the xml path of your local robot,
     it'll not automatically construct the xml file with input assets.
     """
@@ -28,29 +28,37 @@ class BaseRobot:
                  manipulator: Union[str, List[str]] = None,
                  gripper: Union[str, List[str]] = None,
                  attached_body: Union[str, List[str]] = None,
+                 specified_xml: str = None
                  ):
         self.name = name
 
-        manipulator = [manipulator] if isinstance(manipulator, str) else manipulator
-        self.agent_num = len(manipulator)
-        self.agents = [f'arm{i}' for i in range(self.agent_num)]
-        logging.info(f'Activated agents: {self.agents}')
+        if specified_xml is None:
+            manipulator = [manipulator] if isinstance(manipulator, str) else manipulator
 
-        self._scene = scene
-        self._mount = mount
-        self._manipulator = manipulator
-        self._gripper = gripper
-        self._attached_body = attached_body
+            self.mjcf_generator = RobotGenerator(
+                scene=scene,
+                mount=mount,
+                manipulator=manipulator,
+                gripper=gripper,
+                attached_body=attached_body
+            )
+            self.add_assets()
 
-        self.mjcf_generator = self._construct_mjcf_data()
-        self.add_assets()
+            self.agent_num = len(manipulator)
+            xml_path = self.mjcf_generator.save_and_load_xml()
+        else:
+            self.agent_num = 0  # by default, user should specify the agent number.
+            assert self.agent_num > 0, 'Please specify the agent number by setting `self.agent_num`.'
+            xml_path = specified_xml
 
-        xml_path = self.mjcf_generator.save_and_load_xml()
         self.robot_model = mujoco.MjModel.from_xml_path(filename=xml_path, assets=None)
         self.robot_data = mujoco.MjData(self.robot_model)
         # deepcopy for computing kinematics.
         self.kine_data: mujoco.MjData = copy.deepcopy(self.robot_data)
 
+        self.agents = [f'arm{i}' for i in range(self.agent_num)]
+        logging.info(f'Activated agents: {self.agents}')
+        
         # robot infos
         self._arm_joint_names = dict()
         self._arm_joint_indexes = dict()
@@ -67,15 +75,6 @@ class BaseRobot:
 
         self.init_quat = dict()
         self.init_pos = dict()
-
-    def _construct_mjcf_data(self) -> RobotGenerator:
-        return RobotGenerator(
-            scene=self._scene,
-            mount=self._mount,
-            manipulator=self._manipulator,
-            gripper=self._gripper,
-            attached_body=self._attached_body
-        )
 
     @property
     def arm_joint_names(self) -> Dict[str, np.ndarray]:

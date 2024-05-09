@@ -32,7 +32,7 @@
 * Python 3.8 +
 
 ### Install from pip
-> **建议 Install from source, 从获取最新版本**
+> **建议 Install from source, 以获取最新版本**
 
 ```commandline
 $ pip install robopal
@@ -57,7 +57,7 @@ python -m robopal.demos.demo_controller
 ## Contribute
 robopal 目前存在很多不足之处，欢迎大家在 issue 中提出问题或留下宝贵的建议，欢迎对这个项目有兴趣的一起来完善。
 
-## Future works：
+## Future works
 * Documentation and tutorials.
 * Teleoperation Interface and `rollout` function (for Imitation Learning).
 * New demos of bimanual, using `petting zoo` style (for Multi-Agents RL).

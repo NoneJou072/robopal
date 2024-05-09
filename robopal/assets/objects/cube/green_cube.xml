@@ -1,9 +1,9 @@
 <mujoco>
     <worldbody>
         <body name="green_block" pos="0.5 0.0 0.46">
-            <joint name="green_block:joint" type="free" damping="0.1"/>
+            <joint name="green_block:joint" type="free" damping="0.1" frictionloss="0"/>
             <geom name="green_block" size="0.02 0.02 0.02" rgba="0 1 0 1" type="box" conaffinity="0" contype="0" group="1"/>
-            <geom name="green_block_collision" size="0.02 0.02 0.02" type="box" conaffinity="1" condim="3" contype="1" group="4" mass="0.02"/>
+            <geom name="green_block_collision" size="0.02 0.02 0.02" type="box" conaffinity="1" contype="1" condim="4" group="4" mass="0.02" friction="1 1 1" solimp="1 1 1" solref="0.00001 1"/>
             <site name="green_block" pos="0 0 0" size="0.02 0.02 0.02" rgba="0 1 0 0.5" type="sphere" />
         </body>
     </worldbody>

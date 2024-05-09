@@ -33,12 +33,6 @@ and issue: https://github.com/google-deepmind/mujoco/issues/547
                 <joint name="conveyor" type="slide" pos="0 -10 0" axis="0 1 0" damping="1000" range="-1.7 0" limited="true"/>
             </body>
 		</body>
-
-		<body name="cube" pos="1.6 1.2 0.45">
-            <joint name="cube_joint" type="free"/>
-            <geom conaffinity="1" contype="1" name="Object_target" type="box" condim="3"  size="0.03 0.03 0.03" mass="0.5" rgba="0.6 0.8 0.5 1" solimp="1 1 1" solref="0.02 1"/>
-			<site name="target" pos="0 0 0" size="0.001 0.001" rgba="1 0 0 1" type="cylinder"/>
-		</body>
 		
 		<camera fovy="80" name="third_person" pos="2.10 0.3 1.4" euler="0 0.83 1.57"/>
 
