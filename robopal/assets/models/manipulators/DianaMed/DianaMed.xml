@@ -4,7 +4,7 @@
             <headlight ambient="0.5 0.5 0.5"/>
     </visual>
     <option timestep="0.0005" integrator="implicitfast" gravity="0 0 -9.81">
-        <flag sensornoise="disable" contact="enable" energy="enable" gravity="enable"/>
+        <flag contact="enable" energy="enable" gravity="enable"/>
     </option>
     <asset>
         <mesh name="base_link" file="meshes/base_link.STL"/>

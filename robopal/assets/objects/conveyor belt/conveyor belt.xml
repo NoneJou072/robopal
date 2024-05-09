@@ -45,7 +45,7 @@ and issue: https://github.com/google-deepmind/mujoco/issues/547
 	</worldbody>
 
     <actuator>
-        <general name="conveyor" joint="conveyor" gainprm="0" biasprm="-20000" biastype="affine"/>
+        <general name="conveyor" joint="conveyor" gainprm="0" biasprm="-10000" biastype="affine"/>
     </actuator>
 
 </mujoco>
