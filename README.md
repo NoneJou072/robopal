@@ -1,7 +1,7 @@
 
 <div style="text-align: center;">
 
-# **ROBOPAL**
+<img src="logo.png" width = 60%/>
 
 ![License](https://img.shields.io/badge/license-Apache2.0-yellow?style=flat-square) 
 ![GitHub Repo stars](https://img.shields.io/github/stars/NoneJou072/robopal?style=flat-square&logo=github)
@@ -9,6 +9,7 @@
 [![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen?style=flat-square)](https://robopal.readthedocs.io/zh/latest/index.html)
 ![PyPI - Version](https://img.shields.io/pypi/v/robopal?style=flat-square)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11078757.svg)](https://doi.org/10.5281/zenodo.11078757)
+
 </div>
 
 **robopal** 是一个基于 [MuJoCo](http://mujoco.org/) 动力学引擎搭建的多平台开源机器人仿真框架，主要用于机械臂的深度强化学习训练与控制算法验证。框架内提供了多种控制方案与底层环境，
@@ -24,20 +25,20 @@
 ---
 ## Getting Started  
 
-### 环境要求
+### Preparation
 
 * **Windows** / **Linux**
 * [MuJoCo-3.1.4+](http://mujoco.org/)
 * Python 3.8 +
 
-### 二进制安装
-> 当前 PyPi 上的 robopal 版本过低，暂不推荐使用. **建议从源安装最新版本**
+### Install from pip
+> **建议 Install from source, 从获取最新版本**
 
 ```commandline
 $ pip install robopal
 ```
 
-### Build from source
+### Install from source
   
    ```python
    # Clone robopal
@@ -56,8 +57,13 @@ python -m robopal.demos.demo_controller
 ## Contribute
 robopal 目前存在很多不足之处，欢迎大家在 issue 中提出问题或留下宝贵的建议，欢迎对这个项目有兴趣的一起来完善。
 
-## Citation
+## Future works：
+* Documentation and tutorials.
+* Teleoperation Interface and `rollout` function (for Imitation Learning).
+* New demos of bimanual, using `petting zoo` style (for Multi-Agents RL).
 
+## Citation
+Please cite robopal if you find useful in this work:
 ```bibtex
 @software{Zhou_robopal_A_Simulation_2024,
 author = {Zhou, Haoran and Huang, Yichao and Zhao, Yuhan and Lu, Yang},
