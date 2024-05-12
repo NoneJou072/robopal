@@ -4,11 +4,12 @@ import numpy as np
 from robopal.envs.robot import RobotEnv
 import robopal.commons.transform as trans
 import robopal.commons.cv_utils as cv
+from robopal.robots.diana_med import DianaAruco
 
 
 class VisualServo(RobotEnv):
     def __init__(self,
-                 robot=None,
+                 robot=DianaAruco,
                  render_mode='human',
                  control_freq=200,
                  controller='JNTIMP',
@@ -110,7 +111,6 @@ class VisualServo(RobotEnv):
 
 
 if __name__ == "__main__":
-    from robopal.robots.diana_med import DianaAruco
 
     env = VisualServo(
         robot=DianaAruco,
