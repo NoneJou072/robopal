@@ -41,4 +41,12 @@ class UR5eConveyor(UR5e):
     def add_assets(self):
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/conveyor belt/conveyor belt.xml')
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/carton/carton.xml')
-        self.mjcf_generator.set_node_attrib('body', 'carton', {'pos': '1.1 -0.3 0.53'})
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')
+        self.mjcf_generator.set_node_attrib('body', 'carton', {'pos': '1.1 -0.3 0.49'})
+        self.mjcf_generator.set_node_attrib('body', 'green_block', {'pos': '1.6 0.43 0.45'})
+
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return {self.agents[0]: np.array([1.46345588e-05, -6.87047296e-01,  2.10020717e+00, -2.98390247e+00,
+ -1.57080312e+00,  1.57079752e+00])}

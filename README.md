@@ -12,15 +12,19 @@
 
 </div>
 
-**robopal** 是一个基于 [MuJoCo](http://mujoco.org/) 动力学引擎搭建的多平台开源机器人仿真框架，主要用于机械臂的深度强化学习训练与控制算法验证。框架内提供了多种控制方案与底层环境，
-具有以下优点：
-* 采用 Mujoco 原生 API 计算机械臂运动学与动力学
-* 简洁的代码结构，没有复杂的嵌套关系，方便快速上手学习和使用
-* 环境遵循最新版 OpenAI Gymnasium 接口规范，方便集成主流强化学习算法库(eg. SB3)
-* 提供多种基础控制方案，如关节空间/笛卡尔空间的位置控制、速度控制、阻抗控制
-* 提供丰富的任务环境，如桌面操作，视觉伺服等
+**robopal** is a multi-platform, modular robot simulation framework based on [MuJoCo](http://mujoco.org/) physics engine, which is mainly used for reinforcement learning training and control algorithm implementation of robotic arms. Please check the [Documentation](https://robopal.readthedocs.io/) for more information.
 
-请[查看文档](https://robopal.readthedocs.io/)以获取更多信息 (更新中)
+**robopal** 是一个基于 [MuJoCo](http://mujoco.org/) 物理引擎搭建的多平台的，模块化的机器人仿真框架，主要用于机械臂的强化学习训练与控制算法实施。
+
+robopal 为您提供了：
+* 采用 [Mujoco](http://mujoco.org/) 原生 API 计算机械臂动力学与[运动学]()，无需额外安装扩展库，提高运行帧数
+* 简洁的代码结构，没有复杂的嵌套关系，方便快速上手学习和使用
+* 具备 [Gymnasium]() 风格的单臂环境与 [PettingZoo]() 风格的双臂环境，方便集成大部分的单/多智能体强化学习算法库(eg. [stable-baselines3]()，[MARL]())
+* 提供多种基础控制方案，如关节空间/笛卡尔空间的位置控制、速度控制、阻抗控制，并提供了遥操作接口
+* 提供丰富的任务环境示例，如 ConveyorBelt，PickAndPlace, Drawer, Cabinet，VisualServo等
+* 模块化定制 MJCF 描述的机器人场景模型，可自由组合搭配场景，基座，机械臂，末端执行器和物体
+
+请查看[文档](https://robopal.readthedocs.io/)以获取更多信息 (更新中)
 
 ---
 ## Getting Started  
@@ -32,7 +36,7 @@
 * Python 3.8 +
 
 ### Install from pip
-> **建议 Install from source, 以获取最新版本**
+> You are advised to **Install from source** to obtain the latest version
 
 ```commandline
 $ pip install robopal
@@ -55,7 +59,7 @@ python -m robopal.demos.demo_controller
 ```
 
 ## Contribute
-robopal 目前存在很多不足之处，欢迎大家在 issue 中提出问题或留下宝贵的建议，欢迎对这个项目有兴趣的一起来完善。
+robopal currently has many shortcomings. Everyone is welcome to raise questions or leave suggestions in the [Issue](), and you are welcome to [Pull Request]() to improve this project together.
 
 ## Future works
 * Documentation and tutorials.

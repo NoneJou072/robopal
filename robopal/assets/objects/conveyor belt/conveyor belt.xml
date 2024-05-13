@@ -27,10 +27,10 @@ and issue: https://github.com/google-deepmind/mujoco/issues/547
 		</body>
 
 		<body name="conveyor_floor" pos="1.555 0.3 0.422">
-			<geom name="conveyor_floor"  size="0.2 1 0.01" type="plane" density="20000" condim="3" friction="1 1 1" material="conveyor"/>
+			<geom name="conveyor_floor"  size="0.2 1 0.01" type="plane" density="2000" condim="3" friction="1 1 1" material="conveyor"/>
             <body pos="0 .9 -.005">
                 <geom type="box" rgba="0 0 0 0" size=".2 .5 .01"/>
-                <joint name="conveyor" type="slide" pos="0 -10 0" axis="0 1 0" damping="1000" range="-1.7 0" limited="true"/>
+                <joint name="conveyor" type="slide" pos="0 -10 0" axis="0 1 0" damping="100" range="-1.7 0" limited="true"/>
             </body>
 		</body>
 		
@@ -39,7 +39,7 @@ and issue: https://github.com/google-deepmind/mujoco/issues/547
 	</worldbody>
 
     <actuator>
-        <general name="conveyor" joint="conveyor" gainprm="0" biasprm="-10000" biastype="affine"/>
+        <general name="conveyor" joint="conveyor" gainprm="0" biasprm="-100000" biastype="affine"/>
     </actuator>
 
 </mujoco>

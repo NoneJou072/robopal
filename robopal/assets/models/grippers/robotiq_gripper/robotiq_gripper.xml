@@ -22,7 +22,7 @@
                 <geom rgba=".3 .4 .5 1" type="mesh" contype="1" conaffinity="0" group="3" />
             </default>
             <default class="robotiq_pad_col">
-                <geom rgba=".3 .4 .5 1" type="mesh" contype="1" conaffinity="1" group="3" condim="4" solref="0.00001 1"/>
+                <geom rgba=".3 .4 .5 1" type="mesh" contype="1" conaffinity="1" group="3" condim="4" friction="1 1 1" solref="0.001 1" solimp="1 0.99 0.001"/>
             </default>
         </default>
     </default>
@@ -39,7 +39,7 @@
         <joint joint1="robotiq_2f_85_right_driver_joint" joint2="robotiq_2f_85_left_driver_joint"/>
     </equality>
     <actuator>
-        <position name="robotiq_2f_85" joint="robotiq_2f_85_right_driver_joint" ctrlrange="0 1" ctrllimited="true"/>
+        <position name="robotiq_2f_85" joint="robotiq_2f_85_right_driver_joint" kp="5" ctrlrange="0 1" ctrllimited="true"/>
     </actuator>
 
    <worldbody>
