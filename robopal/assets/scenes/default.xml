@@ -1,7 +1,7 @@
 <mujoco model="empty_floor">
   <compiler angle="radian"/>
 
-  <option timestep="0.001" gravity="0 0 -9.81">
+  <option timestep="0.001" gravity="0 0 -9.81" impratio="10">
       <flag contact="enable" energy="enable" gravity="enable"/>
   </option>
   
