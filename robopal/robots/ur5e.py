@@ -7,6 +7,7 @@ ASSET_DIR = os.path.join(os.path.dirname(__file__), '../assets')
 
 class UR5e(BaseRobot):
     """ UR5e robot base class. """
+
     def __init__(self,
                  scene='default',
                  manipulator='UR5e',
@@ -48,5 +49,22 @@ class UR5eConveyor(UR5e):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return {self.agents[0]: np.array([1.46345588e-05, -6.87047296e-01,  2.10020717e+00, -2.98390247e+00,
- -1.57080312e+00,  1.57079752e+00])}
+        return {self.agents[0]: np.array([1.46345588e-05, -6.87047296e-01, 2.10020717e+00, -2.98390247e+00,
+                                          -1.57080312e+00, 1.57079752e+00])}
+
+
+class UR5eGrasp(UR5e):
+    def __init__(self):
+        super().__init__(scene='grasping',
+                         gripper='rethink_gripper',
+                         mount='top_point')
+
+        self.end_name = {self.agents[0]: '0_eef'}
+
+    def add_assets(self):
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')
+
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return {self.agents[0]: np.array([-0.22131256, -1.36007871, 1.27996613, -1.49068995, -1.57079325, -0.22131563])}
