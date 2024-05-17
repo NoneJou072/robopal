@@ -355,7 +355,7 @@ class MujocoEnv:
                 name1 = mujoco.mj_id2name(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, contact_info.geom1)
                 name2 = mujoco.mj_id2name(self.mj_model, mujoco.mjtObj.mjOBJ_GEOM, contact_info.geom2)
                 dist = contact_info.dist
-                logging.info("contact geom: ", name1, name2)
-                print("dist: ", dist)
+                logging.info(f"contact geom: {name1} and {name2}")
+                logging.info(f"dist: {dist}")
             return True
         return False

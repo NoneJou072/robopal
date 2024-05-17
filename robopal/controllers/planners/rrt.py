@@ -390,9 +390,10 @@ class RRT:
             return False
 
         for x, y, z in zip(node.path_x, node.path_y, node.path_z):
+
             target_pos = np.array([x, y, z])
             target_rot = np.array([1, 0, 0, 0])
-            qpos = sim.ik(target_pos, target_rot, sim.robot.get_arm_qpos())
+            qpos = sim.controller.ik(target_pos, target_rot)
             sim.set_joint_qpos(qpos)
 
             mujoco.mj_forward(sim.mj_model, sim.mj_data)
@@ -403,9 +404,9 @@ class RRT:
                 COLLISIONS = sim.get_geom_id(COLLISIONS)
                 TYPE_CHANGED = True
 
-            is_collision = sim.is_contact(LEFT_GRIPPER_GEOMS, COLLISIONS)
+            is_collision = sim.is_contact(LEFT_GRIPPER_GEOMS, COLLISIONS, verbose=0)
             if is_collision:
-                logging.info("collide!")
+                logging.info("find collision")
                 return True
         return False
 
@@ -424,7 +425,7 @@ def rrt_star(start, end, sim) -> Union[List[list], None]:
         max_iter=1000,
     )
 
-    sim.mj_model.geom('obstacle_box').margin[0] = 0.1
+    sim.mj_model.geom('obstacle_box').margin[0] = 0.01
     sim.save_state()
 
     MAX_FAILTURE_TIMES = 3

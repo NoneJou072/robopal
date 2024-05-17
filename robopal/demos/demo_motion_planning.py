@@ -22,7 +22,6 @@ assert path is not None
 
 for pos in reversed(path):
     pos = np.array(pos)
-    print(pos)
     current_pos = env.robot.get_end_xpos()
     while np.linalg.norm(current_pos - pos) > 0.02:
         env.renderer.set_renderer_config()
