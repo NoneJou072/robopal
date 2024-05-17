@@ -1,6 +1,7 @@
 
 .. include:: ../../README.md
-
+   :parser: markdown
+   
 .. toctree::
    :hidden:
    :maxdepth: 1

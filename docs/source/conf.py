@@ -32,14 +32,15 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinxcontrib.apidoc',
     'sphinx.ext.viewcode',
-    'm2r2'
+    'm2r2',
+    # 'recommonmark',
 ]
 source_suffix = ['.rst', '.md']
 
 templates_path = ['_templates']
 exclude_patterns = []
 
-language = 'zh_CN'
+# language = 'zh_CN'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

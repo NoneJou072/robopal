@@ -4,3 +4,5 @@ sphinx-press-theme
 sphinxcontrib-napoleon
 sphinxcontrib-qthelp
 sphinxcontrib-serializinghtml
+-e ../.
+recommonmark

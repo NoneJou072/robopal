@@ -1,7 +1,7 @@
 
 <div style="text-align: center;">
 
-<img src="logo.png" width = 60%/>
+<img title="Logo" src="https://github.com/NoneJou072/robopal/tree/main/docs/source/_static/logo.png" width = 100%/>
 
 ![License](https://img.shields.io/badge/license-Apache2.0-yellow?style=flat-square) 
 ![GitHub Repo stars](https://img.shields.io/github/stars/NoneJou072/robopal?style=flat-square&logo=github)
