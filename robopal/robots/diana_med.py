@@ -66,7 +66,7 @@ class DualDianaMed(BaseRobot):
 class DianaAruco(DianaMed):
     def __init__(self):
         super().__init__(scene='default',
-                         gripper='Swab_gripper', )
+                         gripper='realsense', )
 
     def add_assets(self):
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/aruco/aruco.xml')
