@@ -19,7 +19,10 @@ apidoc_separate_modules = True
 project = 'robopal'
 copyright = '2023, Haoran Zhou'
 author = 'Haoran Zhou'
-release = '0.2.1'
+# The short X.Y version
+version = '0.4'
+# The full version, including alpha/beta/rc tags
+release = '0.4.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -42,5 +45,12 @@ language = 'zh_CN'
 
 html_theme = 'press'
 html_static_path = ['_static']
+html_logo = "_static/small-logo.png"
+
+html_theme_options = {
+  "external_links": [
+      ("Github", "https://github.com/NoneJou072/robopal"),
+  ]
+}
 
 master_doc = 'index'
