@@ -56,7 +56,7 @@ class UR5eConveyor(UR5e):
 class UR5eGrasp(UR5e):
     def __init__(self):
         super().__init__(scene='grasping',
-                         gripper='rethink_gripper',
+                         gripper='robotiq_gripper',
                          mount='top_point')
 
         self.end_name = {self.agents[0]: '0_eef'}
@@ -68,3 +68,4 @@ class UR5eGrasp(UR5e):
     def init_qpos(self):
         """ Robot's init joint position. """
         return {self.agents[0]: np.array([-0.22131256, -1.36007871, 1.27996613, -1.49068995, -1.57079325, -0.22131563])}
+    

@@ -46,4 +46,5 @@ class PandaGrasp(Panda):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return {self.agents[0]: np.array([-0.50519705, -0.08310027, 0.40185057, -2.43247759, -0.1146132, 2.3381506, -0.06526962])}
+        return {self.agents[0]: np.array([-0.61,  -0.84,  0.47, -2.54,  0.35,  1.75, 0.44])}
+    

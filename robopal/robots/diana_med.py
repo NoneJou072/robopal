@@ -104,6 +104,7 @@ class DianaGrasp(DianaMed):
         super().__init__(scene='grasping',
                          gripper='rethink_gripper',
                          mount='top_point')
+        self.end_name = {self.agents[0]: '0_eef'}
 
     def add_assets(self):
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')

@@ -110,6 +110,9 @@ class MjRenderer:
             logging.info("Viewer has closed!")
             import os
             os._exit(0)
+    
+    def close_render_window(self):
+        self.viewer.close()
 
     def set_renderer_config(self):
         """ Setup mujoco global config while using viewer as renderer.

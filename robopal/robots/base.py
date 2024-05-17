@@ -59,20 +59,28 @@ class BaseRobot:
         self.agents = [f'arm{i}' for i in range(self.agent_num)]
         logging.info(f'Activated agents: {self.agents}')
         
-        # robot infos
+        # manipulator infos
         self._arm_joint_names = dict()
         self._arm_joint_indexes = dict()
         self._arm_actuator_names = dict()
         self._arm_actuator_indexes = dict()
-        self._gripper_joint_names = dict()
-        self._gripper_joint_indexes = dict()
-        self._gripper_actuator_names = dict()
-        self._gripper_actuator_indexes = dict()
         self.base_link_name = dict()
         self.end_name = dict()
-        # Bounds at the joint limits.
-        self.mani_joint_bounds = dict()
+        self.mani_joint_bounds = dict()  # Bounds at the joint limits
 
+        # set end effector
+        gripper = [gripper] if isinstance(gripper, str) else gripper
+        from robopal.robots import END_MAP
+        from robopal.robots.grippers import BaseEnd
+        if specified_xml is None:
+            self.end: Dict[str, BaseEnd] = {
+                agent: END_MAP[gripper](self.robot_data) for agent, gripper in zip(self.agents, gripper)
+            }
+        else:
+            self.end = None  # by default, user should specify the end effector.
+            assert self.end is not None, 'Please specify the end effector by manual setting `self.end`.'
+
+        # initial infos
         self.init_quat = dict()
         self.init_pos = dict()
 
