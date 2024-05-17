@@ -107,8 +107,6 @@ class MjRenderer:
         if isinstance(self.viewer, viewer.Handle) and self.viewer.is_running():
             self.viewer.close()
             del self.viewer
-            import glfw
-            glfw.terminate()
             logging.info("Viewer has closed!")
             import os
             os._exit(0)

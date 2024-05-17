@@ -133,12 +133,13 @@ class CartesianIKController(JointImpedanceController):
         mujoco.mj_jacBody(self.robot.robot_model, self.robot.kine_data, jac_pos, jac_quat, self.robot.kine_data.body(self.robot.end_name[agent]).id)
         jac_pos = jac_pos[:, self.robot.arm_joint_indexes[agent]]
         jac_quat = jac_quat[:, self.robot.arm_joint_indexes[agent]]
+
         # Get Deffector, the 3x3 mju_subquat Jacobian
-        effector_quat = np.empty(4)
-        mujoco.mju_mat2Quat(effector_quat, self.robot.kine_data.body(self.robot.end_name[agent]).xmat)
-        target_quat = quat
+        effector_quat = T.mat_2_quat(
+            self.robot.kine_data.body(self.robot.end_name[agent]).xmat.reshape(3, 3)
+        )
         Deffector = np.empty((3, 3))
-        mujoco.mjd_subQuat(target_quat, effector_quat, None, Deffector)
+        mujoco.mjd_subQuat(quat, effector_quat, None, Deffector)
 
         # Rotate into target frame, multiply by subQuat Jacobian, scale by radius.
         target_mat = T.quat_2_mat(quat)
