@@ -1,7 +1,7 @@
 
 <div style="text-align: center;">
 
-<img title="Logo" src="https://github.com/NoneJou072/robopal/tree/main/docs/source/_static/logo.png" width = 100%/>
+<img title="Logo" src="https://github.com/NoneJou072/robopal/blob/main/docs/source/_static/logo.png?raw=true" width = 80%/>
 
 ![License](https://img.shields.io/badge/license-Apache2.0-yellow?style=flat-square) 
 ![GitHub Repo stars](https://img.shields.io/github/stars/NoneJou072/robopal?style=flat-square&logo=github)
@@ -32,7 +32,7 @@ robopal 为您提供了：
 ### Preparation
 
 * **Windows** / **Linux**
-* [MuJoCo-3.1.4+](http://mujoco.org/)
+* [MuJoCo-3.1.4](http://mujoco.org/)
 * Python 3.8 +
 
 ### Install from pip

@@ -7,9 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   robopal.demos.cases_with_camera
-   robopal.demos.multi_task_manipulation
-   robopal.demos.single_task_manipulation
+   robopal.demos.manipulation_tasks
 
 Submodules
 ----------
@@ -17,7 +15,11 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   robopal.demos.demo_choose_controller
+   robopal.demos.demo_controller
+   robopal.demos.demo_grasping
+   robopal.demos.demo_motion_planning
+   robopal.demos.demo_tele_calibrate
+   robopal.demos.demo_visual_servo
 
 Module contents
 ---------------

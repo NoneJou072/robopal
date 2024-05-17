@@ -8,10 +8,8 @@ Submodules
    :maxdepth: 4
 
    robopal.envs.base
-   robopal.envs.base_mjx
-   robopal.envs.jnt_ctrl_env
-   robopal.envs.task_ik_ctrl_env
-   robopal.envs.task_imp_ctrl_env
+   robopal.envs.parallel_dual_arm
+   robopal.envs.robot
 
 Module contents
 ---------------

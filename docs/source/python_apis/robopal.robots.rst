@@ -9,6 +9,9 @@ Submodules
 
    robopal.robots.base
    robopal.robots.diana_med
+   robopal.robots.grippers
+   robopal.robots.panda
+   robopal.robots.ur5e
 
 Module contents
 ---------------
