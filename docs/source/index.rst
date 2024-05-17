@@ -1,12 +1,8 @@
-.. robopal documentation master file, created by
-   sphinx-quickstart on Sun Sep 24 00:10:04 2023.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
-Welcome to robopal's documentation!
-===================================
+.. include:: ../../README.md
 
 .. toctree::
+   :hidden:
    :maxdepth: 1
    :caption: USER GUIDE
 
@@ -15,6 +11,7 @@ Welcome to robopal's documentation!
    quickstart
 
 .. toctree::
+   :hidden:
    :maxdepth: 1
    :caption: MODULES API
 
@@ -23,13 +20,9 @@ Welcome to robopal's documentation!
    modules/renderers
 
 .. toctree::
+   :hidden:
    :maxdepth: 1
    :caption: SOURCE API
 
    python_apis/robopal
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
