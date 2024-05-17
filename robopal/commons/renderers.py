@@ -54,7 +54,7 @@ class MjRenderer:
         if keycode == 32:  # space
             self.render_paused = not self.render_paused
         elif keycode == 256:  # esc
-            self.exit_flag = not self.exit_flag
+            self.exit_flag = True
         elif keycode == 257:  # enter
             image = self.image_queue.get()
             cv.save_image(image)
@@ -82,11 +82,11 @@ class MjRenderer:
         """ render per frame in glfw.
         """
         if self.render_paused and self.render_mode in ["human", "rgb_array", "depth"]:
-            if self.viewer.is_running() and self.exit_flag is False:
-                self.viewer: viewer.Handle
-                self.viewer.sync()
-            else:
-                self.close()
+            if isinstance(self.viewer, viewer.Handle):
+                if self.viewer.is_running() and not self.exit_flag:
+                    self.viewer.sync()
+                else:
+                    self.close()
 
             if self.enable_camera_view:
                 enable_depth = True if self.render_mode == 'depth' else False
@@ -107,9 +107,11 @@ class MjRenderer:
         if isinstance(self.viewer, viewer.Handle) and self.viewer.is_running():
             self.viewer.close()
             del self.viewer
-            self.viewer = None
-        logging.info("Environment has closed!")
-        sys.exit()
+            import glfw
+            glfw.terminate()
+            logging.info("Viewer has closed!")
+            import os
+            os._exit(0)
 
     def set_renderer_config(self):
         """ Setup mujoco global config while using viewer as renderer.
