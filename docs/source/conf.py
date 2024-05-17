@@ -33,7 +33,6 @@ extensions = [
     'sphinxcontrib.apidoc',
     'sphinx.ext.viewcode',
     'm2r2',
-    # 'recommonmark',
 ]
 source_suffix = ['.rst', '.md']
 
