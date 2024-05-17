@@ -5,3 +5,4 @@ sphinxcontrib-napoleon
 sphinxcontrib-qthelp
 sphinxcontrib-serializinghtml
 robopal
+recommonmark
