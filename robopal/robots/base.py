@@ -164,6 +164,14 @@ class BaseRobot:
         :return: joint position
         """
         return np.array([self.robot_data.joint(j).qacc[0] for j in self.arm_joint_names[agent]])
+    
+    def get_arm_tau(self, agent: str = 'arm0') -> np.ndarray:
+        """ Get arm joint torque of the specified agent.
+
+        :param agent: agent name
+        :return: joint torque
+        """
+        return np.array([self.robot_data.actuator(a).ctrl[0] for a in self.arm_actuator_names[agent]])
 
     def get_mass_matrix(self, agent: str = 'arm0') -> np.ndarray:
         """ Get Mass Matrix
