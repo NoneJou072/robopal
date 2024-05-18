@@ -73,9 +73,12 @@ class BaseRobot:
         from robopal.robots import END_MAP
         from robopal.robots.grippers import BaseEnd
         if specified_xml is None:
-            self.end: Dict[str, BaseEnd] = {
-                agent: END_MAP[gripper](self.robot_data) for agent, gripper in zip(self.agents, gripper)
-            }
+            if gripper is None:
+                self.end = None
+            else:
+                self.end: Dict[str, BaseEnd] = {
+                    agent: END_MAP[gripper](self.robot_data) for agent, gripper in zip(self.agents, gripper)
+                }
         else:
             self.end = None  # by default, user should specify the end effector.
             assert self.end is not None, 'Please specify the end effector by manual setting `self.end`.'
