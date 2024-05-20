@@ -2,7 +2,7 @@ import numpy as np
 import logging
 
 from robopal.robots.diana_med import DianaMed
-from robopal.robots.diana_med import DualDianaMed
+from robopal.robots.dual_arms import DualDianaMed
 from robopal.robots.panda import Panda
 from robopal.robots.ur5e import UR5e
 from robopal.envs import RobotEnv
@@ -34,10 +34,10 @@ if __name__ == "__main__":
         options['ctrl'] = ['JNTIMP', 'CARTIK'][int(ctrl_id) - 1]
         assert options['ctrl'] in ['JNTIMP', 'CARTIK'], 'Invalid controller'
     else:
-        print("Available controllers:\n 1.JNTIMP\n 2.JNTVEL\n 3.CARTIMP\n 4.CARTIK")
+        print("Available controllers:\n 1.JNTTAU\n 2.JNTIMP\n 3.JNTVEL\n 4.CARTIMP\n 5.CARTIK")
         ctrl_id = input("Choose the controller:")
-        options['ctrl'] = ['JNTIMP', 'JNTVEL', 'CARTIMP', 'CARTIK'][int(ctrl_id) - 1]
-        assert options['ctrl'] in ['JNTIMP', 'JNTVEL', 'CARTIMP', 'CARTIK'], 'Invalid controller'
+        options['ctrl'] = ['JNTTAU', 'JNTIMP', 'JNTVEL', 'CARTIMP', 'CARTIK'][int(ctrl_id) - 1]
+        assert options['ctrl'] in ['JNTTAU', 'JNTIMP', 'JNTVEL', 'CARTIMP', 'CARTIK'], 'Invalid controller'
 
     # Initialize the environment
     env = RobotEnv(
@@ -50,7 +50,10 @@ if __name__ == "__main__":
 
     # Set the action
     if env.robot.agent_num == 1:
-        if options['ctrl'] == 'JNTIMP':
+        if options['ctrl'] == 'JNTTAU':
+            action = 10 * np.ones(env.robot.jnt_num)
+            
+        elif options['ctrl'] == 'JNTIMP':
             action = np.random.uniform(low=env.robot.mani_joint_bounds[env.robot.agents[0]][0],
                                        high=env.robot.mani_joint_bounds[env.robot.agents[0]][1],
                                        size=env.robot.jnt_num)
