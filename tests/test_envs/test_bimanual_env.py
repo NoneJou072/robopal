@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 import logging
 
-from robopal.robots.diana_med import DualDianaMed
+from robopal.robots.dual_arms import DualDianaMed
 from robopal.envs import RobotEnv
 
 logging.basicConfig(level=logging.INFO)

@@ -1,10 +1,10 @@
 <mujoco model="base_point">
     <asset>
-        <texture file="white-marble.png" type="2d" name="aluminum"/>
-        <material name="cylinder" reflectance="0.5" texrepeat="5 5" texture="aluminum" texuniform="true"/>
+        <texture file="white-marble.png" type="2d" name="aluminum2"/>
+        <material name="cylinder2" reflectance="0.5" texrepeat="5 5" texture="aluminum" texuniform="true"/>
     </asset>
     <worldbody>
-        <body name="mount_base_link" pos="1.09 0.30 0.72" quat="-1 0 0 1">
+        <body name="mount_base_link" pos="-1.09 0.30 0.72" quat="-1 0 0 1">
       		<geom pos="0 0 -0.14" size="0.07 0.14" type="cylinder" friction="1 0.005 0.0001"/>
       		<geom pos="0 0 -0.14" material="cylinder" size="0.072 0.16" type="cylinder" conaffinity="0" contype="0"/>
         </body>

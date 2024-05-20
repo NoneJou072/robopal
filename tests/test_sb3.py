@@ -2,7 +2,7 @@ from stable_baselines3 import HerReplayBuffer
 from sb3_contrib import TQC
 from stable_baselines3.common.callbacks import BaseCallback
 from robopal.demos.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
-from robopal.commons.gym_wrapper import GoalEnvWrapper
+from robopal.commons.wrappers import GoalEnvWrapper
 
 
 class TensorboardCallback(BaseCallback):

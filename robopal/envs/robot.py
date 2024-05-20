@@ -1,7 +1,6 @@
 from typing import Union, Dict
 
 import numpy as np
-import mujoco
 
 from robopal.envs.base import MujocoEnv
 from robopal.controllers import controllers, BaseController
@@ -55,7 +54,7 @@ class RobotEnv(MujocoEnv):
         # memorize the initial position and rotation
         self.init_pos = dict()
         self.init_quat = dict()
-        for agent in self.robot.agents:
+        for agent in self.agents:
             self.init_pos[agent], self.init_quat[agent] = self.controller.forward_kinematics(self.robot.get_arm_qpos(agent), agent)
         self.robot.init_pos = self.init_pos
         self.robot.init_quat = self.init_quat
@@ -79,18 +78,10 @@ class RobotEnv(MujocoEnv):
         if isinstance(joint_inputs, np.ndarray):
             self.set_actuator_ctrl(joint_inputs)
         else:
-            for agent in self.robot.agents:
+            for agent in self.agents:
                 self.set_actuator_ctrl(joint_inputs[agent], agent)
 
         super().step()
-
-    def set_gripper_ctrl(self, actuator_name: str, actuator_value: int, agent: str = "arm0"):
-        """ Gripper control.
-
-        :param actuator_name: Gripper actuator name.
-        :param actuator_value: Gripper actuator value.
-        """
-        self.mj_data.actuator(actuator_name).ctrl = actuator_value
     
     @auto_render
     def reset(self, seed=None, options=None):

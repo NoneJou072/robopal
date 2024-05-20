@@ -1,7 +1,8 @@
 import numpy as np
 import logging
 
-from robopal.robots.diana_med import DianaMed, DualDianaMed
+from robopal.robots.diana_med import DianaMed
+from robopal.robots.diana_med import DualDianaMed
 from robopal.robots.panda import Panda
 from robopal.robots.ur5e import UR5e
 from robopal.envs import RobotEnv
