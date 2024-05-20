@@ -146,9 +146,10 @@ class CartesianIKController(JointImpedanceController):
         mat = radius * Deffector.T @ target_mat.T
         jac_quat = mat @ jac_quat
 
-        base2world_mat = self.robot.get_base_xmat(agent)
-        jac_pos = base2world_mat.T @ jac_pos
-        jac_quat = base2world_mat.T @ jac_quat
+        if self.reference == 'base':
+            base2world_mat = self.robot.get_base_xmat(agent)
+            jac_pos = base2world_mat.T @ jac_pos
+            jac_quat = base2world_mat.T @ jac_quat
 
         # Regularization Jacobian.
         jac_reg = reg * np.eye(len(self.robot.arm_joint_indexes[agent]))
