@@ -60,4 +60,31 @@ class DualDianaGrasp(DualDianaMed):
     def init_qpos(self):
         return {self.agents[0]: np.array([0, 0.1, 0, 2.28, 0, -1, 0]),
                 self.agents[1]: np.array([0, 0.1, 0, 2.28, 0, -1, 0])}
+
+
+class DualDianaReach(DualDianaMed):
+    def __init__(self):
+        super().__init__(
+            scene='grasping',
+            manipulator=['DianaMed', 'DianaMed'],
+            gripper=['rethink_gripper', 'rethink_gripper'],
+            mount=['cylinder', 'cylinder2'],
+            attached_body=['0_attachment', '1_attachment']
+        )
+
+    def add_assets(self):
+
+        goal_site0 = """<site name="goal_site0" pos="0.4 0.0 0.5" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />"""
+        goal_site1 = """<site name="goal_site1" pos="0.4 0.0 0.5" size="0.02 0.02 0.02" rgba="0 1 0 1" type="sphere" />"""
+        self.mjcf_generator.add_node_from_str('worldbody', goal_site0)
+        self.mjcf_generator.add_node_from_str('worldbody', goal_site1)
+
+        # set mount pose.
+        self.mjcf_generator.set_node_attrib('body', '0_mount_base_link', {'pos': '1.2 0.0 0.3', 'quat': "0 0 0 1"})
+        self.mjcf_generator.set_node_attrib('body', '1_mount_base_link', {'pos': '-0.4 0.0 0.3', 'quat': "1 0 0 0"})
+
+    @property
+    def init_qpos(self):
+        return {self.agents[0]: np.array([0, 0.1, 0, 2.28, 0, -1, 0]),
+                self.agents[1]: np.array([0, 0.1, 0, 2.28, 0, -1, 0])}
     

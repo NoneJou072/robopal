@@ -8,11 +8,6 @@ import robopal.commons.transform as T
 logging.basicConfig(level=logging.INFO)
 
 
-def goal_distance(goal_a, goal_b):
-    assert goal_a.shape == goal_b.shape
-    return np.linalg.norm(goal_a - goal_b, axis=-1)
-
-
 class BimanualManipulate(RobotEnv):
     """
     The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
@@ -118,8 +113,13 @@ class BimanualManipulate(RobotEnv):
     def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, th=0.02) -> np.ndarray:
         """ Compute whether the achieved goal successfully achieved the desired goal.
         """
-        d = goal_distance(achieved_goal, desired_goal)
+        d = self.goal_distance(achieved_goal, desired_goal)
         return (d < th).astype(np.float32)
+    
+    @staticmethod
+    def goal_distance(goal_a, goal_b):
+        assert goal_a.shape == goal_b.shape
+        return np.linalg.norm(goal_a - goal_b, axis=-1)
 
     def _get_obs(self, agent: str = None) -> Union[Dict, np.ndarray]:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position

@@ -125,4 +125,4 @@ class PettingStyleWrapper(ParallelEnv):
     # If your spaces change over time, remove this line (disable caching).
     @functools.lru_cache(maxsize=None)
     def action_space(self, agent):
-        return spaces.Box(low=-np.inf, high=np.inf, shape=self.env.action_dim, dtype="float64")
+        return spaces.Box(low=-1.0, high=1.0, shape=self.env.action_dim, dtype="float64")

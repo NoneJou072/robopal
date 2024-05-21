@@ -102,8 +102,8 @@ class CartesianIKController(JointImpedanceController):
 
         # Regularization residual.
         reg_target = self.robot.init_qpos[agent] if reg_target is None else reg_target
-        res_reg = reg * (x - reg_target)
-
+        res_reg = reg * (x.squeeze() - reg_target)
+        
         return np.hstack((res_pos, res_quat, res_reg))
 
     def _ik_jac(self, x, res, pos=None, quat=None, radius=.04, reg=1e-3, agent='arm0'):
