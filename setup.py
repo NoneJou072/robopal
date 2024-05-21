@@ -9,7 +9,7 @@ setup(
     version='0.4.0',
     author="Haoran Zhou, Yichao Huang, Yuhan Zhao, Yang Lu",
     author_email="jou072@126.com",
-    description="robopal: A Simulation Framework based Mujoco",
+    description="robopal: A Novel Simulation Framework based Mujoco",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/NoneJou072/robopal",
@@ -22,6 +22,7 @@ setup(
     ],
     extras_require={
         'planning': ['ruckig~=0.9.2'],
+        'multi-agents': ['pettingzoo']
     },
     classifiers=[
         "License :: OSI Approved :: MIT License",
