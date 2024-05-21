@@ -1,7 +1,13 @@
 
 # Robot
 
-robopal 将模型分为四个部分, 分别是 `manipulators`,`grippers`,`mounts`,`scenes`. 通过程序进行模型的拼接.
+在 robopal 中，环境模型由四个部分组成, 分别是
+* `manipulators`
+* `grippers`
+* `mounts`
+* `scenes`
+
+ 通过 `xml splice` 自动化脚本将这四个部分拼接到一起，组成 MJCF 模型.
 
 下面是一个简单的示例，
 该文件位于 `robopal/robots/single_task_manipulation` 目录下的 `PickAndPlaceEnv` 环境。

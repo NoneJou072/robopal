@@ -19,8 +19,9 @@ robopal
    :caption: MODULES API
 
    modules/controllers
-   modules/gym_style
+   modules/wrappers
    modules/renderers
+   modules/robots
 
 .. toctree::
    :hidden:
