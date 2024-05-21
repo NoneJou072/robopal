@@ -38,7 +38,7 @@ class XMLSplicer:
         """
         self.tree = ET.parse(scene)
         self.root = self.tree.getroot()
-        ELEMENTS = ['asset', 'worldbody', 'actuator', 'default', 'contact', 'sensor', 'equality']
+        ELEMENTS = ['asset', 'worldbody', 'actuator', 'default', 'contact', 'sensor', 'equality', 'tendon']
         for element in ELEMENTS:
             if self.root.find(element) is None:
                 self.root.append(ET.Element(element))
@@ -92,6 +92,10 @@ class XMLSplicer:
         if root_node.find('equality') is not None:
             for equality in root_node.find('equality'):
                 self.root.find('equality').append(equality)
+        # add tendon
+        if root_node.find('tendon') is not None:
+            for tendon in root_node.find('tendon'):
+                self.root.find('tendon').append(tendon)
 
     def _file_repath(self, xml_path, asset_node: ET.Element):
         """ Reset file path of the assets to abstract path.
@@ -108,6 +112,8 @@ class XMLSplicer:
                                                  child.attrib['file'])
 
     def tag_rename(self, id, node: ET.Element):
+        """ add indice to the tag name
+        """
         for mesh in node.findall('.//mesh[@name]'):
             for element in node.findall('.//geom[@mesh=\'{}\']'.format(mesh.attrib['name'])):
                 element.attrib['mesh'] = '{}_{}'.format(id, element.attrib['mesh'])
@@ -139,10 +145,23 @@ class XMLSplicer:
                     if value == target:
                         element.attrib[key] = '{}_{}'.format(id, element.attrib[key])
 
+        # find all connect nodes with name attribute
         for connect in node.findall('.//connect[@name]'):
             for element in node.findall('.//'):
                 for key, value in element.attrib.items():
                     if value == connect.attrib['name']:
+                        element.attrib[key] = '{}_{}'.format(id, element.attrib[key])
+
+        # find all contact nodes with name attribute
+        for contact in node.findall('.//exclude[@body1]'):
+            for element in node.findall('.//'):
+                for key, value in element.attrib.items():
+                    if value == contact.attrib['body1']:
+                        element.attrib[key] = '{}_{}'.format(id, element.attrib[key])
+        for contact in node.findall('.//exclude[@body2]'):
+            for element in node.findall('.//'):
+                for key, value in element.attrib.items():
+                    if value == contact.attrib['body2']:
                         element.attrib[key] = '{}_{}'.format(id, element.attrib[key])
 
         for site in node.findall('.//site[@name]'):

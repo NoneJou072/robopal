@@ -1,5 +1,4 @@
 import logging
-import sys
 from queue import Queue
 from collections import deque
 from typing import Union, List

@@ -48,3 +48,13 @@ class RobotiqGripper(BaseEnd):
 
     def close(self):
         self.apply_action(self._ctrl_range[1])
+
+
+class PandaHand(BaseEnd):
+    def __init__(self, robot_data) -> None:
+        super().__init__(robot_data)
+
+        self._ctrl_range = [0, 255]
+
+    def apply_action(self, action):
+        self.robot_data.actuator('0_actuator8').ctrl[0] = action
