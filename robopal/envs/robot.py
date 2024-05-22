@@ -50,6 +50,9 @@ class RobotEnv(MujocoEnv):
         if self._n_substeps == 0:
             raise ValueError("Control frequency is too low. Checkout you are not in renderer mode."
                              "Current Model-Timestep:{}".format(self.model_timestep))
+        if self.robot.end is not None:
+            for agent in self.agents:
+                self.robot.end[agent].dt = self.dt
 
         # memorize the initial position and rotation
         self.init_pos = dict()

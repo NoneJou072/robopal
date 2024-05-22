@@ -2,17 +2,19 @@ import numpy as np
 
 from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
 import robopal.commons.transform as trans
-from robopal.robots.diana_med import DianaGrasp
+from robopal.robots.diana_med import DianaPickAndPlace
 
 
 class PickAndPlaceEnv(ManipulateEnv):
 
     def __init__(self,
-                 robot=DianaGrasp,
+                 robot=DianaPickAndPlace,
                  render_mode='human',
                  control_freq=20,
                  enable_camera_viewer=False,
                  controller='CARTIK',
+                 is_action_normalize=True,
+                 is_end_pose_randomize=True
                  ):
         super().__init__(
             robot=robot,
@@ -20,6 +22,8 @@ class PickAndPlaceEnv(ManipulateEnv):
             control_freq=control_freq,
             enable_camera_viewer=enable_camera_viewer,
             controller=controller,
+            is_action_normalize=is_action_normalize,
+            is_end_pose_randomize=is_end_pose_randomize
         )
         self.name = 'PickAndPlace-v1'
 
@@ -66,15 +70,20 @@ class PickAndPlaceEnv(ManipulateEnv):
         )
 
         obs[18:21] = self.get_body_xvelr('green_block') * self.dt
-        obs[21] = self.mj_data.joint('0_r_finger_joint').qpos[0]
-        obs[22] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
+        obs[21:23] = self.robot.end['arm0'].get_finger_observations()
 
         return {
             'observation': obs.copy(),
-            'achieved_goal': object_pos.copy(),  # block position
-            'desired_goal': self.get_site_pos('goal_site').copy()
+            'achieved_goal': self._get_achieved_goal(),
+            'desired_goal': self._get_desired_goal()
         }
+    
+    def _get_achieved_goal(self) -> np.ndarray:
+        return self.get_body_pos('green_block')
 
+    def _get_desired_goal(self) -> np.ndarray:
+        return self.get_site_pos('goal_site')
+    
     def _get_info(self) -> dict:
         return {'is_success': self._is_success(self.get_body_pos('green_block'), self.get_site_pos('goal_site'), th=0.02)}
 

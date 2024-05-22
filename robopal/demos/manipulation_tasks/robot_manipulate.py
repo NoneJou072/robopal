@@ -8,11 +8,6 @@ import robopal.commons.transform as T
 logging.basicConfig(level=logging.INFO)
 
 
-def goal_distance(goal_a, goal_b):
-    assert goal_a.shape == goal_b.shape
-    return np.linalg.norm(goal_a - goal_b, axis=-1)
-
-
 class ManipulateEnv(RobotEnv):
     """
     The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
@@ -26,6 +21,8 @@ class ManipulateEnv(RobotEnv):
                  enable_camera_viewer=False,
                  controller='CARTIK',
                  is_interpolate=False,
+                 is_action_normalize=True,
+                 is_end_pose_randomize=True,
                  ):
         super().__init__(
             robot=robot,
@@ -35,6 +32,9 @@ class ManipulateEnv(RobotEnv):
             controller=controller,
             is_interpolate=is_interpolate,
         )
+
+        self.is_action_normalize = is_action_normalize
+        self.is_end_pose_randomize = is_end_pose_randomize
 
         self.max_episode_steps = 50
 
@@ -54,9 +54,9 @@ class ManipulateEnv(RobotEnv):
         current_pos, _ = self.controller.forward_kinematics(self.robot.get_arm_qpos())
         actual_pos_action = current_pos + self.pos_ratio * action[:3]
         actual_pos_action = actual_pos_action.clip(self.pos_min_bound, self.pos_max_bound)
-        gripper_ctrl = (action[3] + 1) * (self.grip_max_bound - self.grip_min_bound) / 2 + self.grip_min_bound
+        gripper_ctrl = (action[3] + 1) * (self.grip_max_bound - self.grip_min_bound) / 2 + self.grip_min_bound * np.ones(1)
         
-        return actual_pos_action, gripper_ctrl
+        return np.concatenate([actual_pos_action, gripper_ctrl], axis=0)
 
     def step(self, action) -> Tuple:
         """ Take one step in the environment.
@@ -68,11 +68,12 @@ class ManipulateEnv(RobotEnv):
         """
         self._timestep += 1
 
-        actual_pos_action, gripper_ctrl = self.action_normalize(action)
+        if self.is_action_normalize:
+            action = self.action_normalize(action)
 
         # take one step
-        self.robot.end[self.agents[0]].apply_action(gripper_ctrl)
-        super().step(actual_pos_action[:3])
+        self.robot.end[self.agents[0]].apply_action(action[3])
+        super().step(action[:3])
 
         obs = self._get_obs()
         reward = self.compute_rewards(obs['achieved_goal'], obs['desired_goal'], th=0.02)
@@ -82,12 +83,17 @@ class ManipulateEnv(RobotEnv):
 
         return obs, reward, terminated, truncated, info
 
+    @staticmethod
+    def goal_distance(goal_a, goal_b):
+        assert goal_a.shape == goal_b.shape
+        return np.linalg.norm(goal_a - goal_b, axis=-1)
+
     def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, info: dict = None, **kwargs):
         """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
         target position, and 0 if the block is in the final target position (the block is considered to have
         reached the goal if the Euclidean distance between both is lower than 0.05 m).
         """
-        d = goal_distance(achieved_goal, desired_goal)
+        d = self.goal_distance(achieved_goal, desired_goal)
         if kwargs:
             return -(d >= kwargs['th']).astype(np.float64)
         return -(d >= 0.02).astype(np.float64)
@@ -95,7 +101,7 @@ class ManipulateEnv(RobotEnv):
     def _is_success(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, th=0.02) -> np.ndarray:
         """ Compute whether the achieved goal successfully achieved the desired goal.
         """
-        d = goal_distance(achieved_goal, desired_goal)
+        d = self.goal_distance(achieved_goal, desired_goal)
         return (d < th).astype(np.float32)
 
     def _get_obs(self, agent: str = None) -> Union[Dict, np.ndarray]:
@@ -105,6 +111,16 @@ class ManipulateEnv(RobotEnv):
         between the block and the gripper, and the last dimension corresponding to the current gripper opening.
         """
         raise NotImplementedError
+    
+    def _get_achieved_goal(self) -> np.ndarray:
+        """ get achieved goal, required for goal-based env.
+        """
+        pass
+
+    def _get_desired_goal(self) -> np.ndarray:
+        """ get desired goal, required for goal-based env.
+        """
+        pass
 
     def _get_info(self, agent: str = None) -> dict:
         return {}

@@ -63,9 +63,15 @@ class DrawerEnv(ManipulateEnv):
 
         return {
             'observation': obs.copy(),
-            'achieved_goal': object_pos.copy(),  # handle position
-            'desired_goal': self.get_site_pos('drawer_goal').copy()
+            'achieved_goal': self._get_achieved_goal(),
+            'desired_goal': self._get_desired_goal()
         }
+    
+    def _get_achieved_goal(self) -> np.ndarray:
+        return self.get_site_pos('drawer')
+
+    def _get_desired_goal(self) -> np.ndarray:
+        return self.get_site_pos('drawer_goal')
 
     def _get_info(self) -> dict:
         return {'is_success': self._is_success(self.get_site_pos('drawer'), self.get_site_pos('drawer_goal'), th=0.02)}

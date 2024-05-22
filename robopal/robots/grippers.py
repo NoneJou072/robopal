@@ -6,6 +6,9 @@ class BaseEnd(object):
     gripper_joint_indexes = dict()
     gripper_actuator_names = dict()
     gripper_actuator_indexes = dict()
+
+    # dt will pass in after the environment is instantiated
+    dt: int = None
     
     def __init__(self, robot_data) -> None:
 
@@ -22,6 +25,9 @@ class BaseEnd(object):
     def close(self):
         self.apply_action(self._ctrl_range[0])
 
+    def get_finger_observations(self):
+        pass
+
 
 class RethinkGripper(BaseEnd):
     def __init__(self, robot_data) -> None:
@@ -32,7 +38,13 @@ class RethinkGripper(BaseEnd):
     def apply_action(self, action):
         self.robot_data.actuator('0_gripper_l_finger_joint').ctrl[0] = action
         self.robot_data.actuator('0_gripper_r_finger_joint').ctrl[0] = action
-        
+    
+    def get_finger_observations(self):
+        return np.concatenate([
+            self.robot_data.joint('0_l_finger_joint').qpos,
+            self.robot_data.joint('0_l_finger_joint').qvel * self.dt
+        ], axis=0)
+
 
 class RobotiqGripper(BaseEnd):
     def __init__(self, robot_data) -> None:
@@ -58,3 +70,10 @@ class PandaHand(BaseEnd):
 
     def apply_action(self, action):
         self.robot_data.actuator('0_actuator8').ctrl[0] = action
+
+    def get_finger_observations(self):
+        return np.concatenate([
+            self.robot_data.joint('0_finger_joint1').qpos,
+            self.robot_data.joint('0_finger_joint1').qvel * self.dt
+        ], axis=0)
+    

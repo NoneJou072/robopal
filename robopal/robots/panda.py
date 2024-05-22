@@ -35,14 +35,50 @@ class Panda(BaseRobot):
 class PandaGrasp(Panda):
     def __init__(self):
         super().__init__(scene='grasping',
-                         gripper='rethink_gripper',
+                         gripper='panda_hand',
+                         mount='top_point')
+
+        self.end_name = {self.agents[0]: '0_hand'}
+
+    def add_assets(self):
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')
+
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return {self.agents[0]: np.array([-0.61,  -0.84,  0.47, -2.54,  0.35,  1.75, 0.44])}
+
+
+class PandaPickAndPlace(Panda):
+    def __init__(self):
+        super().__init__(scene='grasping',
+                         gripper='panda_hand',
+                         mount='top_point')
+
+        self.end_name = {self.agents[0]: '0_hand'}
+
+    def add_assets(self):
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')
+        goal_site = """<site name="goal_site" pos="0.4 0.0 0.5" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />"""
+        self.mjcf_generator.add_node_from_str('worldbody', goal_site)
+
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return {self.agents[0]: np.array([-0.61,  -0.84,  0.47, -2.54,  0.35,  1.75, 0.44])}
+    
+
+class PandaGrasp(Panda):
+    def __init__(self):
+        super().__init__(scene='grasping',
+                         gripper='panda_hand',
                          mount='top_point')
 
         self.end_name = {self.agents[0]: '0_eef'}
 
     def add_assets(self):
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')
-
+        
     @property
     def init_qpos(self):
         """ Robot's init joint position. """

@@ -68,7 +68,7 @@ class DianaCalib(DianaMed):
         self.mjcf_generator.add_node_from_str('worldbody', cam)
 
 
-class DianaGrasp(DianaMed):
+class DianaPickAndPlace(DianaMed):
     def __init__(self):
         super().__init__(scene='grasping',
                          gripper='rethink_gripper',
@@ -87,7 +87,23 @@ class DianaGrasp(DianaMed):
         return {self.agents[0]: np.array([0.02167871, -0.16747492, 0.00730963, 2.5573341, -0.00401727, -0.42203728, -0.01099269])}
 
 
-class DianaGraspMultiObjs(DianaGrasp):
+class DianaGrasp(DianaMed):
+    def __init__(self):
+        super().__init__(scene='grasping',
+                         gripper='rethink_gripper',
+                         mount='top_point')
+        self.end_name = {self.agents[0]: '0_eef'}
+
+    def add_assets(self):
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')
+
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return {self.agents[0]: np.array([0.02167871, -0.16747492, 0.00730963, 2.5573341, -0.00401727, -0.42203728, -0.01099269])}
+
+
+class DianaGraspMultiObjs(DianaPickAndPlace):
     def add_assets(self):
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/red_cube.xml')
         self.mjcf_generator.set_node_attrib('body', 'red_block', {'pos': '0.5 -0.1 0.46'})
