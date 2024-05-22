@@ -54,7 +54,7 @@ class MjRenderer:
             self.render_paused = not self.render_paused
         elif keycode == 256:  # esc
             self.exit_flag = True
-        elif keycode == 257:  # enter
+        elif keycode == 257 and self.enable_camera_view:  # enter
             image = self.image_queue.get()
             cv.save_image(image)
             logging.info(f"Save a picture to {cv.CV_CACHE_DIR}.")

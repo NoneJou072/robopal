@@ -1,6 +1,7 @@
 from typing import Union, List
 import xml.etree.ElementTree as ET
 from os import path
+from copy import deepcopy
 
 ASSETS_PATH = path.join(path.dirname(path.dirname(__file__)), 'assets')
 MODELS_PATH = path.join(ASSETS_PATH, 'models')
@@ -119,12 +120,15 @@ class XMLSplicer:
                 element.attrib['mesh'] = '{}_{}'.format(id, element.attrib['mesh'])
             mesh.attrib['name'] = '{}_{}'.format(id, mesh.attrib['name'])
 
+        # find all nodes according the specified name
         for body in node.findall('.//body[@name]'):
+            body_name = deepcopy(body.attrib['name'])
             for element in node.findall('.//'):
                 for key, value in element.attrib.items():
-                    if value == body.attrib['name'] and key != 'mesh':
+                    if value == body_name and key != 'mesh':
                         element.attrib[key] = '{}_{}'.format(id, element.attrib[key])
 
+        # find all geom nodes with name attribute
         for geom in node.findall('.//geom[@name]'):
             geom.attrib['name'] = '{}_{}'.format(id, geom.attrib['name'])
 
@@ -138,11 +142,12 @@ class XMLSplicer:
         #                 body.set('childclass', '{}_{}'.format(id, body.attrib['childclass']))
         #         default.set('class', '{}_{}'.format(id, default.attrib['class']))
 
+        # find all joint nodes with name attribute
         for joint in node.findall('.//joint[@name]'):
-            target = joint.attrib['name']
+            joint_name = deepcopy(joint.attrib['name'])
             for element in node.findall('.//'):
                 for key, value in element.attrib.items():
-                    if value == target:
+                    if value == joint_name:
                         element.attrib[key] = '{}_{}'.format(id, element.attrib[key])
 
         # find all connect nodes with name attribute
@@ -153,17 +158,10 @@ class XMLSplicer:
                         element.attrib[key] = '{}_{}'.format(id, element.attrib[key])
 
         # find all contact nodes with name attribute
-        for contact in node.findall('.//exclude[@body1]'):
-            for element in node.findall('.//'):
-                for key, value in element.attrib.items():
-                    if value == contact.attrib['body1']:
-                        element.attrib[key] = '{}_{}'.format(id, element.attrib[key])
-        for contact in node.findall('.//exclude[@body2]'):
-            for element in node.findall('.//'):
-                for key, value in element.attrib.items():
-                    if value == contact.attrib['body2']:
-                        element.attrib[key] = '{}_{}'.format(id, element.attrib[key])
+        # contact body has already renamed above.
+        pass 
 
+        # find all site nodes with name attribute
         for site in node.findall('.//site[@name]'):
             for element in node.findall('.//'):
                 for key, value in element.attrib.items():
