@@ -1,5 +1,5 @@
 from robopal.demos.bimanual_tasks import BimanualPickAndPlace
-from robopal.commons.wrappers import PettingStyleWrapper
+from robopal.wrappers import PettingStyleWrapper
 from pettingzoo.test import parallel_api_test
 
 if __name__ == "__main__":

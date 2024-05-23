@@ -10,7 +10,7 @@ MUJOCO_LOG.TXT
 **/build
 cv_cache
 robot.xml
-**/collection
+**/collections
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

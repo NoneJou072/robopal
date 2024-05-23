@@ -1,7 +1,7 @@
 import os
 
 from robopal.demos.bimanual_tasks import BimanualReach
-from robopal.commons.wrappers import PettingStyleWrapper
+from robopal.wrappers import PettingStyleWrapper
 import ray
 from ray.rllib.env.wrappers.pettingzoo_env import ParallelPettingZooEnv
 from ray.tune.registry import register_env

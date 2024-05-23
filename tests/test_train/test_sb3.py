@@ -2,7 +2,7 @@ from stable_baselines3 import HerReplayBuffer
 from sb3_contrib import TQC
 from stable_baselines3.common.callbacks import BaseCallback
 from robopal.demos.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
-from robopal.commons.wrappers import GoalEnvWrapper
+from robopal.wrappers import GoalEnvWrapper
 
 
 class TensorboardCallback(BaseCallback):
@@ -38,10 +38,11 @@ model = TQC(
     ),
     verbose=1,
     tensorboard_log=log_dir,
-    batch_size=256,
+    batch_size=1024,
+    learning_rate=1e-3,
     gamma=0.95,
     tau=0.05,
-    policy_kwargs=dict(n_critics=2, net_arch=[256, 256])
+    policy_kwargs=dict(n_critics=2, net_arch=[512, 512, 512]),
 )
 
 # Train the model

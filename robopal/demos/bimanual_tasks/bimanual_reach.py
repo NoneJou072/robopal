@@ -3,7 +3,7 @@ import numpy as np
 from robopal.demos.bimanual_tasks import BimanualManipulate
 import robopal.commons.transform as trans
 from robopal.robots.dual_arms import DualDianaReach
-from robopal.commons.wrappers import PettingStyleWrapper
+from robopal.wrappers import PettingStyleWrapper
 
 class BimanualReach(BimanualManipulate):
 
