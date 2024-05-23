@@ -14,7 +14,7 @@ class Panda(BaseRobot):
                  mount=None
                  ):
         super().__init__(
-            name="diana_med",
+            name="panda",
             scene=scene,
             mount=mount,
             manipulator=manipulator,

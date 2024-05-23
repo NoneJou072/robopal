@@ -49,8 +49,7 @@ class MujocoEnv:
         self.mj_data: mujoco.MjData = self.robot.robot_data
 
         # time infos
-        self.cur_time = 0
-        self.timestep = 0
+        self.cur_timestep = 0
         self.model_timestep = 0
         self.control_timestep = 0
         self._n_substeps = 1
@@ -71,8 +70,10 @@ class MujocoEnv:
         :return: None
         """
         if self.renderer.render_paused:
-            self.cur_time += 1
+            self.cur_timestep += 1
             mujoco.mj_step(self.mj_model, self.mj_data, self._n_substeps)
+        if self.renderer.exit_flag:
+            self.close()
 
     def reset(
         self,
@@ -102,14 +103,16 @@ class MujocoEnv:
         """ close the environment. """
         if self.renderer is not None:
             self.renderer.close()
+            import os
+            logging.info("Enviroment has closed!")
+            os._exit(0)
 
     def _initialize_time(self):
         """ Initializes the time constants used for simulation.
 
         :param control_freq (float): Hz rate to run control loop at within the simulation
         """
-        self.cur_time = 0
-        self.timestep = 0
+        self.cur_timestep = 0
         self.model_timestep = self.mj_model.opt.timestep
         if self.model_timestep <= 0:
             raise ValueError("Invalid simulation timestep defined!")

@@ -82,7 +82,7 @@ class MjRenderer:
         """
         if self.render_paused and self.render_mode in ["human", "rgb_array", "depth"]:
             if isinstance(self.viewer, viewer.Handle):
-                if self.viewer.is_running() and not self.exit_flag:
+                if self.viewer.is_running():
                     self.viewer.sync()
                 else:
                     self.close()
@@ -107,8 +107,6 @@ class MjRenderer:
             self.viewer.close()
             del self.viewer
             logging.info("Viewer has closed!")
-            import os
-            os._exit(0)
     
     def close_render_window(self):
         self.viewer.close()

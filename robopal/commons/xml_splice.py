@@ -270,13 +270,13 @@ class XMLSplicer:
             joint.set(key, kwargs[key])
         joint_element.append(joint)
 
-    def save_xml(self, output_path='../assets'):
+    def save_xml(self, output_path=path.join(path.dirname(__file__), '../assets')):
         """ Save xml file with identity path"""
         self.tree.write(path.join(output_path, f"{self.xml_name}.xml"))
+        return self.load_xml(output_path)
 
-    def save_and_load_xml(self, output_path=path.join(path.dirname(__file__), '../assets')):
-        """ Save xml file and get its path"""
-        self.save_xml(output_path)
+    def load_xml(self, output_path=path.join(path.dirname(__file__), '../assets')):
+        """ Load xml file"""
         return path.abspath(path.join(output_path, f"{self.xml_name}.xml"))
 
     def splice_robot(self, scene=None, mount=None, manipulator=None, gripper=None, **kwargs):

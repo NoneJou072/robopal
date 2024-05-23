@@ -18,7 +18,8 @@ setup(
     install_requires=[
         'numpy>=1.23.5',
         'mujoco>=3.1.4',
-        'gymnasium'
+        'gymnasium',
+        'rich'
     ],
     extras_require={
         'planning': ['ruckig~=0.9.2'],

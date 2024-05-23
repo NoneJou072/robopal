@@ -45,7 +45,7 @@ class BaseRobot:
             self.add_assets()
 
             self.agent_num = len(manipulator)
-            xml_path = self.mjcf_generator.save_and_load_xml()
+            xml_path = self.mjcf_generator.save_xml()
         else:
             self.agent_num = 0  # by default, user should specify the agent number.
             assert self.agent_num > 0, 'Please specify the agent number by setting `self.agent_num`.'

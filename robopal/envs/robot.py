@@ -35,6 +35,7 @@ class RobotEnv(MujocoEnv):
             camera_name=camera_name,
             render_mode=render_mode,
         )
+        self.name = "default_env"
         self.is_interpolate = is_interpolate
 
         # choose controller
@@ -91,9 +92,18 @@ class RobotEnv(MujocoEnv):
         self.controller.reset()
         super().reset(seed, options)
 
+    def get_configs(self):
+        """ Get global configs of the current enviroment.
+        """
+        return {
+            'name': self.name,
+            'robot': self.robot.name,
+            'control_freq': self.control_freq,
+            'controller': self.controller.name,
+        }
+
     @property
     def dt(self):
-        """
-        Time of each upper step in the environment.
+        """ Time of each upper step in the environment.
         """
         return self._n_substeps * self.mj_model.opt.timestep
