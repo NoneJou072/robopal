@@ -46,7 +46,7 @@ class BimanualManipulate(RobotEnv):
         """
         Map to target action space bounds
         """
-        current_pos, _ = self.controller.forward_kinematics(self.robot.get_arm_qpos(agent))
+        current_pos, _ = self.controller.forward_kinematics(self.robot.get_arm_qpos(agent), agent=agent)
         next_pos = current_pos + self.pos_ratio * action[:3]
         next_pos = next_pos.clip(self.pos_min_bound[agent], self.pos_max_bound[agent])
         gripper_ctrl = (
