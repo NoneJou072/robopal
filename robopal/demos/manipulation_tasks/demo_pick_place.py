@@ -38,8 +38,6 @@ class PickAndPlaceEnv(ManipulateEnv):
 
         self.pos_max_bound = np.array([0.6, 0.2, 0.37])
         self.pos_min_bound = np.array([0.3, -0.2, 0.12])
-        self.grip_max_bound = 0.02
-        self.grip_min_bound = -0.01
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
