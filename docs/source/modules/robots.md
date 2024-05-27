@@ -1,16 +1,22 @@
+# Robots
 
-# Robot
+## 1. 简明介绍
 
-在 robopal 中，环境模型由四个部分组成, 分别是
+在 robopal 中，模型由四个部分组成, 分别是
 * `manipulators`
 * `grippers`
 * `mounts`
 * `scenes`
 
- 通过 `xml splice` 自动化脚本将这四个部分拼接到一起，组成 MJCF 模型.
+这些模型分别存放在 `robopal.assets.models`中。利用 `xml_splice` 自动化脚本可以将这四个部分拼接到一起，组成 MJCF 模型.
 
-下面是一个简单的示例，
-该文件位于 `robopal/robots/single_task_manipulation` 目录下的 `PickAndPlaceEnv` 环境。
+## 2. 组合你的模型
+
+下面是一个简单的示例，演示了如何在 robopal 中创建一个机器人模型。
+
+### 2.1 初始化机械臂模型 
+该演示文件位于 `robopal.robots.diana_med.py` 文件中的 `DianaMed` 类。
+
 
 ```python
 class DianaMed(BaseArm):
@@ -38,21 +44,18 @@ class DianaMed(BaseArm):
         return np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])
 ```
 
-我们也可以使用自定义的模型文件, 例如下面的代码使用了自定义的模型文件 `DianaMed.xml`。
+
+我们也可以使用自定义的模型文件, 例如下面的示例使用了自定义模型 `CustomArm.xml`。
 ```python
-class DianaDrawer(DianaMed):
+class CustomArm(BaseArm):
     def __init__(self):
         super().__init__(scene='grasping',
-                         manipulator='/home/mhming/zhr/robopal/robopal/assets/models/manipulators/DianaMed/DianaMed.xml',
+                         manipulator='CustomArm.xml',
                          gripper='rethink_gripper',
                          mount='top_point')
-
-    def add_assets(self):
-        # add cupboard
-        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cupboard/cupboard.xml')
-
-    @property
-    def init_qpos(self):
-        """ Robot's init joint position. """
-        return np.array([-0.51198529, -0.44737435, -0.50879166, 2.3063219, 0.46514545, -0.48916244, -0.37233289])
 ```
+
+* Q：如何将自己的机械臂模型设置成可被 robopal 自动识别的内置模型？
+* A：将模型打包好，放入 `robopal.assets.models.manipulators`, 注意 `.xml` 文件的名称与存放该文件的文件夹名称一致
+
+### 2.2 初始化末端 
