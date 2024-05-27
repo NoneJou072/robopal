@@ -3,6 +3,7 @@ import numpy as np
 from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
 import robopal.commons.transform as trans
 from robopal.robots.diana_med import DianaCabinet
+from robopal.wrappers import GoalEnvWrapper
 
 
 class LockedCabinetEnv(ManipulateEnv):
@@ -75,11 +76,7 @@ class LockedCabinetEnv(ManipulateEnv):
         obs[36] = self.mj_data.joint('0_r_finger_joint').qpos[0]
         obs[37] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
 
-        return {
-            'observation': obs.copy(),
-            'achieved_goal': self._get_achieved_goal(),
-            'desired_goal': self._get_desired_goal()
-        }
+        return obs.copy()
 
     def _get_achieved_goal(self):
         achieved_goal = np.concatenate([
@@ -114,6 +111,7 @@ class LockedCabinetEnv(ManipulateEnv):
 
 if __name__ == "__main__":
     env = LockedCabinetEnv()
+    env = GoalEnvWrapper(env)
     env.reset()
     for t in range(int(1e5)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)

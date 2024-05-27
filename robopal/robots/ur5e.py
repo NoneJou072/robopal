@@ -27,6 +27,9 @@ class UR5e(BaseRobot):
         self.base_link_name = {self.agents[0]: '0_base'}
         self.end_name = {self.agents[0]: '0_attachment'}
 
+        self.pos_max_bound = np.array([0.6, 0.2, 0.37])
+        self.pos_min_bound = np.array([0.3, -0.2, 0.12])
+
     @property
     def init_qpos(self):
         """ Robot's init joint position. """

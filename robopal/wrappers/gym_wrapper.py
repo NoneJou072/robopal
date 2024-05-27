@@ -54,10 +54,22 @@ class GoalEnvWrapper(GymWrapper):
         )
 
     def step(self, action):
-        return super().step(action)
+        obs, reward, terminated, truncated, info = super().step(action)
+        obs = {
+            'observation': obs.copy(),
+            'achieved_goal': self.env._get_achieved_goal(),
+            'desired_goal': self.env._get_desired_goal()
+        }
+        return obs, reward, terminated, truncated, info
 
     def reset(self, seed=None, options=None):
-        return super().reset(seed=seed, options=options)
+        obs, info = super().reset(seed=seed, options=options)
+        obs = {
+            'observation': obs.copy(),
+            'achieved_goal': self.env._get_achieved_goal(),
+            'desired_goal': self.env._get_desired_goal()
+        }
+        return obs, info
 
     def compute_reward(self, achieved_goal, desired_goal, info: dict = None, **kwargs):
         return self.env.compute_rewards(achieved_goal, desired_goal, info, **kwargs)

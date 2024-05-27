@@ -42,8 +42,7 @@ class ManipulateEnv(RobotEnv):
         self.goal_pos = None
 
         self.pos_ratio = 0.1
-        self.pos_max_bound = np.array([0.65, 0.2, 0.4])
-        self.pos_min_bound = np.array([0.3, -0.2, 0.14])
+
         self.grip_max_bound = self.robot.end[self.agents[0]]._ctrl_range[1]
         self.grip_min_bound = self.robot.end[self.agents[0]]._ctrl_range[0]
 
@@ -53,7 +52,7 @@ class ManipulateEnv(RobotEnv):
         """
         current_pos, _ = self.controller.forward_kinematics(self.robot.get_arm_qpos())
         actual_pos_action = current_pos + self.pos_ratio * action[:3]
-        actual_pos_action = actual_pos_action.clip(self.pos_min_bound, self.pos_max_bound)
+        actual_pos_action = actual_pos_action.clip(self.robot.pos_min_bound, self.robot.pos_max_bound)
         gripper_ctrl = (action[3] + 1) * (self.grip_max_bound - self.grip_min_bound) / 2 + self.grip_min_bound * np.ones(1)
         
         return np.concatenate([actual_pos_action, gripper_ctrl], axis=0)
@@ -76,7 +75,7 @@ class ManipulateEnv(RobotEnv):
         super().step(action[:3])
 
         obs = self._get_obs()
-        reward = self.compute_rewards(obs['achieved_goal'], obs['desired_goal'], th=0.02)
+        reward = self.compute_rewards()
         terminated = False
         truncated = True if self._timestep >= self.max_episode_steps else False
         info = self._get_info()
@@ -88,7 +87,7 @@ class ManipulateEnv(RobotEnv):
         assert goal_a.shape == goal_b.shape
         return np.linalg.norm(goal_a - goal_b, axis=-1)
 
-    def compute_rewards(self, achieved_goal: np.ndarray, desired_goal: np.ndarray, info: dict = None, **kwargs):
+    def compute_rewards(self, achieved_goal: np.ndarray = np.zeros(3), desired_goal: np.ndarray = np.zeros(3), info: dict = None, **kwargs):
         """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
         target position, and 0 if the block is in the final target position (the block is considered to have
         reached the goal if the Euclidean distance between both is lower than 0.05 m).
@@ -142,7 +141,7 @@ class ManipulateEnv(RobotEnv):
         """ Set the initial position of the end effector to a random position within the workspace.
         """
         for agent in self.agents:
-            random_pos = np.random.uniform(self.pos_min_bound, self.pos_max_bound)
+            random_pos = np.random.uniform(self.robot.pos_min_bound, self.robot.pos_max_bound)
             qpos = self.controller.ik(random_pos, self.init_quat[agent], q_init=self.robot.get_arm_qpos(agent))
             self.set_joint_qpos(qpos, agent)
             mujoco.mj_forward(self.mj_model, self.mj_data)

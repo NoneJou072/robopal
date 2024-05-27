@@ -3,6 +3,7 @@ import numpy as np
 from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
 import robopal.commons.transform as trans
 from robopal.robots.diana_med import DianaDrawerCube
+from robopal.wrappers import GoalEnvWrapper
 
 
 class DrawerCubeEnv(ManipulateEnv):
@@ -82,11 +83,7 @@ class DrawerCubeEnv(ManipulateEnv):
                 block_velp # - end_vel
             )
 
-        return {
-            'observation': obs.copy(),
-            'achieved_goal': self._get_achieved_goal(),
-            'desired_goal': self._get_desired_goal()
-        }
+        return obs.copy()
 
     def _get_achieved_goal(self):
         achieved_goal = np.concatenate([
@@ -127,6 +124,7 @@ class DrawerCubeEnv(ManipulateEnv):
 
 if __name__ == "__main__":
     env = DrawerCubeEnv()
+    env = GoalEnvWrapper(env)
     env.reset()
     for t in range(int(1e5)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)

@@ -26,6 +26,9 @@ class DianaMed(BaseRobot):
         self.base_link_name = {self.agents[0]: '0_base_link'}
         self.end_name = {self.agents[0]: '0_link7'}
 
+        self.pos_max_bound = np.array([0.6, 0.2, 0.37])
+        self.pos_min_bound = np.array([0.3, -0.2, 0.03])
+
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
@@ -124,12 +127,7 @@ class DianaGraspMultiObjs(DianaPickAndPlace):
         self.mjcf_generator.add_node_from_str('worldbody', b_goal_site)
 
 
-class DianaDrawer(DianaMed):
-    def __init__(self):
-        super().__init__(scene='grasping',
-                         gripper='rethink_gripper',
-                         mount='top_point')
-
+class DianaDrawer(DianaPickAndPlace):
     def add_assets(self):
         # add cupboard
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cupboard/cupboard.xml')
@@ -157,12 +155,7 @@ class DianaDrawerCube(DianaDrawer):
         return {self.agents[0]: np.array([-0.64551607, -0.29859465, -0.66478589, 2.3211311, 0.3205733, -0.61377277, -0.26366202])}
 
 
-class DianaCabinet(DianaMed):
-    def __init__(self):
-        super().__init__(scene='grasping',
-                         gripper='rethink_gripper',
-                         mount='top_point')
-
+class DianaCabinet(DianaPickAndPlace):
     def add_assets(self):
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cabinet/cabinet.xml')
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cabinet/beam.xml')

@@ -67,6 +67,9 @@ class BaseRobot:
         self.base_link_name = dict()
         self.end_name = dict()
         self.mani_joint_bounds = dict()  # Bounds at the joint limits
+        # Bounds at the workspace limits
+        self.pos_max_bound = np.ones(3)
+        self.pos_min_bound = -1.0 * np.ones(3)
 
         # set end effector
         gripper = [gripper] if isinstance(gripper, str) else gripper

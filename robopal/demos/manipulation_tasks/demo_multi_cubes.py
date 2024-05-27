@@ -3,6 +3,7 @@ import numpy as np
 from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
 import robopal.commons.transform as trans
 from robopal.robots.diana_med import DianaGraspMultiObjs
+from robopal.wrappers import GoalEnvWrapper
 
 
 class MultiCubes(ManipulateEnv):
@@ -34,11 +35,6 @@ class MultiCubes(ManipulateEnv):
 
         self.task_name = ['reach', 'red', 'green', 'blue']
         self.task = 'red'
-
-        self.pos_max_bound = np.array([0.68, 0.25, 0.28])
-        self.pos_min_bound = np.array([0.3, -0.25, 0.13])
-        self.grip_max_bound = 0.02
-        self.grip_min_bound = -0.01
 
         self.red_init_pos = None
         self.green_init_pos = None
@@ -89,11 +85,7 @@ class MultiCubes(ManipulateEnv):
                 self.get_body_xvelp('blue_block') * self.dt,  # velocity with respect to the gripper
             ))
 
-        return {
-            'observation': obs.copy(),
-            'achieved_goal': self._get_achieved_goal(),
-            'desired_goal': self._get_desired_goal()
-        }
+        return obs.copy()
 
     def _get_achieved_goal(self):
         achieved_goal = np.concatenate([
@@ -191,6 +183,7 @@ class MultiCubes(ManipulateEnv):
 
 if __name__ == "__main__":
     env = MultiCubes()
+    env = GoalEnvWrapper(env)
     env.reset()
     for t in range(int(1e5)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)

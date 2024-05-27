@@ -2,6 +2,7 @@ import numpy as np
 
 from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
 from robopal.robots.diana_med import DianaDrawer
+from robopal.wrappers import GoalEnvWrapper
 
 
 class DrawerEnv(ManipulateEnv):
@@ -31,9 +32,6 @@ class DrawerEnv(ManipulateEnv):
 
         self.max_episode_steps = 50
 
-        self.pos_max_bound = np.array([0.65, 0.2, 0.4])
-        self.pos_min_bound = np.array([0.3, -0.2, 0.14])
-
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
         of the block, the next 3 dimensions corresponding to the position of the goal, the next 3 dimensions
@@ -61,11 +59,7 @@ class DrawerEnv(ManipulateEnv):
         obs[15] = self.mj_data.joint('0_r_finger_joint').qpos[0]
         obs[16] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
 
-        return {
-            'observation': obs.copy(),
-            'achieved_goal': self._get_achieved_goal(),
-            'desired_goal': self._get_desired_goal()
-        }
+        return obs.copy()
     
     def _get_achieved_goal(self) -> np.ndarray:
         return self.get_site_pos('drawer')
@@ -84,6 +78,7 @@ class DrawerEnv(ManipulateEnv):
 
 if __name__ == "__main__":
     env = DrawerEnv()
+    env = GoalEnvWrapper(env)
     env.reset()
     for t in range(int(1e5)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)

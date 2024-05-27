@@ -3,7 +3,7 @@ import numpy as np
 from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
 import robopal.commons.transform as trans
 from robopal.robots.diana_med import DianaPickAndPlace
-
+from robopal.wrappers import GoalEnvWrapper
 
 class PickAndPlaceEnv(ManipulateEnv):
 
@@ -36,9 +36,6 @@ class PickAndPlaceEnv(ManipulateEnv):
 
         self.max_episode_steps = 50
 
-        self.pos_max_bound = np.array([0.6, 0.2, 0.37])
-        self.pos_min_bound = np.array([0.3, -0.2, 0.12])
-
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
         of the block, the next 3 dimensions corresponding to the position of the goal, the next 3 dimensions
@@ -70,11 +67,7 @@ class PickAndPlaceEnv(ManipulateEnv):
         obs[18:21] = self.get_body_xvelr('green_block') * self.dt
         obs[21:23] = self.robot.end['arm0'].get_finger_observations()
 
-        return {
-            'observation': obs.copy(),
-            'achieved_goal': self._get_achieved_goal(),
-            'desired_goal': self._get_desired_goal()
-        }
+        return obs.copy()
     
     def _get_achieved_goal(self) -> np.ndarray:
         return self.get_body_pos('green_block')
@@ -107,6 +100,7 @@ class PickAndPlaceEnv(ManipulateEnv):
 
 if __name__ == "__main__":
     env = PickAndPlaceEnv()
+    env = GoalEnvWrapper(env)
     env.reset()
     for t in range(int(1e5)):
         action = np.random.uniform(env.min_action, env.max_action, env.action_dim)
