@@ -30,6 +30,7 @@ class MjRenderer:
         self.camera_name = camera_name
 
         # keyboard flag
+        self.enable_viewer_keyboard = True  # enable keyboard control in viewer
         self.render_paused = True
         self.exit_flag = False
 
@@ -50,14 +51,15 @@ class MjRenderer:
         self.traj = deque(maxlen=200)  # used for rendering trajectory
 
     def key_callback(self, keycode):
-        if keycode == 32:  # space
-            self.render_paused = not self.render_paused
-        elif keycode == 256:  # esc
-            self.exit_flag = True
-        elif keycode == 257 and self.enable_camera_view:  # enter
-            image = self.image_queue.get()
-            cv.save_image(image)
-            logging.info(f"Save a picture to {cv.CV_CACHE_DIR}.")
+        if self.enable_viewer_keyboard:
+            if keycode == 32:  # space
+                self.render_paused = not self.render_paused
+            elif keycode == 256:  # esc
+                self.exit_flag = True
+            elif keycode == 257 and self.enable_camera_view:  # enter
+                image = self.image_queue.get()
+                cv.save_image(image)
+                logging.info(f"Save a picture to {cv.CV_CACHE_DIR}.")
 
     def _init_renderer(self):
         """ Initialize renderer, choose official renderer with "viewer"(joined from version 2.3.3),

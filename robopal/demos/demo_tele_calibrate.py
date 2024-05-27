@@ -22,6 +22,7 @@ if __name__ == "__main__":
     )
 
     keyboard_recoder = KeyboardIO()
+    keyboard_recoder.start()
     
     env.reset()
     init_pos = env.robot.get_end_xpos()
