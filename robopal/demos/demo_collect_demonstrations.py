@@ -13,7 +13,6 @@ if __name__ == "__main__":
         render_mode='human',
         control_freq=20,
         controller='CARTIK',
-        is_action_normalize=False,
     )
     
     env = HumanDemonstrationWrapper(env)
@@ -26,6 +25,7 @@ if __name__ == "__main__":
     for t in range(int(1e6)):
         
         action = env.get_action()
+
         next_obs, reward, termination, truncation, info = env.step(action)
 
         # Also break if we complete the task

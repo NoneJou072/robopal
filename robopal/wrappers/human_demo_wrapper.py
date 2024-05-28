@@ -32,9 +32,6 @@ class HumanDemonstrationWrapper(object):
 
     keyboard_recoder = KeyboardIO()
 
-    motion_bound = [np.array([0.1, -0.2, 0.1]),
-                    np.array([0.6, 0.2, 0.6])]
-
     def __init__(
             self, 
             env: RobotEnv, 
@@ -86,21 +83,28 @@ class HumanDemonstrationWrapper(object):
         self.env.renderer.enable_viewer_keyboard = False
     
     def get_action(self):
-        # get un-normalized action
-        self.action[:3] += self.keyboard_recoder.get_end_pos_offset()
-        self.action[:3] = np.clip(self.action[:3], self.motion_bound[0], self.motion_bound[1])
+        """ compute next actions based on the keyboard input
+        """
+        # normalize the action to -1 ~ 1
+        action = np.zeros(4)
 
-        # self.action[3:7] = T.mat_2_quat(T.quat_2_mat(self.action[3:7]).dot(self.keyboard_recoder.get_end_rot_offset()))
+        action[:3] = self.keyboard_recoder.get_end_pos_offset()
+        action[:3] *= 20
+        action[:3] = (action[:3] - (-1)) * 2 / ((1) - (-1)) - 1
+        
+        # action[3:7] = T.mat_2_quat(T.quat_2_mat(action[3:7]).dot(self.keyboard_recoder.get_end_rot_offset()))
 
-        # un-normalized end action
-        self.action[3] = int(self.keyboard_recoder._gripper_flag)
-        self.action[3] = (self.action[3] - (0)) * (self.env.grip_max_bound - self.env.grip_min_bound) / (1 - 0) + self.env.grip_min_bound
+        # normalized end action, since the end action from the keyboard is a binary value (0 or 1)
+        action[3] = int(self.keyboard_recoder._gripper_flag)
+        action[3] = action[3] * 2 - 1
 
-        return self.action.copy()
+        return action.copy()
     
     def step(self, action: np.ndarray | Dict[str, np.ndarray]):
-        
-        # collect current_state - action
+        """ Input actions should be normalized, since the action 
+        will un-normalize before applying to the environment.
+        """
+        # collect current observation
         obs = self.env._get_obs()
 
         next_obs, reward, termination, truncation, info = self.env.step(action)
@@ -125,9 +129,6 @@ class HumanDemonstrationWrapper(object):
         if self.has_interaction:
             self.save_collection()
 
-        self.action = np.concatenate([
-            self.env.init_pos[self.agent], np.zeros(1)
-        ])
         self.keyboard_recoder._reset_flag = False
         self.has_interaction = False
 

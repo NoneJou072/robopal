@@ -27,7 +27,6 @@ for state_file in sorted(glob(DEFAULT_DATA_DIR_PATH)):
             render_mode="human",
             control_freq=20,
             controller='CARTIK',
-            is_action_normalize=False,
         )
 
         for episode in file_object[group].keys():

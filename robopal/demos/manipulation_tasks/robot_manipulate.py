@@ -21,7 +21,7 @@ class ManipulateEnv(RobotEnv):
                  enable_camera_viewer=False,
                  controller='CARTIK',
                  is_interpolate=False,
-                 is_action_normalize=True,
+                 is_normalized_action=True,
                  is_end_pose_randomize=True,
                  ):
         super().__init__(
@@ -33,25 +33,23 @@ class ManipulateEnv(RobotEnv):
             is_interpolate=is_interpolate,
         )
 
-        self.is_action_normalize = is_action_normalize
+        self.is_normalized_action = is_normalized_action
         self.is_end_pose_randomize = is_end_pose_randomize
 
         self.max_episode_steps = 50
 
         self._timestep = 0
         self.goal_pos = None
-
+        self.desired_position = self.init_pos[self.agents[0]]
         self.pos_ratio = 0.1
 
         self.grip_max_bound = self.robot.end[self.agents[0]]._ctrl_range[1]
         self.grip_min_bound = self.robot.end[self.agents[0]]._ctrl_range[0]
 
-    def action_normalize(self, action) -> Tuple[np.ndarray, Any]:
+    def action_unnormalize(self, action) -> Tuple[np.ndarray, Any]:
+        """ Map to target action space bounds
         """
-        Map to target action space bounds
-        """
-        current_pos, _ = self.controller.forward_kinematics(self.robot.get_arm_qpos())
-        actual_pos_action = current_pos + self.pos_ratio * action[:3]
+        actual_pos_action = self.desired_position + self.pos_ratio * action[:3]
         actual_pos_action = actual_pos_action.clip(self.robot.pos_min_bound, self.robot.pos_max_bound)
         gripper_ctrl = (action[3] + 1) * (self.grip_max_bound - self.grip_min_bound) / 2 + self.grip_min_bound * np.ones(1)
         
@@ -67,12 +65,15 @@ class ManipulateEnv(RobotEnv):
         """
         self._timestep += 1
 
-        if self.is_action_normalize:
-            action = self.action_normalize(action)
+        # normalized actions should be un-normalized before applying to the environment
+        if self.is_normalized_action:
+            action = self.action_unnormalize(action)
 
         # take one step
         self.robot.end[self.agents[0]].apply_action(action[3])
         super().step(action[:3])
+
+        self.desired_position = action[:3]
 
         obs = self._get_obs()
         reward = self.compute_rewards()

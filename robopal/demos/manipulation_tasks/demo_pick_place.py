@@ -13,7 +13,7 @@ class PickAndPlaceEnv(ManipulateEnv):
                  control_freq=20,
                  enable_camera_viewer=False,
                  controller='CARTIK',
-                 is_action_normalize=True,
+                 is_normalized_action=True,
                  is_end_pose_randomize=True
                  ):
         super().__init__(
@@ -22,7 +22,7 @@ class PickAndPlaceEnv(ManipulateEnv):
             control_freq=control_freq,
             enable_camera_viewer=enable_camera_viewer,
             controller=controller,
-            is_action_normalize=is_action_normalize,
+            is_normalized_action=is_normalized_action,
             is_end_pose_randomize=is_end_pose_randomize
         )
         self.name = 'PickAndPlace-v1'
