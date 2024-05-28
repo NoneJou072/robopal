@@ -1,14 +1,20 @@
+import os
+import inspect
 from typing import Union, List
 import xml.etree.ElementTree as ET
 from os import path
 from copy import deepcopy
+import logging
 
-ASSETS_PATH = path.join(path.dirname(path.dirname(__file__)), 'assets')
-MODELS_PATH = path.join(ASSETS_PATH, 'models')
-MOUNTS_DIR_PATH = path.join(MODELS_PATH, 'mounts')
-GRIPPERS_DIR_PATH = path.join(MODELS_PATH, 'grippers')
-MANIPULATORS_DIR_PATH = path.join(MODELS_PATH, 'manipulators')
-SCENES_DIR_PATH = path.join(ASSETS_PATH, 'scenes')
+import robopal
+
+ROBOPAL_PATH = os.path.dirname(inspect.getfile(robopal))
+ASSETS_PATH = os.path.join(ROBOPAL_PATH, 'assets')
+MODELS_PATH = os.path.join(ASSETS_PATH, 'models')
+MOUNTS_DIR_PATH = os.path.join(MODELS_PATH, 'mounts')
+GRIPPERS_DIR_PATH = os.path.join(MODELS_PATH, 'grippers')
+MANIPULATORS_DIR_PATH = os.path.join(MODELS_PATH, 'manipulators')
+SCENES_DIR_PATH = os.path.join(ASSETS_PATH, 'scenes')
 
 
 class XMLSplicer:
@@ -20,7 +26,14 @@ class XMLSplicer:
                  gripper: Union[str, List[str]] = None,
                  **kwargs,
                  ):
+        
         self.xml_name = name
+        if 'xml_path' in kwargs and isinstance(kwargs['xml_path'], str):
+            self._mjcf_path = path.abspath(path.join(kwargs["xml_path"], f"{self.xml_name}.xml"))
+        else:
+            self._mjcf_path = path.abspath(path.join(ASSETS_PATH, f"{self.xml_name}.xml"))
+            logging.info(f"XML file path is not specified, save to {self._mjcf_path}")
+
         self.tree = None
         self.root = None
         self.splice_robot(
@@ -270,14 +283,14 @@ class XMLSplicer:
             joint.set(key, kwargs[key])
         joint_element.append(joint)
 
-    def save_xml(self, output_path=path.join(path.dirname(__file__), '../assets')):
+    def save_xml(self):
         """ Save xml file with identity path"""
-        self.tree.write(path.join(output_path, f"{self.xml_name}.xml"))
-        return self.load_xml(output_path)
+        self.tree.write(self._mjcf_path)
+        return self._mjcf_path
 
-    def load_xml(self, output_path=path.join(path.dirname(__file__), '../assets')):
+    def get_xml_path(self):
         """ Load xml file"""
-        return path.abspath(path.join(output_path, f"{self.xml_name}.xml"))
+        return self._mjcf_path
 
     def splice_robot(self, scene=None, mount=None, manipulator=None, gripper=None, **kwargs):
         """ Splice the robot with the given scene, mount, manipulator and gripper.

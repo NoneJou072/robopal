@@ -95,12 +95,15 @@ class RobotEnv(MujocoEnv):
     def get_configs(self):
         """ Get global configs of the current enviroment.
         """
+        with open(self.robot.mjcf_generator.get_xml_path(), 'r') as f:
+            mjcf_content = f.read()
         return {
             'name': self.name,
             'robot': self.robot.name,
             'control_freq': self.control_freq,
             'controller': self.controller.name,
             'seed': np.random.get_state()[1][0],
+            'mjcf': mjcf_content
         }
 
     @property

@@ -5,8 +5,10 @@ import copy
 
 import mujoco
 import numpy as np
-from robopal.commons import RobotGenerator
 
+from robopal.commons import RobotGenerator
+from robopal.robots import END_MAP
+from robopal.robots.grippers import BaseEnd
 
 class BaseRobot:
     """ Base class for generating Data struct of the arm.
@@ -28,20 +30,24 @@ class BaseRobot:
                  manipulator: Union[str, List[str]] = None,
                  gripper: Union[str, List[str]] = None,
                  attached_body: Union[str, List[str]] = None,
-                 specified_xml: str = None
+                 specified_xml_path: str = None
                  ):
         self.name = name
+        self.specified_xml_path = specified_xml_path
 
-        if specified_xml is None:
-            manipulator = [manipulator] if isinstance(manipulator, str) else manipulator
-
-            self.mjcf_generator = RobotGenerator(
+        self.mjcf_generator = RobotGenerator(
                 scene=scene,
                 mount=mount,
                 manipulator=manipulator,
                 gripper=gripper,
-                attached_body=attached_body
-            )
+                attached_body=attached_body,
+                xml_path=specified_xml_path,
+        )
+        
+        if specified_xml_path is None:
+            manipulator = [manipulator] if isinstance(manipulator, str) else manipulator
+            self.gripper_names = [gripper] if isinstance(gripper, str) else gripper
+
             self.add_assets()
 
             self.agent_num = len(manipulator)
@@ -49,16 +55,19 @@ class BaseRobot:
         else:
             self.agent_num = 0  # by default, user should specify the agent number.
             assert self.agent_num > 0, 'Please specify the agent number by setting `self.agent_num`.'
-            xml_path = specified_xml
+            xml_path = self.mjcf_generator.get_xml_path()
 
-        self.robot_model = mujoco.MjModel.from_xml_path(filename=xml_path, assets=None)
-        self.robot_data = mujoco.MjData(self.robot_model)
+        self.robot_model: mujoco.MjModel = None
+        self.robot_data: mujoco.MjData = None
         # deepcopy for computing kinematics.
-        self.kine_data: mujoco.MjData = copy.deepcopy(self.robot_data)
+        self.kine_data: mujoco.MjData = None
 
         self.agents = [f'arm{i}' for i in range(self.agent_num)]
         logging.info(f'Activated agents: {self.agents}')
         
+        self.build_from_xml(xml_path)
+        self.create_end_effector()
+
         # manipulator infos
         self._arm_joint_names = dict()
         self._arm_joint_indexes = dict()
@@ -71,24 +80,33 @@ class BaseRobot:
         self.pos_max_bound = np.ones(3)
         self.pos_min_bound = -1.0 * np.ones(3)
 
-        # set end effector
-        gripper = [gripper] if isinstance(gripper, str) else gripper
-        from robopal.robots import END_MAP
-        from robopal.robots.grippers import BaseEnd
-        if specified_xml is None:
-            if gripper is None:
+        # initial infos
+        self.init_quat = dict()
+        self.init_pos = dict()
+
+    def create_end_effector(self):
+        if self.specified_xml_path is None:
+            if self.gripper_names is None:
                 self.end = None
             else:
                 self.end: Dict[str, BaseEnd] = {
-                    agent: END_MAP[gripper](self.robot_data) for agent, gripper in zip(self.agents, gripper)
+                    agent: END_MAP[gripper](self.robot_data) for agent, gripper in zip(self.agents, self.gripper_names)
                 }
         else:
             self.end = None  # by default, user should specify the end effector.
             assert self.end is not None, 'Please specify the end effector by manual setting `self.end`.'
 
-        # initial infos
-        self.init_quat = dict()
-        self.init_pos = dict()
+    def build_from_xml(self, xml_path):
+        self.robot_model = mujoco.MjModel.from_xml_path(filename=xml_path, assets=None)
+        self.robot_data = mujoco.MjData(self.robot_model)
+        # deepcopy for computing kinematics.
+        self.kine_data: mujoco.MjData = copy.deepcopy(self.robot_data)
+
+    def build_from_string(self, xml_string):
+        self.robot_model = mujoco.MjModel.from_xml_string(xml_string)
+        self.robot_data = mujoco.MjData(self.robot_model)
+        # deepcopy for computing kinematics.
+        self.kine_data: mujoco.MjData = copy.deepcopy(self.robot_data)
 
     @property
     def arm_joint_names(self) -> Dict[str, np.ndarray]:

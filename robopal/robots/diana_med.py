@@ -1,6 +1,8 @@
 import os
 
-from robopal.robots.base import *
+import numpy as np
+
+from robopal.robots.base import BaseRobot
 
 ASSET_DIR = os.path.join(os.path.dirname(__file__), '../assets')
 

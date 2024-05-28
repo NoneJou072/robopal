@@ -37,7 +37,7 @@ class MjRenderer:
         # Set up sync mujoco viewer
         self.viewer = None
         if self.render_mode in ["human", "rgb_array", "depth"]:
-            self._init_renderer()
+            self._init_renderer(mj_model, mj_data)
         elif self.render_mode is None:
             pass
         else:
@@ -61,16 +61,23 @@ class MjRenderer:
                 cv.save_image(image)
                 logging.info(f"Save a picture to {cv.CV_CACHE_DIR}.")
 
-    def _init_renderer(self):
+    def _init_renderer(self, mj_model, mj_data):
         """ Initialize renderer, choose official renderer with "viewer"(joined from version 2.3.3),
             another renderer with "mujoco_viewer"
         """
+        # refresh the data
+        self.mj_model = mj_model
+        self.mj_data = mj_data
+
+        # set up the renderer
         if self.render_mode == "unity":
             # TODO: Support unity renderer.
             raise ValueError("Unity renderer not supported now.")
         elif self.render_mode in ["human", "rgb_array", "depth"]:
             # This function does not block, allowing user code to continue execution.
-            self.viewer = viewer.launch_passive(self.mj_model, self.mj_data,
+            if isinstance(self.viewer, viewer.Handle):
+                self.viewer.close()
+            self.viewer = viewer.launch_passive(mj_model, mj_data,
                                                 key_callback=self.key_callback, 
                                                 show_left_ui=False, show_right_ui=True)
             self.set_renderer_config()

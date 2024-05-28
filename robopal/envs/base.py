@@ -79,6 +79,7 @@ class MujocoEnv:
         if self.renderer.render_paused:
             self.cur_timestep += 1
             mujoco.mj_step(self.mj_model, self.mj_data, self._n_substeps)
+
         if self.renderer.exit_flag:
             self.close()
 
@@ -102,7 +103,7 @@ class MujocoEnv:
     def reset_object(self):
         """ Set pose of the object. """
         # override mjcf with reseted model
-        mujoco.mj_saveLastXML(MJCF_PATH, self.mj_model)
+        mujoco.mj_saveLastXML(self.robot.mjcf_generator.get_xml_path(), self.mj_model)
 
     def render(self) -> Union[None, np.ndarray]:
         """ render one frame in mujoco """
@@ -352,6 +353,18 @@ class MujocoEnv:
         else:
             state = np.array(state.flatten(), np.float64)
             mujoco.mj_setState(self.mj_model, self.mj_data, state, spec)
+
+    def load_model_from_string(self, xml_string):
+        """ Override model from string.
+
+        :param xml_string: xml string
+        """
+        self.robot.build_from_string(xml_string)
+        self.mj_model = self.robot.robot_model
+        self.mj_data = self.robot.robot_data
+        self.renderer._init_renderer(self.mj_model, self.mj_data)
+        for end in self.robot.end.values():
+            end.robot_data = self.mj_data
 
     def is_contact(self, geom1: Union[str, List[str]], geom2: Union[str, List[str]], verbose=False) -> bool:
         """ Check if two geom or geom list is in contact.
