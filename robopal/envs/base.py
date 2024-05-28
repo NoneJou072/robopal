@@ -1,12 +1,19 @@
 import abc
+import os
 import logging
 from typing import Union, List, Any, Dict, ClassVar
+from copy import deepcopy
+import inspect
 
 import mujoco
 import numpy as np
 
+import robopal
 from robopal.commons.renderers import MjRenderer
 from robopal.robots.base import BaseRobot
+
+ROBOPAL_PATH = os.path.dirname(inspect.getfile(robopal))
+MJCF_PATH = os.path.join(ROBOPAL_PATH, "assets/robot.xml")
 
 
 class MujocoEnv:
@@ -81,6 +88,8 @@ class MujocoEnv:
         options: Union[Dict[str, Any], None] = None,
     ):
         """ Reset the simulate environment, in order to execute next episode. """
+        np.random.seed(seed)
+        
         mujoco.mj_resetData(self.mj_model, self.mj_data)
         self.reset_object()
         self._set_init_qpos()
@@ -92,7 +101,8 @@ class MujocoEnv:
 
     def reset_object(self):
         """ Set pose of the object. """
-        pass
+        # override mjcf with reseted model
+        mujoco.mj_saveLastXML(MJCF_PATH, self.mj_model)
 
     def render(self) -> Union[None, np.ndarray]:
         """ render one frame in mujoco """
@@ -329,11 +339,19 @@ class MujocoEnv:
         state = np.empty(size, np.float64)
         mujoco.mj_getState(self.mj_model, self.mj_data, state, spec)
         self._mj_state = state
+    
+    def get_state(self):
+        """ Get the saved state """
+        return deepcopy(self._mj_state)
 
-    def load_state(self):
+    def load_state(self, state: np.ndarray = None):
         """ Load the state of the mujoco model. """
         spec = mujoco.mjtState.mjSTATE_INTEGRATION
-        mujoco.mj_setState(self.mj_model, self.mj_data, self._mj_state, spec)
+        if state is None:
+            mujoco.mj_setState(self.mj_model, self.mj_data, self._mj_state, spec)
+        else:
+            state = np.array(state.flatten(), np.float64)
+            mujoco.mj_setState(self.mj_model, self.mj_data, state, spec)
 
     def is_contact(self, geom1: Union[str, List[str]], geom2: Union[str, List[str]], verbose=False) -> bool:
         """ Check if two geom or geom list is in contact.

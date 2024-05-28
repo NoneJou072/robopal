@@ -108,6 +108,8 @@ class LockedCabinetEnv(ManipulateEnv):
         elif self.TASK_FLAG == 1:
             self.mj_data.joint('OBJTy').qpos[0] = -0.12
 
+        return super().reset_object()
+
 
 if __name__ == "__main__":
     env = LockedCabinetEnv()

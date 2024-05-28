@@ -95,7 +95,10 @@ class PickAndPlaceEnv(ManipulateEnv):
             random_goal_z_pos = np.random.uniform(0.45, 0.66)
             goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
         site_id = self.get_site_id('goal_site')
+
         self.mj_model.site_pos[site_id] = goal_pos
+
+        return super().reset_object()
 
 
 if __name__ == "__main__":

@@ -75,6 +75,8 @@ class DrawerEnv(ManipulateEnv):
         site_id = self.get_site_id('drawer_goal')
         self.mj_model.site_pos[site_id] = goal_pos
 
+        return super().reset_object()
+
 
 if __name__ == "__main__":
     env = DrawerEnv()

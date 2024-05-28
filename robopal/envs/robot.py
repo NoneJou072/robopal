@@ -100,6 +100,7 @@ class RobotEnv(MujocoEnv):
             'robot': self.robot.name,
             'control_freq': self.control_freq,
             'controller': self.controller.name,
+            'seed': np.random.get_state()[1][0],
         }
 
     @property

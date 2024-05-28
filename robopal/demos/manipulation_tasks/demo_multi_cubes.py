@@ -179,7 +179,8 @@ class MultiCubes(ManipulateEnv):
         elif self.task == 'blue':
             self.set_object_pose('red_block:joint', np.array([red_goal[0], red_goal[1], red_goal[2], 1.0, 0.0, 0.0, 0.0]))
             self.set_object_pose('green_block:joint', np.array([red_goal[0], red_goal[1], red_goal[2] + 0.04, 1.0, 0.0, 0.0, 0.0]))
-
+            
+        return super().reset_object()
 
 if __name__ == "__main__":
     env = MultiCubes()

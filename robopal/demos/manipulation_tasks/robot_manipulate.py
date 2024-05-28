@@ -135,7 +135,7 @@ class ManipulateEnv(RobotEnv):
         return obs, info
 
     def reset_object(self):
-        pass
+        return super().reset_object()
 
     def set_random_init_position(self):
         """ Set the initial position of the end effector to a random position within the workspace.
