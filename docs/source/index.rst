@@ -9,14 +9,14 @@ robopal
    :maxdepth: 1
    :caption: USER GUIDE
 
-   introduction
-   installation
-   quickstart
+   guides/introduction
+   guides/installation
+   guides/quickstart
 
 .. toctree::
    :hidden:
    :maxdepth: 1
-   :caption: MODULES API
+   :caption: MODULES
 
    modules/controllers
    modules/wrappers
@@ -26,7 +26,14 @@ robopal
 .. toctree::
    :hidden:
    :maxdepth: 1
-   :caption: SOURCE API
+   :caption: TUTORIALS
+
+   tutorials/behavior_cloning
+
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+   :caption: API
 
    python_apis/robopal
 
