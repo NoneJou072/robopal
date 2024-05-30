@@ -160,5 +160,5 @@ class BimanualManipulate(RobotEnv):
             random_pos = np.random.uniform(self.pos_min_bound[agent], self.pos_max_bound[agent])
             qpos = self.controller.ik(random_pos, self.init_quat[agent], q_init=self.robot.get_arm_qpos(agent))
             self.set_joint_qpos(qpos, agent)
-            mujoco.mj_forward(self.mj_model, self.mj_data)
+            self.forward()
             self.render()

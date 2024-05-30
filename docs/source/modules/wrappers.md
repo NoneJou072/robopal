@@ -72,7 +72,7 @@ model.save("./her_bit_env")
 ```python
 import os
 
-from robopal.demos.bimanual_tasks import BimanualReach
+from robopal.envs.bimanual_tasks import BimanualReach
 from robopal.wrappers import PettingStyleWrapper
 import ray
 from ray import tune

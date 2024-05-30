@@ -396,7 +396,7 @@ class RRT:
             qpos = sim.controller.ik(target_pos, target_rot)
             sim.set_joint_qpos(qpos)
 
-            mujoco.mj_forward(sim.mj_model, sim.mj_data)
+            sim.forward()
             sim.render()
 
             if not TYPE_CHANGED:

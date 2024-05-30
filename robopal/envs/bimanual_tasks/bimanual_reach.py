@@ -1,7 +1,7 @@
 import numpy as np
 
-from robopal.demos.bimanual_tasks import BimanualManipulate
-import robopal.commons.transform as trans
+from robopal.envs.bimanual_tasks import BimanualManipulate
+import robopal.commons.transform as T
 from robopal.robots.dual_arms import DualDianaReach
 from robopal.wrappers import PettingStyleWrapper
 

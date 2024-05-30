@@ -92,6 +92,10 @@ class MujocoEnv:
         if self.renderer.exit_flag:
             self.close()
 
+    def forward(self):
+        """ Forward the simulation. """
+        mujoco.mj_forward(self.mj_model, self.mj_data)
+
     def reset(
         self,
         seed: Union[int, None] = None,
@@ -103,7 +107,7 @@ class MujocoEnv:
         mujoco.mj_resetData(self.mj_model, self.mj_data)
         self.reset_object()
         self._set_init_qpos()
-        mujoco.mj_forward(self.mj_model, self.mj_data)
+        self.forward()
 
         if isinstance(options, dict):
             if "disable_reset_render" in options and options["disable_reset_render"]:
@@ -144,7 +148,7 @@ class MujocoEnv:
         """ Set or reset init joint position when called env reset func. """
         for agent in self.robot.agents:
             self.set_joint_qpos(self.robot.init_qpos[agent], agent)
-        mujoco.mj_forward(self.mj_model, self.mj_data)
+        self.forward()
 
     def set_joint_qpos(self, qpos: np.ndarray, agent: str = 'arm0'):
         """ Set joint position. """

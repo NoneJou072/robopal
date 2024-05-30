@@ -10,7 +10,7 @@ import numpy as np
 import h5py
 
 import robopal
-from robopal.envs import RobotEnv
+from robopal.envs.manipulation_tasks.robot_manipulate import ManipulateEnv
 from robopal.plugins.devices.keyboard import KeyboardIO
 import robopal.commons.transform as T
 
@@ -28,9 +28,9 @@ class Collection:
     rewards: List[np.ndarray] = field(default_factory=list)
     dones: List[np.ndarray] = field(default_factory=list)
     obs: Dict[str, List[np.ndarray]] = field(
-        default_factory=lambda: {"observations": []})
+        default_factory=lambda: {"low_dim": []})
     next_obs: Dict[str, List[np.ndarray]] = field(
-        default_factory=lambda: {"observations": []})
+        default_factory=lambda: {"low_dim": []})
 
 
 class HumanDemonstrationWrapper(object):
@@ -39,7 +39,7 @@ class HumanDemonstrationWrapper(object):
 
     def __init__(
             self, 
-            env: RobotEnv, 
+            env: ManipulateEnv, 
             collections_dir: str = DEFAULT_DATA_DIR_PATH,
             collect_freq = 1,
             max_collect_horizon = 100,
@@ -64,7 +64,11 @@ class HumanDemonstrationWrapper(object):
         env_args = {
             "env_name": self.env.get_configs("env_name"),
             "env_type": 2,  # GYM_TYPE
-            "env_kwargs": 0
+            # pass to the env constructor
+            "env_kwargs": str({
+                "control_freq" : self.env.control_freq,
+                "controller" : self.env.controller.name,
+            })
         }
         # store env config as an attribute
         for key, value in env_args.items():
@@ -120,8 +124,8 @@ class HumanDemonstrationWrapper(object):
         if self.env.cur_timestep % self.collect_freq == 0:
             self.collection.num_samples += 1
             self.collection.actions.append(action)
-            self.collection.obs["observations"].append(obs)
-            self.collection.next_obs["observations"].append(next_obs)
+            self.collection.obs["low_dim"].append(obs)
+            self.collection.next_obs["low_dim"].append(next_obs)
             self.collection.dones.append(termination)
             self.collection.rewards.append(reward)
             self.env.save_state()
@@ -153,14 +157,14 @@ class HumanDemonstrationWrapper(object):
     def save_collection(self):
         # drop unsuccessful episode
         if self.is_drop_unsuccess_exp:
-            if not self.collection.infos[-1]["is_success"]:
+            if not self.env._get_info()["is_success"]:
                 logging.info("Demonstration is unsuccessful and has NOT been saved")
                 return
         
         # check the collection
-        if len(self.collection.observations) == 0:
+        if len(self.collection.actions) == 0:
             return
-        assert len(self.collection.observations) == len(self.collection.actions)
+        assert len(self.collection.obs) == len(self.collection.actions)
 
         self.num_collects += 1
         ep_data_grp = self.root_group.create_group("demo_{}".format(self.num_collects))
@@ -171,7 +175,6 @@ class HumanDemonstrationWrapper(object):
 
         # write datasets
         ep_data_grp.create_dataset("states", data=np.array(self.collection.states, dtype=np.float64))
-        ep_data_grp.create_dataset("observations", data=np.array(self.collection.observations, dtype=np.float32))
         ep_data_grp.create_dataset("actions", data=np.array(self.collection.actions, dtype=np.float32))
         ep_data_grp.create_dataset("rewards", data=np.array(self.collection.actions, dtype=np.float32))
         ep_data_grp.create_dataset("dones", data=np.array(self.collection.actions, dtype=np.float32))

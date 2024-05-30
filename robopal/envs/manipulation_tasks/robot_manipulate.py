@@ -129,10 +129,13 @@ class ManipulateEnv(RobotEnv):
         options = options or {}
         options['disable_reset_render'] = True
         super().reset(seed, options)
-        self.set_random_init_position()
+
         self._timestep = 0
+        self.set_random_init_position()
+
         obs = self._get_obs()
         info = self._get_info()
+        
         return obs, info
 
     def reset_object(self):
@@ -145,5 +148,5 @@ class ManipulateEnv(RobotEnv):
             random_pos = np.random.uniform(self.robot.pos_min_bound, self.robot.pos_max_bound)
             qpos = self.controller.ik(random_pos, self.init_quat[agent], q_init=self.robot.get_arm_qpos(agent))
             self.set_joint_qpos(qpos, agent)
-            mujoco.mj_forward(self.mj_model, self.mj_data)
+            self.forward()
             self.render()

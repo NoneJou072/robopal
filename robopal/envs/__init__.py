@@ -1,5 +1,6 @@
 from .base import MujocoEnv
 from .robot import RobotEnv
+from .manipulation_tasks.robot_manipulate import ManipulateEnv
 
 from .manipulation_tasks.demo_pick_place import PickAndPlaceEnv
 from .manipulation_tasks.demo_multi_cubes import MultiCubesEnv
