@@ -47,11 +47,14 @@
             <geom mesh="robotiq-2f-base"/>
             <geom class="robotiq_col" type="mesh" mesh="robotiq-2f-base" euler="0 0 0"/>
             <!-- This site was added for visualization. -->
-            <body name="eef" pos="0 0 0.14" quat="0.707105 0 0 -0.707105">
+            <body name="eef" pos="0 0 0.14" quat="0 1 1 0">
                 <site name="grip_site" pos="0 0 0" size="0.005" rgba="1 0 0 0.1" type="sphere" group="1"/>
-                <site name="ee_x" pos="0.1 0 0" size="0.005 .1"  quat="0.707105  0 0.707108 0 " rgba="1 0 0 0.1" type="cylinder" group="1"/>
-                <site name="ee_y" pos="0 0.1 0" size="0.005 .1" quat="0.707105 0.707108 0 0" rgba="0 1 0 0.1" type="cylinder" group="1"/>
-                <site name="ee_z" pos="0 0 0.1" size="0.005 .1" quat="1 0 0 0" rgba="0 0 1 0.5" type="cylinder" group="1"/>
+                <site name="ee_x" pos="0.2 0 0" size="0.005 .2"  quat="0.707105  0 0.707108 0 " rgba="1 0 0 0.1" type="cylinder" group="1"/>
+                <site name="ee_y" pos="0 0.2 0" size="0.005 .2" quat="0.707105 0.707108 0 0" rgba="0 1 0 0.1" type="cylinder" group="1"/>
+                <site name="ee_z" pos="0 0 0.2" size="0.005 .2" quat="1 0 0 0" rgba="0 0 1 0.5" type="cylinder" group="1"/>
+                <site name="ee_x_ne" pos="-0.2 0 0" size="0.005 .2"  quat="0.707105  0 0.707108 0 " rgba="1 1 1 0.1" type="cylinder" group="1"/>
+                <site name="ee_y_ne" pos="0 -0.2 0" size="0.005 .2" quat="0.707105 0.707108 0 0" rgba="1 1 1 0.1" type="cylinder" group="1"/>
+                <site name="ee_z_ne" pos="0 0 -0.2" size="0.005 .2" quat="1 0 0 0" rgba="1 1 1 0.1" type="cylinder" group="1"/>
             </body>
             <body name="robotiq_2f_85_right_driver" pos="0 0.0306011 0.054904">
                 <inertial pos="0 0.01575 0.05295" quat="0.738425 0.674335 0 0" mass="0.0002" diaginertia="0.00043212 0.000431866 0.000360253"/>

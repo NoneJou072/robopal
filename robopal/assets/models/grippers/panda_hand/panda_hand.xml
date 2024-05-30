@@ -64,7 +64,7 @@
       <geom mesh="hand_4" material="off_white_hand" class="visual"/>
       <geom mesh="hand_c" class="collision"/>
       <!-- This site was added for visualization. -->
-      <body name="eef" pos="0 0 0.1" quat="0.707105 0 0 -0.707105">
+      <body name="eef" pos="0 0 0.1" quat="0 1 0 0">
           <site name="grip_site" pos="0 0 0" size="0.005" rgba="1 0 0 0.1" type="sphere" group="1"/>
           <site name="ee_x" pos="0.1 0 0" size="0.005 .1"  quat="0.707105  0 0.707108 0 " rgba="1 0 0 0.1" type="cylinder" group="1"/>
           <site name="ee_y" pos="0 0.1 0" size="0.005 .1" quat="0.707105 0.707108 0 0" rgba="0 1 0 0.1" type="cylinder" group="1"/>

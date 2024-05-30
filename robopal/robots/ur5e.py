@@ -70,5 +70,5 @@ class UR5eGrasp(UR5e):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return {self.agents[0]: np.array([-0.22131256, -1.36007871, 1.27996613, -1.49068995, -1.57079325, -0.22131563])}
+        return {self.agents[0]: np.array([-0.27131313, -1.58681262,  1.45363338, -1.43761664, -1.57079275,  1.29926298])}
     
