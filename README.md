@@ -55,7 +55,7 @@ $ pip install robopal
 ### Run a demo
 
 ```bash
-python -m robopal.demos.demo_controller
+python -m robopal.demos.demo_controllers
 ```
 
 ## Contribute

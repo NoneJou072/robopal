@@ -1,4 +1,4 @@
-from robopal.demos.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
+from robopal.envs.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
 from robopal.wrappers.gym_wrapper import GoalEnvWrapper
 
 env = PickAndPlaceEnv(render_mode="human")

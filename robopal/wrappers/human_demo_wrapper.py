@@ -21,11 +21,16 @@ DEFAULT_DATA_DIR_PATH = os.path.join(ROBOPAL_PATH, COLLECTIONS_DIR_NAME)
 
 @dataclass
 class Collection:
-    env_configs: Dict[str, Any]
+    num_samples: int = 0
+    model_file: str = None
     states: List[np.ndarray] = field(default_factory=list)
-    observations: List[np.ndarray] = field(default_factory=list)
     actions: List[np.ndarray] = field(default_factory=list)
-    infos: List[Dict[str, Any]] = field(default_factory=list)
+    rewards: List[np.ndarray] = field(default_factory=list)
+    dones: List[np.ndarray] = field(default_factory=list)
+    obs: Dict[str, List[np.ndarray]] = field(
+        default_factory=lambda: {"observations": []})
+    next_obs: Dict[str, List[np.ndarray]] = field(
+        default_factory=lambda: {"observations": []})
 
 
 class HumanDemonstrationWrapper(object):
@@ -39,7 +44,6 @@ class HumanDemonstrationWrapper(object):
             collect_freq = 1,
             max_collect_horizon = 100,
             is_drop_unsuccess_exp = True,
-            save_type = 'hdf5',
         ):
         
         self.env = env
@@ -47,27 +51,30 @@ class HumanDemonstrationWrapper(object):
         self.collect_freq = collect_freq
         self.max_collect_horizon = max_collect_horizon
         self.is_drop_unsuccess_exp = is_drop_unsuccess_exp
-        self.save_type = save_type
 
         if not os.path.exists(self.collections_dir):
             logging.info("HumanDemonstrationWrapper: making new directory at {}".format(self.collections_dir))
             os.makedirs(self.collections_dir)
 
-        if self.save_type == "hdf5":
-            hdf5_path = os.path.join(self.collections_dir, "demo.hdf5")
-            self.f = h5py.File(hdf5_path, "w")
-            # store some metadata in the attributes of one group
-            self.root_group = self.f.create_group("data")
+        hdf5_path = os.path.join(self.collections_dir, "demo.hdf5")
+        self.f = h5py.File(hdf5_path, "w")
+        # store some metadata in the attributes of one group
+        self.root_group = self.f.create_group("data")
+
+        env_args = {
+            "env_name": self.env.get_configs("env_name"),
+            "env_type": 2,  # GYM_TYPE
+            "env_kwargs": 0
+        }
+        # store env config as an attribute
+        for key, value in env_args.items():
+            self.root_group.attrs[key] = value
 
         # choose one agent
         self.agent = "arm0"
 
         # memorize the init pose
         self.env.robot.end[self.agent].open()
-        # set init action
-        self.action = np.concatenate([
-            self.env.init_pos[self.agent], np.zeros(1)
-        ])
 
         # store logging directory for current episode
         self.ep_directory = None
@@ -75,7 +82,6 @@ class HumanDemonstrationWrapper(object):
         # remember whether any environment interaction has occurred
         self.has_interaction = False
 
-        # make an init collection
         self.collection: Collection = None
         self.num_collects  = 0
 
@@ -85,12 +91,11 @@ class HumanDemonstrationWrapper(object):
     def get_action(self):
         """ compute next actions based on the keyboard input
         """
-        # normalize the action to -1 ~ 1
         action = np.zeros(4)
 
+        # normalize the action to [-1, 1]
         action[:3] = self.keyboard_recoder.get_end_pos_offset()
         action[:3] *= 20
-        action[:3] = (action[:3] - (-1)) * 2 / ((1) - (-1)) - 1
         
         # action[3:7] = T.mat_2_quat(T.quat_2_mat(action[3:7]).dot(self.keyboard_recoder.get_end_rot_offset()))
 
@@ -110,12 +115,15 @@ class HumanDemonstrationWrapper(object):
         next_obs, reward, termination, truncation, info = self.env.step(action)
 
         if not self.has_interaction:
-            self._on_first_interaction()
+            self.has_interaction = True
 
         if self.env.cur_timestep % self.collect_freq == 0:
+            self.collection.num_samples += 1
             self.collection.actions.append(action)
-            self.collection.observations.append(obs)
-            self.collection.infos.append(info)
+            self.collection.obs["observations"].append(obs)
+            self.collection.next_obs["observations"].append(next_obs)
+            self.collection.dones.append(termination)
+            self.collection.rewards.append(reward)
             self.env.save_state()
             self.collection.states.append(self.env.get_state())
 
@@ -136,8 +144,9 @@ class HumanDemonstrationWrapper(object):
 
         # delete old and make new collection
         del self.collection
-        env_configs = self.env.get_configs()
-        self.collection = Collection(env_configs)
+        self.collection = Collection(
+            model_file=self.env.get_configs("model_file")
+        )
 
         return ret
     
@@ -153,47 +162,35 @@ class HumanDemonstrationWrapper(object):
             return
         assert len(self.collection.observations) == len(self.collection.actions)
 
-        if self.save_type == "hdf5":
-            self.num_collects += 1
-            ep_data_grp = self.root_group.create_group("demo_{}".format(self.num_collects))
+        self.num_collects += 1
+        ep_data_grp = self.root_group.create_group("demo_{}".format(self.num_collects))
 
-            # store env config as an attribute
-            for key, value in self.collection.env_configs.items():
-                ep_data_grp.attrs[key] = value
+        # add attrs
+        ep_data_grp.attrs["num_samples"] = self.collection.num_samples
+        ep_data_grp.attrs["model_file"] = self.collection.model_file
 
-            # write datasets for states and actions
-            ep_data_grp.create_dataset("states", data=np.array(self.collection.states, dtype=np.float64))
-            ep_data_grp.create_dataset("observations", data=np.array(self.collection.observations, dtype=np.float32))
-            ep_data_grp.create_dataset("actions", data=np.array(self.collection.actions, dtype=np.float32))
+        # write datasets
+        ep_data_grp.create_dataset("states", data=np.array(self.collection.states, dtype=np.float64))
+        ep_data_grp.create_dataset("observations", data=np.array(self.collection.observations, dtype=np.float32))
+        ep_data_grp.create_dataset("actions", data=np.array(self.collection.actions, dtype=np.float32))
+        ep_data_grp.create_dataset("rewards", data=np.array(self.collection.actions, dtype=np.float32))
+        ep_data_grp.create_dataset("dones", data=np.array(self.collection.actions, dtype=np.float32))
 
-        else:
-            # make state dir
-            t1, t2 = str(time.time()).split(".")
-            state_path = os.path.join(self.ep_directory, "state_{}_{}.npz".format(t1, t2))
-
-            # save collection
-            np.savez(state_path, collection=self.collection)
+        # write obs
+        obs_group = ep_data_grp.create_group("obs")
+        for key, value in self.collection.obs.items():
+            obs_group.create_dataset(key, value)
+        next_obs_group = ep_data_grp.create_group("next_obs")
+        for key, value in self.collection.next_obs.items():
+            next_obs_group.create_dataset(key, value)
 
         logging.info("Demonstration is successful and has been saved")
-
-    def _on_first_interaction(self):
-        self.has_interaction = True
-
-        if self.save_type == "hdf5":
-            pass
-        else:
-            # create a directory with a timestamp
-            t1, t2 = str(time.time()).split(".")
-            self.ep_directory = os.path.join(self.collections_dir, "ep_{}_{}".format(t1, t2))
-            assert not os.path.exists(self.ep_directory)
-            logging.info("HumanDemonstrationWrapper: making folder at {}".format(self.ep_directory))
-            os.makedirs(self.ep_directory)
 
     def close(self):
         if self.has_interaction:
             self.save_collection()
-        if self.save_type == "hdf5":
-            self.f.close()
-            logging.info("HumanDemonstrationWrapper: closed hdf5 file")
+
+        self.f.close()
+        logging.info("HumanDemonstrationWrapper: closed hdf5 file")
 
         self.env.close()

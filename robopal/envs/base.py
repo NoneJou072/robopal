@@ -1,7 +1,6 @@
-import abc
 import os
 import logging
-from typing import Union, List, Any, Dict, ClassVar
+from typing import Union, List, Any, Dict
 from copy import deepcopy
 import inspect
 
@@ -10,10 +9,16 @@ import numpy as np
 
 import robopal
 from robopal.commons.renderers import MjRenderer
+import robopal.envs
 from robopal.robots.base import BaseRobot
 
 ROBOPAL_PATH = os.path.dirname(inspect.getfile(robopal))
 MJCF_PATH = os.path.join(ROBOPAL_PATH, "assets/robot.xml")
+
+
+def make(env_name: str, **kwargs) -> "MujocoEnv":
+    """ Create an environment instance. """
+    return robopal.envs.REGISTERED_ENVS[env_name](**kwargs)
 
 
 class MujocoEnv:
@@ -36,6 +41,7 @@ class MujocoEnv:
             "unity",
         ],
     }
+    name = "MujocoEnv"
 
     def __init__(
         self,
@@ -69,6 +75,9 @@ class MujocoEnv:
         self._set_init_qpos()
 
         self._mj_state = None
+
+    def __name__(self):
+        return self.name
 
     def step(self, action: Union[np.ndarray, Dict[str, np.ndarray]] = None) -> Any:
         """ 

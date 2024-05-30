@@ -7,7 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   robopal.demos.manipulation_tasks
+   robopal.envs.manipulation_tasks
 
 Submodules
 ----------
@@ -15,7 +15,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   robopal.demos.demo_controller
+   robopal.demos.demo_controllers
    robopal.demos.demo_grasping
    robopal.demos.demo_motion_planning
    robopal.demos.demo_tele_calibrate

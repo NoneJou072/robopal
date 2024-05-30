@@ -1,12 +1,14 @@
 import numpy as np
 
-from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
+from robopal.envs.manipulation_tasks.robot_manipulate import ManipulateEnv
 from robopal.robots.diana_med import DianaDrawer
 from robopal.wrappers import GoalEnvWrapper
 
 
 class DrawerEnv(ManipulateEnv):
 
+    name = 'Drawer-v1'
+    
     def __init__(self,
                  robot=DianaDrawer,
                  render_mode='human',
@@ -21,7 +23,6 @@ class DrawerEnv(ManipulateEnv):
             enable_camera_viewer=enable_camera_viewer,
             controller=controller,
         )
-        self.name = 'Drawer-v1'
 
         self.obs_dim = (17,)
         self.goal_dim = (3,)

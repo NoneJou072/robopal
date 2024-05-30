@@ -1,7 +1,7 @@
 from stable_baselines3 import HerReplayBuffer
 from sb3_contrib import TQC
 from stable_baselines3.common.callbacks import BaseCallback
-from robopal.demos.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
+from robopal.envs.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
 from robopal.wrappers import GoalEnvWrapper
 
 

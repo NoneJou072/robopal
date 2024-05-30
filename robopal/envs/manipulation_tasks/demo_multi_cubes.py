@@ -1,13 +1,15 @@
 import numpy as np
 
-from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
+from robopal.envs.manipulation_tasks.robot_manipulate import ManipulateEnv
 import robopal.commons.transform as trans
 from robopal.robots.diana_med import DianaGraspMultiObjs
 from robopal.wrappers import GoalEnvWrapper
 
 
-class MultiCubes(ManipulateEnv):
+class MultiCubesEnv(ManipulateEnv):
 
+    name = 'MultiCubeStack-v2'
+    
     def __init__(self,
                  robot=DianaGraspMultiObjs,
                  render_mode='human',
@@ -22,7 +24,6 @@ class MultiCubes(ManipulateEnv):
             enable_camera_viewer=enable_camera_viewer,
             controller=controller,
         )
-        self.name = 'MultiCubeStack-v2'
 
         self.obs_dim = (44,)
         self.goal_dim = (12,)
@@ -183,7 +184,7 @@ class MultiCubes(ManipulateEnv):
         return super().reset_object()
 
 if __name__ == "__main__":
-    env = MultiCubes()
+    env = MultiCubesEnv()
     env = GoalEnvWrapper(env)
     env.reset()
     for t in range(int(1e5)):

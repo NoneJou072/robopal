@@ -1,6 +1,6 @@
 # Refer to [robosuite](https://github.com/ARISE-Initiative/robosuite/blob/master/robosuite/scripts/collect_human_demonstrations.py#L231) in this part.
 
-from robopal.demos.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
+from robopal.envs.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
 from robopal.wrappers import HumanDemonstrationWrapper
 
 

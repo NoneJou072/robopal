@@ -1,12 +1,14 @@
 import numpy as np
 
-from robopal.demos.manipulation_tasks.robot_manipulate import ManipulateEnv
+from robopal.envs.manipulation_tasks.robot_manipulate import ManipulateEnv
 import robopal.commons.transform as trans
 from robopal.robots.diana_med import DianaPickAndPlace
 from robopal.wrappers import GoalEnvWrapper
 
 class PickAndPlaceEnv(ManipulateEnv):
 
+    name = 'PickAndPlace-v1'
+    
     def __init__(self,
                  robot=DianaPickAndPlace,
                  render_mode='human',
@@ -25,7 +27,6 @@ class PickAndPlaceEnv(ManipulateEnv):
             is_normalized_action=is_normalized_action,
             is_end_pose_randomize=is_end_pose_randomize
         )
-        self.name = 'PickAndPlace-v1'
 
         self.obs_dim = (23,)
         self.goal_dim = (3,)

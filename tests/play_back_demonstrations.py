@@ -5,7 +5,7 @@ import logging
 
 import h5py
 import robopal
-from robopal.demos.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
+from robopal.envs.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
 
 ROBOPAL_PATH = os.path.dirname(inspect.getfile(robopal))
 COLLECTIONS_DIR_NAME = 'collections/collections_*'
