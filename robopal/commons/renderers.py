@@ -18,16 +18,20 @@ class MjRenderer:
         mj_model,
         mj_data,
         render_mode: Union[str, None] = 'human',
-        enable_camera_view=False,
-        camera_name='0_cam'
+        is_show_camera_in_cv = False,
+        is_render_camera_offscreen = False,
+        camera_in_render = '0_cam',
+        camera_in_window = "free",
     ):
 
         self.mj_model = mj_model
         self.mj_data = mj_data
 
         self.render_mode = render_mode
-        self.enable_camera_view = enable_camera_view if cv.CV_FLAG else False
-        self.camera_name = camera_name
+        self.is_show_camera_in_cv  = is_show_camera_in_cv  if cv.CV_FLAG else False
+        self.is_render_camera_offscreen = is_render_camera_offscreen
+        self.camera_in_render = camera_in_render
+        self.camera_in_window = camera_in_window
 
         # keyboard flag
         self.enable_viewer_keyboard = True  # enable keyboard control in viewer
@@ -56,7 +60,7 @@ class MjRenderer:
                 self.render_paused = not self.render_paused
             elif keycode == 256:  # esc
                 self.exit_flag = True
-            elif keycode == 257 and self.enable_camera_view:  # enter
+            elif keycode == 257 and self.is_show_camera_in_cv :  # enter
                 image = self.image_queue.get()
                 cv.save_image(image)
                 logging.info(f"Save a picture to {cv.CV_CACHE_DIR}.")
@@ -80,13 +84,13 @@ class MjRenderer:
             self.viewer = viewer.launch_passive(mj_model, mj_data,
                                                 key_callback=self.key_callback, 
                                                 show_left_ui=False, show_right_ui=True)
-            self.set_renderer_config()
-            if self.enable_camera_view:
+            self.select_camera_view(self.camera_in_window)
+            if self.is_show_camera_in_cv :
                 cv.init_cv_window()
         else:
             raise ValueError('Invalid renderer name.')
 
-    def render(self):
+    def render(self, render_mode: str = None):
         """ render per frame in glfw.
         """
         if self.render_paused and self.render_mode in ["human", "rgb_array", "depth"]:
@@ -96,9 +100,9 @@ class MjRenderer:
                 else:
                     self.close()
 
-            if self.enable_camera_view:
+            if self.is_show_camera_in_cv :
                 enable_depth = True if self.render_mode == 'depth' else False
-                image = self.render_pixels_from_camera(self.camera_name, enable_depth=enable_depth)
+                image = self.render_pixels_from_camera(self.camera_in_render, enable_depth=enable_depth)
                 self.image_queue.put(image)
                 if self.image_queue.full():
                     self.image_queue.get()
@@ -110,7 +114,7 @@ class MjRenderer:
 
     def close(self):
         """ close the environment. """
-        if self.enable_camera_view:
+        if self.is_show_camera_in_cv :
             cv.close_cv_window()
         if isinstance(self.viewer, viewer.Handle) and self.viewer.is_running():
             self.viewer.close()
@@ -120,14 +124,22 @@ class MjRenderer:
     def close_render_window(self):
         self.viewer.close()
 
-    def set_renderer_config(self):
+    def select_camera_view(self, cam = "free"):
         """ Setup mujoco global config while using viewer as renderer.
             It should be noted that the render thread need locked.
         """
-        self.viewer.cam.lookat = np.array([0.4, 0, 0.5])
-        self.viewer.cam.azimuth += 0.005
         with self.viewer.lock():
-            self.viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(self.mj_data.time % 2)
+            if cam == "free":
+                self.viewer.cam.type = mujoco.mjtCamera.mjCAMERA_FREE
+                self.viewer.cam.lookat = np.array([0.4, 0, 0.5])
+            else:
+                cam_id = mujoco.mj_name2id(self.mj_model, mujoco.mjtObj.mjOBJ_CAMERA, cam)
+                if cam_id >= 0:
+                    self.viewer.cam.type = mujoco.mjtCamera.mjCAMERA_FIXED
+                    self.viewer.cam.fixedcamid = cam_id
+                else:
+                    logging.warning(f"Camera {cam} not found.")
+            self.viewer.cam.azimuth += 0.005
 
     def add_visual_point(self, pos: Union[np.ndarray, List[np.ndarray]]):
         """ Render the trajectory from deque above,

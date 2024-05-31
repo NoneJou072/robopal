@@ -10,6 +10,7 @@ import numpy as np
 import robopal
 from robopal.commons.renderers import MjRenderer
 import robopal.envs
+import robopal.robots
 from robopal.robots.base import BaseRobot
 
 ROBOPAL_PATH = os.path.dirname(inspect.getfile(robopal))
@@ -41,18 +42,23 @@ class MujocoEnv:
             "unity",
         ],
     }
-    name = "MujocoEnv"
 
     def __init__(
         self,
-        robot = None,
+        robot: Union[BaseRobot, str] = None,
         control_freq: int = 200,
         enable_camera_viewer: bool = False,
         camera_name: str = None,
         render_mode: str = 'human',
     ):
-
-        self.robot: BaseRobot = robot()
+        if isinstance(robot, str):
+            try:
+                self.robot: BaseRobot = robopal.robots.REGISTERED_ROBOTS[robot]()
+            except KeyError:
+                logging.error(f"Robot {robot} is not registered. Available robots are {robopal.robots.REGISTERED_ROBOTS.keys()}.")
+                raise KeyError
+        else:
+            self.robot = robot()
         assert isinstance(self.robot, BaseRobot), "Please select a robot config file."
         
         self.agents = self.robot.agents
@@ -69,15 +75,22 @@ class MujocoEnv:
 
         assert render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
-        self.renderer = MjRenderer(self.mj_model, self.mj_data, self.render_mode,
-                                   enable_camera_viewer, camera_name)
+        self.renderer = MjRenderer(
+            self.mj_model, self.mj_data, 
+            render_mode = self.render_mode,
+            is_show_camera_in_cv = enable_camera_viewer, 
+            is_render_camera_offscreen = False,
+            camera_in_render = camera_name,
+            camera_in_window = "free"
+        )
         self._initialize_time()
         self._set_init_qpos()
 
         self._mj_state = None
 
-    def __name__(self):
-        return self.name
+    @property
+    def name(self):
+        return self.__class__.__name__
 
     def step(self, action: Union[np.ndarray, Dict[str, np.ndarray]] = None) -> Any:
         """ 

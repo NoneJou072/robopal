@@ -128,10 +128,16 @@ class ManipulateEnv(RobotEnv):
     def reset(self, seed=None, options=None):
         options = options or {}
         options['disable_reset_render'] = True
+        
         super().reset(seed, options)
 
         self._timestep = 0
         self.set_random_init_position()
+        for agent in self.agents:
+            self.init_pos[agent], self.init_quat[agent] = self.controller.forward_kinematics(self.robot.get_arm_qpos(agent), agent)
+        self.desired_position = self.init_pos[self.agents[0]]
+        self.robot.init_pos = self.init_pos
+        self.robot.init_quat = self.init_quat
 
         obs = self._get_obs()
         info = self._get_info()
@@ -146,7 +152,6 @@ class ManipulateEnv(RobotEnv):
         """
         for agent in self.agents:
             random_pos = np.random.uniform(self.robot.pos_min_bound, self.robot.pos_max_bound)
-            qpos = self.controller.ik(random_pos, self.init_quat[agent], q_init=self.robot.get_arm_qpos(agent))
+            qpos = self.controller.ik(random_pos, np.array([1, 0, 0, 0]), q_init=self.robot.get_arm_qpos(agent))
             self.set_joint_qpos(qpos, agent)
             self.forward()
-            self.render()

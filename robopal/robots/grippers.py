@@ -1,6 +1,20 @@
 import numpy as np
 
-class BaseEnd(object):
+REGISTERED_ENDS = {}
+
+
+class EndMetaClass(type):
+    """Metaclass for registering robot arms"""
+
+    def __new__(meta, name, bases, attrs):
+        cls = super().__new__(meta, name, bases, attrs)
+
+        if not cls.__name__ == "BaseEnd":
+            REGISTERED_ENDS[cls.__name__] = cls
+        return cls
+
+
+class BaseEnd(object, metaclass=EndMetaClass):
 
     gripper_joint_names = dict()
     gripper_joint_indexes = dict()
@@ -76,4 +90,11 @@ class PandaHand(BaseEnd):
             self.robot_data.joint('0_finger_joint1').qpos,
             self.robot_data.joint('0_finger_joint1').qvel * self.dt
         ], axis=0)
-    
+
+
+# TODO: Reafactor
+END_MAP = {
+    "rethink_gripper": RethinkGripper,
+    "robotiq_gripper": RobotiqGripper,
+    "panda_hand": PandaHand,
+}

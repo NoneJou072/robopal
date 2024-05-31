@@ -2,51 +2,51 @@ import os
 import inspect
 from glob import glob
 import logging
-import json
+import ast
 
 import h5py
 import robopal
-from robopal.envs.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
 
 ROBOPAL_PATH = os.path.dirname(inspect.getfile(robopal))
 COLLECTIONS_DIR_NAME = 'collections/collections_*'
 DEFAULT_DATA_DIR_PATH = os.path.join(ROBOPAL_PATH, COLLECTIONS_DIR_NAME)
 
 
-for state_file in sorted(glob(DEFAULT_DATA_DIR_PATH)):
+def play_demonstrations():
+    for state_file in sorted(glob(DEFAULT_DATA_DIR_PATH)):
 
-    # read .hdf5 files
-    file = h5py.File(state_file + '/demo.hdf5','r')   
-    logging.info("Reading from {}".format(state_file + '/demo.hdf5'))
+        # read .hdf5 files
+        file = h5py.File(state_file + '/demo.hdf5','r')   
+        logging.info("Reading from {}".format(state_file + '/demo.hdf5'))
 
-    for group in file.keys():
-        
-        env_meta = json.loads(file["data"].attrs["env_args"])
-        print(env_meta)
-        print(type(env_meta))
-        
-        from robopal.robots.panda import PandaPickAndPlace
+        for group in file.keys():
 
-        env = PickAndPlaceEnv(
-            robot=PandaPickAndPlace,
-            render_mode="human",
-            control_freq=20,
-            controller='CARTIK',
-        )
+            env_name = file["data"].attrs["env_name"]
+            env_meta = ast.literal_eval(file["data"].attrs["env_kwargs"])
+            logging.info(env_meta)
 
-        for episode in file[group].keys():
+            env = robopal.make(
+                env_name,
+                **env_meta
+            )
+            print(file[group].keys())
+            for episode in file[group].keys():
+                episode = "demo_2"
+                logging.info("\n>Reading group: {}, episode: {}".format(group, episode))
 
-            logging.info("\n>Reading group: {}, episode: {}".format(group, episode))
+                # for key in file[group][episode].attrs:
+                #     logging.info("{}: {}".format(key, file[group][episode].attrs[key]))
 
-            for key in file[group][episode].attrs:
-                logging.info("{}: {}".format(key, file[group][episode].attrs[key]))
+                env.load_model_from_string(file[group][episode].attrs["model_file"])
 
+                first_state = file[group][episode]["states"][0]
+                env.load_state(first_state)
+                env.forward()
 
-            env.reset(seed=file[group][episode].attrs["seed"])
-            env.load_model_from_string(file[group][episode].attrs["mjcf"])
+                for action in file[group][episode]["actions"]:
+                    env.step(action)
+                    
+            env.renderer.close()
 
-            first_state = file[group][episode]["states"][0]
-            env.load_state(first_state)
-
-            for action in file[group][episode]["actions"]:
-                env.step(action)
+if __name__ == "__main__":
+    play_demonstrations()

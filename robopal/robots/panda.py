@@ -1,6 +1,7 @@
 import os
 
-from robopal.robots.base import *
+import numpy as np
+from robopal.robots.base import BaseRobot
 
 ASSET_DIR = os.path.join(os.path.dirname(__file__), '../assets')
 
@@ -14,7 +15,6 @@ class Panda(BaseRobot):
                  mount=None
                  ):
         super().__init__(
-            name="panda",
             scene=scene,
             mount=mount,
             manipulator=manipulator,
@@ -58,7 +58,7 @@ class PandaPickAndPlace(Panda):
                          gripper='panda_hand',
                          mount='top_point')
 
-        self.end_name = {self.agents[0]: '0_hand'}
+        self.end_name = {self.agents[0]: '0_eef'}
 
     def add_assets(self):
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')

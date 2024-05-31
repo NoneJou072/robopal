@@ -17,7 +17,6 @@ class RobotEnv(MujocoEnv):
     :param is_interpolate: Use interpolator while stepping.
     :param enable_camera_viewer: Use camera or not.
     """
-    name = "RobotEnv"
     
     def __init__(self,
                  robot=None,
@@ -91,11 +90,12 @@ class RobotEnv(MujocoEnv):
     @auto_render
     def reset(self, seed=None, options=None):
         self.controller.reset()
-        super().reset(seed, options)
+        return super().reset(seed, options)
 
     def get_configs(self, key: str = None):
         """ Get global configs of the current enviroment.
         """
+        mjcf_content = None
         with open(self.robot.mjcf_generator.get_xml_path(), 'r') as f:
             mjcf_content = f.read()
         env_args = {
@@ -106,6 +106,7 @@ class RobotEnv(MujocoEnv):
             'rng': None,  # todo: add rng
             'model_file': mjcf_content
         }
+
         if isinstance(key, str):
             assert key in env_args.keys(), "Invalid key."
             return env_args[key]

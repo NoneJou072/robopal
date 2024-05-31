@@ -1,7 +1,5 @@
-from robopal.robots.grippers import *
-
-END_MAP = {
-    "rethink_gripper": RethinkGripper,
-    "robotiq_gripper": RobotiqGripper,
-    "panda_hand": PandaHand,
-}
+from .diana_med import *
+from .panda import *
+from .ur5e import *
+from .grippers import REGISTERED_ENDS
+from .base import REGISTERED_ROBOTS

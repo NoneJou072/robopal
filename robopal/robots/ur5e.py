@@ -15,7 +15,6 @@ class UR5e(BaseRobot):
                  mount=None
                  ):
         super().__init__(
-            name="ur5e",
             scene=scene,
             mount=mount,
             manipulator=manipulator,

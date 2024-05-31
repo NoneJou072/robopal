@@ -15,7 +15,6 @@ class DualDianaMed(BaseRobot):
                  attached_body=['0_attachment', '1_attachment']
                  ):
         super().__init__(
-            name="diana_med",
             scene=scene,
             mount=mount,
             manipulator=manipulator,

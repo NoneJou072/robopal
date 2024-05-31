@@ -25,7 +25,6 @@ if __name__ == "__main__":
         pos = np.array(pos)
         current_pos = env.robot.get_end_xpos()
         while np.linalg.norm(current_pos - pos) > 0.02:
-            env.renderer.set_renderer_config()
             env.renderer.add_visual_point(path)
 
             env.step(np.concatenate([pos, [1, 0, 0, 0]]))

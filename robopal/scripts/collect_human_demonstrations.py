@@ -1,15 +1,16 @@
-# Refer to [robosuite](https://github.com/ARISE-Initiative/robosuite/blob/master/robosuite/scripts/collect_human_demonstrations.py#L231) in this part.
+# Refer to [robosuite](
+# https://github.com/ARISE-Initiative/robosuite/blob/master/robosuite/scripts/collect_human_demonstrations.py#L231
+# ) in this part.
 
-from robopal.envs.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
+import robopal
 from robopal.wrappers import HumanDemonstrationWrapper
 
 
 if __name__ == "__main__":
 
-    from robopal.robots.panda import PandaPickAndPlace
-
-    env = PickAndPlaceEnv(
-        robot=PandaPickAndPlace,
+    env = robopal.make(
+        "PickAndPlace-v1",
+        robot="PandaPickAndPlace",
         render_mode='human',
         control_freq=20,
         controller='CARTIK',

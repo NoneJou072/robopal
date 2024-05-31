@@ -16,7 +16,6 @@ class DianaMed(BaseRobot):
                  mount=None
                  ):
         super().__init__(
-            name="diana_med",
             scene=scene,
             mount=mount,
             manipulator=manipulator,

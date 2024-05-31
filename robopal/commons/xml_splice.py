@@ -17,9 +17,17 @@ MANIPULATORS_DIR_PATH = os.path.join(MODELS_PATH, 'manipulators')
 SCENES_DIR_PATH = os.path.join(ASSETS_PATH, 'scenes')
 
 
-class XMLSplicer:
+class RobotGenerator(object):
+    """ XML Splicer class for splicing the robot with the given scene, mount, manipulator and gripper.
+    
+    :param name: robot name
+    :param scene: scene name
+    :param mount: mount name
+    :param manipulator: manipulator name
+    :param gripper: gripper name
+    :param kwargs: other arguments
+    """
     def __init__(self,
-                 name: str = 'robot',
                  scene: str = 'default',
                  mount: Union[str, List[str]] = None,
                  manipulator: Union[str, List[str]] = None,
@@ -27,12 +35,9 @@ class XMLSplicer:
                  **kwargs,
                  ):
         
-        self.xml_name = name
+        self._mjcf_path = None
         if 'xml_path' in kwargs and isinstance(kwargs['xml_path'], str):
-            self._mjcf_path = path.abspath(path.join(kwargs["xml_path"], f"{self.xml_name}.xml"))
-        else:
-            self._mjcf_path = path.abspath(path.join(ASSETS_PATH, f"{self.xml_name}.xml"))
-            logging.info(f"XML file path is not specified, save to {self._mjcf_path}")
+            self._mjcf_path = path.abspath(kwargs["xml_path"])
 
         self.tree = None
         self.root = None
@@ -283,9 +288,11 @@ class XMLSplicer:
             joint.set(key, kwargs[key])
         joint_element.append(joint)
 
-    def save_xml(self):
+    def save_xml(self, xml_name = "robot"):
         """ Save xml file with identity path"""
+        self._mjcf_path = path.abspath(path.join(ASSETS_PATH, f"{xml_name}.xml"))
         self.tree.write(self._mjcf_path)
+        logging.info(f"mjcf model has been saved to {self._mjcf_path}")
         return self._mjcf_path
 
     def get_xml_path(self):

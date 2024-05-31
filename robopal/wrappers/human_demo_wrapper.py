@@ -45,7 +45,7 @@ class HumanDemonstrationWrapper(object):
             max_collect_horizon = 100,
             is_drop_unsuccess_exp = True,
         ):
-        
+
         self.env = env
         self.collections_dir = collections_dir
         self.collect_freq = collect_freq
@@ -63,9 +63,10 @@ class HumanDemonstrationWrapper(object):
 
         env_args = {
             "env_name": self.env.get_configs("env_name"),
-            "env_type": 2,  # GYM_TYPE
+            "env_type": 4,  # ROBOPAL_TYPE in robomimic4pal
             # pass to the env constructor
             "env_kwargs": str({
+                "robot": self.env.get_configs("robot"),
                 "control_freq" : self.env.control_freq,
                 "controller" : self.env.controller.name,
             })
@@ -88,6 +89,7 @@ class HumanDemonstrationWrapper(object):
 
         self.collection: Collection = None
         self.num_collects  = 0
+        self.total = 0
 
         # disable the viewer keyboard
         self.env.renderer.enable_viewer_keyboard = False
@@ -164,17 +166,17 @@ class HumanDemonstrationWrapper(object):
         # check the collection
         if len(self.collection.actions) == 0:
             return
-        assert len(self.collection.obs) == len(self.collection.actions)
 
         self.num_collects += 1
         ep_data_grp = self.root_group.create_group("demo_{}".format(self.num_collects))
 
         # add attrs
+        self.total += self.collection.num_samples
         ep_data_grp.attrs["num_samples"] = self.collection.num_samples
         ep_data_grp.attrs["model_file"] = self.collection.model_file
 
         # write datasets
-        ep_data_grp.create_dataset("states", data=np.array(self.collection.states, dtype=np.float64))
+        ep_data_grp.create_dataset("states", data=np.array(self.collection.states, dtype=np.float32))
         ep_data_grp.create_dataset("actions", data=np.array(self.collection.actions, dtype=np.float32))
         ep_data_grp.create_dataset("rewards", data=np.array(self.collection.actions, dtype=np.float32))
         ep_data_grp.create_dataset("dones", data=np.array(self.collection.actions, dtype=np.float32))
@@ -182,17 +184,19 @@ class HumanDemonstrationWrapper(object):
         # write obs
         obs_group = ep_data_grp.create_group("obs")
         for key, value in self.collection.obs.items():
-            obs_group.create_dataset(key, value)
+            obs_group.create_dataset(key, data=np.array(value, dtype=np.float32))
         next_obs_group = ep_data_grp.create_group("next_obs")
         for key, value in self.collection.next_obs.items():
-            next_obs_group.create_dataset(key, value)
+            next_obs_group.create_dataset(key, data=np.array(value, dtype=np.float32))
 
-        logging.info("Demonstration is successful and has been saved")
+        logging.info("Demonstration is successful and has been saved in demo_{}".format(self.num_collects))
 
     def close(self):
         if self.has_interaction:
             self.save_collection()
 
+        # store the total number of samples
+        self.root_group.attrs["total"] = self.total
         self.f.close()
         logging.info("HumanDemonstrationWrapper: closed hdf5 file")
 

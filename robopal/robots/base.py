@@ -6,11 +6,24 @@ import copy
 import mujoco
 import numpy as np
 
-from robopal.commons import RobotGenerator
-from robopal.robots import END_MAP
-from robopal.robots.grippers import BaseEnd
+from robopal.commons.xml_splice import RobotGenerator
+from robopal.robots.grippers import BaseEnd, END_MAP
 
-class BaseRobot:
+REGISTERED_ROBOTS = {}
+
+
+class RobotMetaClass(type):
+    """Metaclass for registering robot arms"""
+
+    def __new__(meta, name, bases, attrs):
+        cls = super().__new__(meta, name, bases, attrs)
+
+        if not cls.__name__ == "BaseRobot":
+            REGISTERED_ROBOTS[cls.__name__] = cls
+        return cls
+
+
+class BaseRobot(metaclass=RobotMetaClass):
     """ Base class for generating Data struct of the arm.
 
     :param name(str): robot name
@@ -24,7 +37,6 @@ class BaseRobot:
     """
 
     def __init__(self,
-                 name: str = None,
                  scene: str = 'default',
                  mount: Union[str, List[str]] = None,
                  manipulator: Union[str, List[str]] = None,
@@ -32,7 +44,7 @@ class BaseRobot:
                  attached_body: Union[str, List[str]] = None,
                  specified_xml_path: str = None
                  ):
-        self.name = name
+
         self.specified_xml_path = specified_xml_path
 
         self.mjcf_generator = RobotGenerator(
@@ -161,6 +173,11 @@ class BaseRobot:
     def jnt_num(self) -> Union[int, Dict[str, int]]:
         """ Number of joints. """
         return len(self.arm_joint_names[self.agents[0]])
+    
+    @property
+    def name(self) -> str:
+        """ Robot name. """
+        return self.__class__.__name__
 
     def get_arm_qpos(self, agent: str = 'arm0') -> np.ndarray:
         """ Get arm joint position of the specified agent.

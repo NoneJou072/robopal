@@ -5,7 +5,6 @@ from mujoco import viewer
 
 if __name__ == "__main__":
     robot = BaseRobot(
-        name="diana_med",
         scene='default',
         manipulator='DianaMed',
         gripper='panda_hand',
