@@ -20,20 +20,25 @@ class RobotEnv(MujocoEnv):
     
     def __init__(self,
                  robot=None,
+                 *,
                  control_freq=200,
                  enable_camera_viewer=False,
                  controller='JNTIMP',
                  is_interpolate=False,
                  camera_name=None,
                  render_mode='human',
+                 is_render_camera_offscreen = False,
+                 camera_in_window = "frontview",
                  ):
 
         super().__init__(
             robot=robot,
             control_freq=control_freq,
-            enable_camera_viewer=enable_camera_viewer,
-            camera_name=camera_name,
             render_mode=render_mode,
+            is_show_camera_in_cv=enable_camera_viewer,
+            camera_in_render=camera_name,
+            is_render_camera_offscreen = is_render_camera_offscreen,
+            camera_in_window = camera_in_window,
         )
 
         self.is_interpolate = is_interpolate

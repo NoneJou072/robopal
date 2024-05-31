@@ -27,7 +27,7 @@ class Panda(BaseRobot):
         self.end_name = {self.agents[0]: '0_attachment'}
 
         self.pos_max_bound = np.array([0.6, 0.2, 0.37])
-        self.pos_min_bound = np.array([0.3, -0.2, 0.12])
+        self.pos_min_bound = np.array([0.3, -0.2, 0.02])
 
     @property
     def init_qpos(self):

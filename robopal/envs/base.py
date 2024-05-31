@@ -27,10 +27,10 @@ class MujocoEnv:
 
         :param robot(str): Load xml file from xml_path to build the mujoco model
         :param render_mode(str): Choose if you use the renderer to render the scene or not
-        :param camera_name(str): Choose the camera
+        :param camera_in_render(str): Choose the camera
         :param control_freq(int): Upper-layer control frequency
         Note that high frequency will cause high time-lag
-        :param enable_camera_view(bool): Use camera or not
+        :param is_show_camera_in_cv(bool): Use camera or not
     """
 
     metadata = {
@@ -46,10 +46,13 @@ class MujocoEnv:
     def __init__(
         self,
         robot: Union[BaseRobot, str] = None,
+        *,
         control_freq: int = 200,
-        enable_camera_viewer: bool = False,
-        camera_name: str = None,
+        is_show_camera_in_cv: bool = False,
+        camera_in_render: str = None,
         render_mode: str = 'human',
+        is_render_camera_offscreen = False,
+        camera_in_window = "free",
     ):
         if isinstance(robot, str):
             try:
@@ -78,10 +81,10 @@ class MujocoEnv:
         self.renderer = MjRenderer(
             self.mj_model, self.mj_data, 
             render_mode = self.render_mode,
-            is_show_camera_in_cv = enable_camera_viewer, 
-            is_render_camera_offscreen = False,
-            camera_in_render = camera_name,
-            camera_in_window = "free"
+            is_show_camera_in_cv = is_show_camera_in_cv, 
+            is_render_camera_offscreen = is_render_camera_offscreen,
+            camera_in_render = camera_in_render,
+            camera_in_window = camera_in_window
         )
         self._initialize_time()
         self._set_init_qpos()

@@ -22,7 +22,7 @@ if __name__ == "__main__":
         action = env.get_body_pos('green_block')
         for t in range(int(200)):
             env.step(action)
-        for t in range(int(200)):
+        for t in range(int(250)):
             env.robot.end['arm0'].close()
             env.step(action)
         action += np.array([0.0, 0.0, 0.29])
