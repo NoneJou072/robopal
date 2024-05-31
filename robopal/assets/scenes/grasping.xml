@@ -10,10 +10,6 @@
     <global azimuth="120" elevation="-20"/>
   </visual>
 
-<!--  <default>-->
-<!--    <geom solref="0.01 1" solimp=".95 .99 .0001" condim="1"/>-->
-<!--  </default>-->
-
   <asset>
     <mesh name="table" file="../objects/table/table.STL" scale="1.0 1.0 0.66"/>
 
@@ -32,7 +28,7 @@
     <light diffuse=".8 .8 .8" dir="0 -.15 -1" directional="false" pos="1 1 8.0" specular="0.3 0.3 0.3" castshadow="false"/>
     <light diffuse=".8 .8 .8" dir="0 -.15 -1" directional="false" pos="-3. -3. 8.0" specular="0.3 0.3 0.3" castshadow="false"/>
     <!-- front view -->
-    <camera mode="fixed" name="frontview" pos="1.6 0 1.45" quat="0.56 0.43 0.43 0.56"/>
+    <camera mode="fixed" name="frontview" pos="1.3 0 0.9" quat="0.56 0.43 0.43 0.56"/>
     <!-- bird view -->
     <camera mode="fixed" name="birdview" pos="-0.2 0 3.0" quat="0.7071 0 0 0.7071"/>
     <!-- agent view -->
