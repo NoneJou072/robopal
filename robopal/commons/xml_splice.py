@@ -41,13 +41,71 @@ class RobotGenerator(object):
 
         self.tree = None
         self.root = None
-        self.splice_robot(
+
+        self._concatenate_robot(
             scene=scene,
             mount=mount,
             manipulator=manipulator,
             gripper=gripper,
             **kwargs,
         )
+
+    def _concatenate_robot(
+            self, 
+            scene=None, 
+            mount=None, 
+            manipulator=None, 
+            gripper=None, 
+            **kwargs
+        ):
+        """ Splice the robot with the given scene, mount, manipulator and gripper.
+
+        :param scene: scene name
+        :param mount: mount name
+        :param manipulator: manipulator name
+        :param gripper: gripper name
+        :param kwargs:
+        """
+        # Check the scene.
+        if isinstance(scene, str):
+            if scene.endswith('.xml'):
+                scene_path = scene
+            else:
+                scene_path = path.join(SCENES_DIR_PATH, '{}.xml'.format(scene))
+            self._init_scene(scene_path)
+        else:
+            raise ValueError("Must have scene.xml to generate the world.")
+
+        if isinstance(mount, str):
+            mount = [mount]
+        if isinstance(mount, list):
+            for ch_id, ch_name in enumerate(mount):
+                if ch_name.endswith('.xml'):
+                    mount_path = ch_name
+                else:
+                    mount_path = path.join(MOUNTS_DIR_PATH, ch_name, '{}.xml'.format(ch_name))
+                self.add_all_component_from_xml(mount_path, goal_body=(ch_id, 'worldbody'))
+
+        if isinstance(manipulator, str):
+            manipulator = [manipulator]
+        if isinstance(manipulator, list):
+            for mani_id, mani_name in enumerate(manipulator):
+                if mani_name.endswith('.xml'):
+                    manipulator_path = mani_name
+                else:
+                    manipulator_path = path.join(MANIPULATORS_DIR_PATH, mani_name, '{}.xml'.format(mani_name))
+                self.add_all_component_from_xml(manipulator_path,
+                                            goal_body=(mani_id, f'{mani_id}_mount_base_link') if mount is not None else (mani_id, 'worldbody'))
+
+            if gripper is not None:
+                assert kwargs['attached_body'] is not None, "Please specify the attached_body for the gripper."
+                attached_body = kwargs['attached_body'] if isinstance(kwargs['attached_body'], list) else [kwargs['attached_body']]
+                if isinstance(gripper, str):
+                    gripper = [gripper]
+                if isinstance(gripper, list):
+                    for goal_body, g in zip(enumerate(attached_body), gripper):
+                        gripper_path = path.join(GRIPPERS_DIR_PATH, g, '{}.xml'.format(g))
+                        self.add_all_component_from_xml(gripper_path, goal_body=goal_body)
 
     def _init_scene(self, scene):
         """
@@ -63,9 +121,9 @@ class RobotGenerator(object):
                 self.root.append(ET.Element(element))
             else:
                 for node in self.root.findall(element):
-                    self._file_repath(scene, node)
+                    self._rename_path(scene, node)
 
-    def add_component_from_xml(self, xml: str, goal_body: tuple) -> None:
+    def add_all_component_from_xml(self, xml: str, goal_body: tuple) -> None:
         """
         For each input xml file, we extract the component we need, and append it into global tree.
 
@@ -77,11 +135,11 @@ class RobotGenerator(object):
         tree = ET.parse(xml)
         root_node = tree.getroot()
         # preprocess
-        self.tag_rename(goal_body[0], root_node)
+        self._rename_tag(goal_body[0], root_node)
 
         # add assets
         if root_node.find('asset') is not None:
-            self._file_repath(xml, root_node.find('asset'))
+            self._rename_path(xml, root_node.find('asset'))
             for asset in root_node.find('asset'):
                 self.root.find('asset').append(asset)
         # add world-body
@@ -116,7 +174,7 @@ class RobotGenerator(object):
             for tendon in root_node.find('tendon'):
                 self.root.find('tendon').append(tendon)
 
-    def _file_repath(self, xml_path, asset_node: ET.Element):
+    def _rename_path(self, xml_path, asset_node: ET.Element):
         """ Reset file path of the assets to abstract path.
         Note all the texture files should put into the texture dict.
         :param xml_path: path of specified xml file
@@ -130,7 +188,7 @@ class RobotGenerator(object):
                 child.attrib['file'] = path.join(TEXTURE_DIR_PATH,
                                                  child.attrib['file'])
 
-    def tag_rename(self, id, node: ET.Element):
+    def _rename_tag(self, id, node: ET.Element):
         """ add indice to the tag name
         """
         for mesh in node.findall('.//mesh[@name]'):
@@ -196,25 +254,41 @@ class RobotGenerator(object):
         for actuator in node.findall('.//actuator/*[@name]'):
             actuator.set('name', '{}_{}'.format(id, actuator.attrib['name']))
 
-    def add_node_from_xml(self, xml_path: str = None):
+    def add_node_from_xml(
+            self, 
+            xml_path: str = None, 
+            parent_body_name: str = None
+        ):
         """ Add node from xml file. The attached node is the parent node of the new node.
-        :param node: the parent node of the new node
-        :param xml_path: the path of the xml file
+        :param xml_path: the path of the xml file.
+        :param node: the name of the linked body. if set None, will add to the worldbody.
         """
-        if xml_path is None:
-            raise ValueError("Please checkout your xml path.")
-        new_tree = ET.parse(xml_path)
+        assert isinstance(xml_path, str), "Please checkout your xml path."
+
+        sub_tree = ET.parse(xml_path)
 
         for node_type in ['worldbody', 'asset', 'actuator']:
-            new_node = new_tree.getroot().find(node_type)
-            if new_node is not None:
-                parent_element = self.root.find(node_type)
-                new_node = new_node.findall('*')
-                if isinstance(new_node, list):
-                    for node in new_node:
-                        parent_element.append(node)
+            # find the sub node
+            sub_node = sub_tree.getroot().find(node_type)
+            if sub_node is not None:
+                if node_type == 'worldbody' and parent_body_name is not None:
+                    parent_node = self.root.find(f'.//body[@name=\'{parent_body_name}\']')
                 else:
-                    parent_element.append(new_node)
+                    parent_node = self.root.find(node_type)
+                
+                # get all sub nodes in specified node
+                sub_node = sub_node.findall('*')
+                # add all sub nodes to the parent node
+                if isinstance(sub_node, list):
+                    for node in sub_node:
+                        parent_node.append(node)
+                else:
+                    parent_node.append(sub_node)
+
+    def add_node_from_str(self, father_node: str, xml_text: str):
+        parent_element = self.root.find(father_node)
+        new_element = ET.fromstring(xml_text)
+        parent_element.append(new_element)
 
     def set_node_attrib(self, node: str, name: str, attrib: dict):
         """ Set node attribute.
@@ -226,11 +300,6 @@ class RobotGenerator(object):
         node_element = self.root.find(f'.//{node}[@name=\'{name}\']')
         for key in attrib:
             node_element.set(key, attrib[key])
-
-    def add_node_from_str(self, father_node: str, xml_text: str):
-        parent_element = self.root.find(father_node)
-        new_element = ET.fromstring(xml_text)
-        parent_element.append(new_element)
 
     def add_texture(self, name: str, type: str, file: str):
         parent_element = self.root.find("asset")
@@ -298,53 +367,3 @@ class RobotGenerator(object):
     def get_xml_path(self):
         """ Load xml file"""
         return self._mjcf_path
-
-    def splice_robot(self, scene=None, mount=None, manipulator=None, gripper=None, **kwargs):
-        """ Splice the robot with the given scene, mount, manipulator and gripper.
-
-        :param scene: scene name
-        :param mount: mount name
-        :param manipulator: manipulator name
-        :param gripper: gripper name
-        :param kwargs:
-        """
-        # Check the scene.
-        if isinstance(scene, str):
-            if scene.endswith('.xml'):
-                scene_path = scene
-            else:
-                scene_path = path.join(SCENES_DIR_PATH, '{}.xml'.format(scene))
-            self._init_scene(scene_path)
-        else:
-            raise ValueError("Must have scene.xml to generate the world.")
-
-        if isinstance(mount, str):
-            mount = [mount]
-        if isinstance(mount, list):
-            for ch_id, ch_name in enumerate(mount):
-                if ch_name.endswith('.xml'):
-                    mount_path = ch_name
-                else:
-                    mount_path = path.join(MOUNTS_DIR_PATH, ch_name, '{}.xml'.format(ch_name))
-                self.add_component_from_xml(mount_path, goal_body=(ch_id, 'worldbody'))
-
-        if isinstance(manipulator, str):
-            manipulator = [manipulator]
-        if isinstance(manipulator, list):
-            for mani_id, mani_name in enumerate(manipulator):
-                if mani_name.endswith('.xml'):
-                    manipulator_path = mani_name
-                else:
-                    manipulator_path = path.join(MANIPULATORS_DIR_PATH, mani_name, '{}.xml'.format(mani_name))
-                self.add_component_from_xml(manipulator_path,
-                                            goal_body=(mani_id, f'{mani_id}_mount_base_link') if mount is not None else (mani_id, 'worldbody'))
-
-            if gripper is not None:
-                assert kwargs['attached_body'] is not None, "Please specify the attached_body for the gripper."
-                attached_body = kwargs['attached_body'] if isinstance(kwargs['attached_body'], list) else [kwargs['attached_body']]
-                if isinstance(gripper, str):
-                    gripper = [gripper]
-                if isinstance(gripper, list):
-                    for goal_body, g in zip(enumerate(attached_body), gripper):
-                        gripper_path = path.join(GRIPPERS_DIR_PATH, g, '{}.xml'.format(g))
-                        self.add_component_from_xml(gripper_path, goal_body=goal_body)

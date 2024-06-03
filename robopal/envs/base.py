@@ -134,10 +134,10 @@ class MujocoEnv:
         # override mjcf with reseted model
         mujoco.mj_saveLastXML(self.robot.mjcf_generator.get_xml_path(), self.mj_model)
 
-    def render(self) -> Union[None, np.ndarray]:
+    def render(self, mode=None) -> Union[None, np.ndarray]:
         """ render one frame in mujoco """
         if self.render_mode in ["human", "rgb_array", "depth"]:
-            self.renderer.render()
+            self.renderer.render(mode)
 
     def close(self):
         """ close the environment. """
@@ -184,7 +184,7 @@ class MujocoEnv:
             assert obj_pose.shape[0] == 7
             self.mj_data.joint(obj_joint_name).qpos = obj_pose
 
-    def set_site_pose(self, site_name: str = None, site_pos: np.ndarray = None):
+    def set_site_pos(self, site_name: str = None, site_pos: np.ndarray = None):
         """ Set pose of the object. """
         if isinstance(site_name, str):
             site_id = self.get_site_id(site_name)

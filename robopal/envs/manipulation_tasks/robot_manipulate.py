@@ -18,23 +18,31 @@ class ManipulateEnv(RobotEnv):
                  robot=None,
                  render_mode='human',
                  control_freq=20,
-                 is_show_camera_in_cv=False,
                  controller='CARTIK',
                  is_interpolate=False,
                  is_normalized_action=True,
-                 is_end_pose_randomize=True,
+                 is_randomize_end=True,
+                 is_randomize_object=True,
+                 is_show_camera_in_cv=False,
+                 is_render_camera_offscreen = False,
+                 camera_in_render=None,
+                 camera_in_window = "free",
                  ):
         super().__init__(
             robot=robot,
             render_mode=render_mode,
             control_freq=control_freq,
-            is_show_camera_in_cv=is_show_camera_in_cv,
             controller=controller,
             is_interpolate=is_interpolate,
+            is_show_camera_in_cv=is_show_camera_in_cv,
+            is_render_camera_offscreen=is_render_camera_offscreen,
+            camera_in_render=camera_in_render,
+            camera_in_window=camera_in_window,
         )
 
         self.is_normalized_action = is_normalized_action
-        self.is_end_pose_randomize = is_end_pose_randomize
+        self.is_randomize_end = is_randomize_end
+        self.is_randomize_object = is_randomize_object
 
         self.max_episode_steps = 50
 
@@ -132,7 +140,9 @@ class ManipulateEnv(RobotEnv):
         super().reset(seed, options)
 
         self._timestep = 0
-        self.set_random_init_position()
+
+        if self.is_randomize_end:
+            self.set_random_init_position()
         self.update_init_pose_to_current()
 
         obs = self._get_obs()
@@ -147,6 +157,10 @@ class ManipulateEnv(RobotEnv):
         self.desired_position = self.init_pos[self.agents[0]]
 
     def reset_object(self):
+        """ Reset the object to a random pose within the workspace.
+        """
+        if self.is_randomize_object:
+            pass
         return super().reset_object()
 
     def set_random_init_position(self):

@@ -14,6 +14,10 @@ if __name__ == "__main__":
         render_mode='human',
         control_freq=20,
         controller='CARTIK',
+        camera_in_window="frontview",
+        is_render_camera_offscreen=True,
+        is_randomize_end=False,
+        is_randomize_object=False,
     )
     
     env = HumanDemonstrationWrapper(env)

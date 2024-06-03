@@ -6,7 +6,8 @@ from robopal.robots.dual_arms import DualDianaReach
 from robopal.wrappers import PettingStyleWrapper
 
 class BimanualReach(BimanualManipulate):
-
+    name = 'BimanualReach-v0'
+    
     def __init__(self,
                  robot=DualDianaReach,
                  render_mode='human',
@@ -21,7 +22,6 @@ class BimanualReach(BimanualManipulate):
             is_show_camera_in_cv=is_show_camera_in_cv,
             controller=controller,
         )
-        self.name = 'BimanualReach-v0'
 
         self.obs_dim = (14,)
         self.action_dim = (4,)
@@ -82,7 +82,7 @@ class BimanualReach(BimanualManipulate):
         goal1_y_pos = np.random.uniform(-0.15, 0.15)
         goal1_z_pos = np.random.uniform(0.46, 0.66)
         goal1_pos = np.array([goal1_x_pos, goal1_y_pos, goal1_z_pos])
-        self.set_site_pose('goal_site0', goal1_pos)
+        self.set_site_pos('goal_site0', goal1_pos)
 
         goal2_x_pos = np.random.uniform(0.15, 0.35)
         goal2_y_pos = np.random.uniform(-0.15, 0.15)
@@ -93,7 +93,7 @@ class BimanualReach(BimanualManipulate):
             goal2_y_pos = np.random.uniform(-0.15, 0.15)
             goal2_z_pos = np.random.uniform(0.45, 0.66)
             goal2_pos = np.array([goal2_x_pos, goal2_y_pos, goal2_z_pos])
-        self.set_site_pose('goal_site1', goal2_pos)
+        self.set_site_pos('goal_site1', goal2_pos)
 
 
 if __name__ == "__main__":

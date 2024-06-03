@@ -37,15 +37,15 @@ class DianaMed(BaseRobot):
 
 
 class DianaAruco(DianaMed):
-    def __init__(self):
-        super().__init__(scene='default',
-                         gripper='realsense', )
 
     def add_assets(self):
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/aruco/aruco.xml')
+        # add camera
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/realsense_d435/realsense.xml', parent_body_name='0_link7')
 
 
 class DianaCollide(DianaMed):
+
     def add_assets(self):
         self.mjcf_generator.add_geom(node='worldbody', name='obstacle_box', pos='0.9 0.2 0.3',
                                      size='0.4 0.05 0.2', type='box')

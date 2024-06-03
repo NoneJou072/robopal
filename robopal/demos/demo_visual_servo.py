@@ -15,7 +15,8 @@ class VisualServo(RobotEnv):
                  controller='JNTIMP',
                  is_interpolate=False,
                  is_show_camera_in_cv=True,
-                 camera_in_render='0_cam'
+                 camera_in_render='0_cam',
+                 is_render_camera_offscreen=False,
                  ):
         super().__init__(
             robot=robot,
@@ -25,6 +26,7 @@ class VisualServo(RobotEnv):
             is_show_camera_in_cv=is_show_camera_in_cv,
             camera_in_render=camera_in_render,
             render_mode=render_mode,
+            is_render_camera_offscreen=is_render_camera_offscreen,
         )
         self.camera_in_render = camera_in_render
         self.camera_intrinsic_matrix = cv.get_cam_intrinsic()
@@ -118,7 +120,8 @@ if __name__ == "__main__":
         control_freq=100,
         controller='JNTIMP',
         is_show_camera_in_cv=True,
-        camera_in_render='0_cam'
+        is_render_camera_offscreen=True,
+        camera_in_render='cam',
     )
     env.reset()
     for t in range(int(1e6)):

@@ -20,7 +20,7 @@ class MjRenderer:
         render_mode: Union[str, None] = 'human',
         is_show_camera_in_cv = False,
         is_render_camera_offscreen = False,
-        camera_in_render = '0_cam',
+        camera_in_render = 'frontview',
         camera_in_window = "free",
     ):
 
@@ -28,8 +28,15 @@ class MjRenderer:
         self.mj_data = mj_data
 
         self.render_mode = render_mode
-        self.is_show_camera_in_cv  = is_show_camera_in_cv  if cv.CV_FLAG else False
         self.is_render_camera_offscreen = is_render_camera_offscreen
+        if is_show_camera_in_cv:
+            assert cv.CV_FLAG, "OpenCV is not installed."
+            assert self.is_render_camera_offscreen, "Camera should be rendered offscreen, please set is_render_camera_offscreen to True."
+        self.is_show_camera_in_cv = is_show_camera_in_cv
+
+        if self.render_mode in ["rgb_array", "depth"]:
+            assert self.is_render_camera_offscreen, "Camera should be rendered offscreen, please set is_render_camera_offscreen to True."
+
         self.camera_in_render = camera_in_render
         self.camera_in_window = camera_in_window
 
@@ -48,9 +55,9 @@ class MjRenderer:
             raise ValueError(f'{self.render_mode} is not a valid mode.')
 
         # image renderer
-        self.image_renderer = mujoco.Renderer(self.mj_model)
-        self._image = None
-        self.image_queue = Queue(3)
+        if self.is_render_camera_offscreen:
+            self.image_renderer = mujoco.Renderer(self.mj_model)
+            self.image_queue = Queue(3)
 
         self.traj = deque(maxlen=200)  # used for rendering trajectory
 
@@ -85,12 +92,12 @@ class MjRenderer:
                                                 key_callback=self.key_callback, 
                                                 show_left_ui=False, show_right_ui=True)
             self.select_camera_view(self.camera_in_window)
-            if self.is_show_camera_in_cv :
+            if self.is_show_camera_in_cv:
                 cv.init_cv_window()
         else:
             raise ValueError('Invalid renderer name.')
 
-    def render(self, render_mode: str = None):
+    def render(self, mode: str = None):
         """ render per frame in glfw.
         """
         if self.render_paused and self.render_mode in ["human", "rgb_array", "depth"]:
@@ -100,15 +107,18 @@ class MjRenderer:
                 else:
                     self.close()
 
-            if self.is_show_camera_in_cv :
+            if self.is_render_camera_offscreen:
                 enable_depth = True if self.render_mode == 'depth' else False
                 image = self.render_pixels_from_camera(self.camera_in_render, enable_depth=enable_depth)
                 self.image_queue.put(image)
                 if self.image_queue.full():
                     self.image_queue.get()
+
+            if self.is_show_camera_in_cv:
                 cv.show_image(image)
             
-            if self.render_mode in ["rgb_array", "depth"]:
+            if self.render_mode in ["rgb_array", "depth"] or mode == "rgb_array" or mode == "depth":
+                assert self.is_render_camera_offscreen, "Camera should be rendered offscreen, please set is_render_camera_offscreen to True."
                 return image
         return
 
@@ -173,7 +183,7 @@ class MjRenderer:
         self.viewer.opt.label = mujoco.mjtLabel.mjLABEL_SITE
         self.viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_TRANSPARENT] = True
     
-    def render_pixels_from_camera(self, cam='0_cam', enable_depth=True):
+    def render_pixels_from_camera(self, cam, enable_depth=True):
         self.image_renderer.update_scene(self.mj_data, camera=cam)
         if enable_depth is True:
             self.image_renderer.enable_depth_rendering()
@@ -182,5 +192,4 @@ class MjRenderer:
         else:
             org = self.image_renderer.render()
             image = org[:, :, ::-1]
-        self._image = image
         return image

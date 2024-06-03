@@ -161,4 +161,3 @@ class BimanualManipulate(RobotEnv):
             qpos = self.controller.ik(random_pos, self.init_quat[agent], q_init=self.robot.get_arm_qpos(agent))
             self.set_joint_qpos(qpos, agent)
             self.forward()
-            self.render()

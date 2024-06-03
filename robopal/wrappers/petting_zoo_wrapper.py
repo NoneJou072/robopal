@@ -48,10 +48,10 @@ class PettingStyleWrapper(ParallelEnv):
         """
         return self.env.step(actions)
 
-    def render(self):
+    def render(self, mode=None):
         """ Renders the environment.
         """
-        self.env.render(self)
+        self.env.render(self, mode)
 
     # Observation space should be defined here.
     # lru_cache allows observation and action spaces to be memoized, reducing clock cycles required to get each agent's space.

@@ -163,15 +163,15 @@ class MultiCubesEnv(ManipulateEnv):
             random_goal_x_pos = np.random.uniform(0.4, 0.55)
             random_goal_y_pos = np.random.uniform(-0.15, 0.15)
         red_goal = np.array([random_goal_x_pos, random_goal_y_pos, 0.44])
-        self.set_site_pose('red_goal', red_goal)
+        self.set_site_pos('red_goal', red_goal)
 
         # green goal
         green_goal = np.array([red_goal[0], red_goal[1], red_goal[2] + 0.04])
-        self.set_site_pose('green_goal', green_goal)
+        self.set_site_pos('green_goal', green_goal)
 
         # blue goal
         blue_goal = np.array([green_goal[0], green_goal[1], green_goal[2] + 0.04])
-        self.set_site_pose('blue_goal', blue_goal)
+        self.set_site_pos('blue_goal', blue_goal)
 
         if self.task == 'red':
             pass

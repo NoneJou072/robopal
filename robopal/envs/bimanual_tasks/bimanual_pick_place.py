@@ -6,7 +6,8 @@ from robopal.robots.dual_arms import DualDianaGrasp
 from robopal.wrappers import PettingStyleWrapper
 
 class BimanualPickAndPlace(BimanualManipulate):
-
+    name = 'BimanualPickAndPlace-v0'
+    
     def __init__(self,
                  robot=DualDianaGrasp,
                  render_mode='human',
@@ -21,7 +22,6 @@ class BimanualPickAndPlace(BimanualManipulate):
             is_show_camera_in_cv=is_show_camera_in_cv,
             controller=controller,
         )
-        self.name = 'BimanualPickAndPlace-v0'
 
         self.obs_dim = (23,)
         self.action_dim = (4,)

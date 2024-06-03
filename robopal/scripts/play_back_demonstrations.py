@@ -2,9 +2,10 @@ import os
 import inspect
 from glob import glob
 import logging
-import ast
+import json
 
 import h5py
+import numpy as np
 import robopal
 
 ROBOPAL_PATH = os.path.dirname(inspect.getfile(robopal))
@@ -19,36 +20,40 @@ def play_demonstrations():
         file = h5py.File(state_file + '/demo.hdf5','r')   
         logging.info("Reading from {}".format(state_file + '/demo.hdf5'))
 
-        for group in file.keys():
+        env_args = json.loads(file["data"].attrs["env_args"])
+        env_name = env_args["env_name"]
+        env_meta = env_args["env_kwargs"]
+        logging.info(f"env name: {env_name}")
+        logging.info(f"env meta: {env_meta}")
 
-            env_name = file["data"].attrs["env_name"]
-            env_meta = ast.literal_eval(file["data"].attrs["env_kwargs"])
-            logging.info(f"env meta: {env_meta}")
+        env = robopal.make(
+            env_name,
+            **env_meta
+        )
 
-            env = robopal.make(
-                env_name,
-                **env_meta
-            )
+        demos = list(file["data"].keys())
+        inds = np.argsort([int(elem[5:]) for elem in demos])
+        demos = [demos[i] for i in inds]
 
-            for episode in file[group].keys():
-                logging.info("\n>Reading group: {}, episode: {}".format(group, episode))
+        # playback each episode
+        for episode in demos:
+            logging.info("\n>Reading episode: {}".format(episode))
 
-                # for key in file[group][episode].attrs:
-                #     logging.info("{}: {}".format(key, file[group][episode].attrs[key]))
+            # for key in file["data"][episode].attrs:
+            #     logging.info("{}: {}".format(key, file["data"][episode].attrs[key]))
 
-                env.load_model_from_string(file[group][episode].attrs["model_file"])
+            env.load_model_from_string(file["data"][episode].attrs["model_file"])
 
-                first_state = file[group][episode]["states"][0]
+            first_state = file["data"][episode]["states"][0]
 
-                env.load_state(first_state)
-                env.forward()
+            env.load_state(first_state)
+            env.forward()
+            env.update_init_pose_to_current()
 
-                env.update_init_pose_to_current()
-
-                for action in file[group][episode]["actions"]:
-                    env.step(action)
+            for action in file["data"][episode]["actions"]:
+                env.step(action)
                     
-            env.renderer.close()
+        env.renderer.close()
 
 if __name__ == "__main__":
     play_demonstrations()

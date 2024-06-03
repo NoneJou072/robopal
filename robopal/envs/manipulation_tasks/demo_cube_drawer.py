@@ -120,7 +120,7 @@ class DrawerCubeEnv(ManipulateEnv):
         random_x_pos = np.random.uniform(0.35, 0.4)
         random_y_pos = np.random.uniform(-0.15, 0.15)
         self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.44, 1.0, 0.0, 0.0, 0.0]))
-        self.set_site_pose('cube_goal', np.array([0.59, 0.0, 0.478]))
+        self.set_site_pos('cube_goal', np.array([0.59, 0.0, 0.478]))
 
         return super().reset_object()
 

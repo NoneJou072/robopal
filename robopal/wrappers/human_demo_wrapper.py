@@ -5,6 +5,7 @@ import time
 from dataclasses import dataclass, field
 import inspect
 from copy import deepcopy
+import json
 
 import numpy as np
 import h5py
@@ -63,26 +64,24 @@ class HumanDemonstrationWrapper(object):
 
         env_args = {
             "env_name": self.env.get_configs("env_name"),
-            "env_type": 4,  # ROBOPAL_TYPE in robomimic4pal
+            "type": 4,  # ROBOPAL_TYPE in robomimic4pal
             # pass to the env constructor
-            "env_kwargs": str({
+            "env_kwargs": {
                 "robot": self.env.get_configs("robot"),
                 "control_freq" : self.env.control_freq,
                 "controller" : self.env.controller.name,
-            })
+                "is_randomize_end" : self.env.is_randomize_end,
+                "is_randomize_object" : self.env.is_randomize_object,
+            }
         }
         # store env config as an attribute
-        for key, value in env_args.items():
-            self.root_group.attrs[key] = value
+        self.root_group.attrs["env_args"] = json.dumps(env_args)
 
         # choose one agent
         self.agent = "arm0"
 
         # memorize the init pose
         self.env.robot.end[self.agent].open()
-
-        # store logging directory for current episode
-        self.ep_directory = None
 
         # remember whether any environment interaction has occurred
         self.has_interaction = False
@@ -133,7 +132,6 @@ class HumanDemonstrationWrapper(object):
             self.collection.dones.append(termination)
             self.collection.rewards.append(reward)
             self.collection.states.append(state)
-            print(state[:20])
         if self.keyboard_recoder._exit_flag:
             self.close()
 

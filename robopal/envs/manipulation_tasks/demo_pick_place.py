@@ -16,7 +16,11 @@ class PickAndPlaceEnv(ManipulateEnv):
                  is_show_camera_in_cv=False,
                  controller='CARTIK',
                  is_normalized_action=True,
-                 is_end_pose_randomize=True
+                 is_randomize_end=True,
+                 is_randomize_object=True,
+                 is_render_camera_offscreen = False,
+                 camera_in_render=None,
+                 camera_in_window = "free",
                  ):
         super().__init__(
             robot=robot,
@@ -25,7 +29,11 @@ class PickAndPlaceEnv(ManipulateEnv):
             is_show_camera_in_cv=is_show_camera_in_cv,
             controller=controller,
             is_normalized_action=is_normalized_action,
-            is_end_pose_randomize=is_end_pose_randomize
+            is_randomize_end=is_randomize_end,
+            is_randomize_object=is_randomize_object,
+            is_render_camera_offscreen=is_render_camera_offscreen,
+            camera_in_render=camera_in_render,
+            camera_in_window=camera_in_window,
         )
 
         self.obs_dim = (23,)
@@ -80,30 +88,25 @@ class PickAndPlaceEnv(ManipulateEnv):
         return {'is_success': self._is_success(self.get_body_pos('green_block'), self.get_site_pos('goal_site'), th=0.02)}
 
     def reset_object(self):
-        random_x_pos = np.random.uniform(0.35, 0.55)
-        random_y_pos = np.random.uniform(-0.15, 0.15)
-        self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
+        if self.is_randomize_object:
+            random_x_pos, random_y_pos = np.random.uniform([0.35, -0.15], [0.55, 0.15])
+            block_pose = np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0])
 
-        random_goal_x_pos = np.random.uniform(0.35, 0.55)
-        random_goal_y_pos = np.random.uniform(-0.15, 0.15)
-        random_goal_z_pos = np.random.uniform(0.46, 0.66)
+            goal_pos = np.random.uniform([0.35, -0.15, 0.46], [0.55, 0.15, 0.66])
+            while np.linalg.norm(block_pose[:3] - goal_pos) <= 0.05:
+                goal_pos = np.random.uniform([0.35, -0.15, 0.46], [0.55, 0.15, 0.65])
 
-        block_pos = np.array([random_x_pos, random_y_pos, 0.46])
-        goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
-        while np.linalg.norm(block_pos - goal_pos) <= 0.05:
-            random_goal_x_pos = np.random.uniform(0.4, 0.6)
-            random_goal_y_pos = np.random.uniform(-0.2, 0.2)
-            random_goal_z_pos = np.random.uniform(0.45, 0.66)
-            goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
-        site_id = self.get_site_id('goal_site')
-
-        self.mj_model.site_pos[site_id] = goal_pos
+            self.set_object_pose('green_block:joint', block_pose)
+            self.set_site_pos('goal_site', goal_pos)
 
         return super().reset_object()
 
 
 if __name__ == "__main__":
-    env = PickAndPlaceEnv()
+    env = PickAndPlaceEnv(
+        is_randomize_end=False,
+        is_randomize_object=False,
+    )
     env = GoalEnvWrapper(env)
     env.reset()
     for t in range(int(1e5)):
