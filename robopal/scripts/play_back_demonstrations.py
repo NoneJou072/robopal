@@ -23,15 +23,14 @@ def play_demonstrations():
 
             env_name = file["data"].attrs["env_name"]
             env_meta = ast.literal_eval(file["data"].attrs["env_kwargs"])
-            logging.info(env_meta)
+            logging.info(f"env meta: {env_meta}")
 
             env = robopal.make(
                 env_name,
                 **env_meta
             )
-            print(file[group].keys())
+
             for episode in file[group].keys():
-                episode = "demo_2"
                 logging.info("\n>Reading group: {}, episode: {}".format(group, episode))
 
                 # for key in file[group][episode].attrs:
@@ -40,8 +39,11 @@ def play_demonstrations():
                 env.load_model_from_string(file[group][episode].attrs["model_file"])
 
                 first_state = file[group][episode]["states"][0]
+
                 env.load_state(first_state)
                 env.forward()
+
+                env.update_init_pose_to_current()
 
                 for action in file[group][episode]["actions"]:
                     env.step(action)

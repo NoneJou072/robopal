@@ -63,6 +63,10 @@ class RobotEnv(MujocoEnv):
         # memorize the initial position and rotation
         self.init_pos = dict()
         self.init_quat = dict()
+        
+        self.update_init_pose_to_current()
+
+    def update_init_pose_to_current(self):
         for agent in self.agents:
             self.init_pos[agent], self.init_quat[agent] = self.controller.forward_kinematics(self.robot.get_arm_qpos(agent), agent)
         self.robot.init_pos = self.init_pos

@@ -117,6 +117,8 @@ class HumanDemonstrationWrapper(object):
         """
         # collect current observation
         obs = self.env._get_obs()
+        self.env.save_state()
+        state = self.env.get_state()
 
         next_obs, reward, termination, truncation, info = self.env.step(action)
 
@@ -130,9 +132,8 @@ class HumanDemonstrationWrapper(object):
             self.collection.next_obs["low_dim"].append(next_obs)
             self.collection.dones.append(termination)
             self.collection.rewards.append(reward)
-            self.env.save_state()
-            self.collection.states.append(self.env.get_state())
-
+            self.collection.states.append(state)
+            print(state[:20])
         if self.keyboard_recoder._exit_flag:
             self.close()
 

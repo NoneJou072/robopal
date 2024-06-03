@@ -133,16 +133,18 @@ class ManipulateEnv(RobotEnv):
 
         self._timestep = 0
         self.set_random_init_position()
-        for agent in self.agents:
-            self.init_pos[agent], self.init_quat[agent] = self.controller.forward_kinematics(self.robot.get_arm_qpos(agent), agent)
-        self.desired_position = self.init_pos[self.agents[0]]
-        self.robot.init_pos = self.init_pos
-        self.robot.init_quat = self.init_quat
+        self.update_init_pose_to_current()
 
         obs = self._get_obs()
         info = self._get_info()
         
         return obs, info
+    
+    def update_init_pose_to_current(self):
+        super().update_init_pose_to_current()
+
+        # reset the desired position to the initial position
+        self.desired_position = self.init_pos[self.agents[0]]
 
     def reset_object(self):
         return super().reset_object()
