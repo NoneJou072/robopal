@@ -14,19 +14,19 @@ class VisualServo(RobotEnv):
                  control_freq=200,
                  controller='JNTIMP',
                  is_interpolate=False,
-                 enable_camera_viewer=True,
-                 camera_name='0_cam'
+                 is_show_camera_in_cv=True,
+                 camera_in_render='0_cam'
                  ):
         super().__init__(
             robot=robot,
             control_freq=control_freq,
             controller=controller,
             is_interpolate=is_interpolate,
-            enable_camera_viewer=enable_camera_viewer,
-            camera_name=camera_name,
+            is_show_camera_in_cv=is_show_camera_in_cv,
+            camera_in_render=camera_in_render,
             render_mode=render_mode,
         )
-        self.camera_name = camera_name
+        self.camera_in_render = camera_in_render
         self.camera_intrinsic_matrix = cv.get_cam_intrinsic()
 
         self.distCoeffs = np.zeros(5)
@@ -35,7 +35,7 @@ class VisualServo(RobotEnv):
         self.detector = cv2.aruco.ArucoDetector(aruco_dictionary, aruco_parameters)
 
     def aruco_detection(self, marker_size):
-        cv_image = self.renderer.render_pixels_from_camera(cam=self.camera_name, enable_depth=False)
+        cv_image = self.renderer.render_pixels_from_camera(cam=self.camera_in_render, enable_depth=False)
         if cv_image is not None:
             corners, marker_ids, _ = self.detector.detectMarkers(cv_image)
             if marker_ids is not None:
@@ -117,8 +117,8 @@ if __name__ == "__main__":
         render_mode='human',
         control_freq=100,
         controller='JNTIMP',
-        enable_camera_viewer=True,
-        camera_name='0_cam'
+        is_show_camera_in_cv=True,
+        camera_in_render='0_cam'
     )
     env.reset()
     for t in range(int(1e6)):

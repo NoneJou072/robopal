@@ -48,10 +48,10 @@ class MujocoEnv:
         robot: Union[BaseRobot, str] = None,
         *,
         control_freq: int = 200,
-        is_show_camera_in_cv: bool = False,
-        camera_in_render: str = None,
         render_mode: str = 'human',
+        is_show_camera_in_cv: bool = False,
         is_render_camera_offscreen = False,
+        camera_in_render: str = None,
         camera_in_window = "free",
     ):
         if isinstance(robot, str):

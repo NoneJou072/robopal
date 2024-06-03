@@ -15,29 +15,29 @@ class RobotEnv(MujocoEnv):
     :param control_freq: Upper-layer control frequency. i.g. frame per second-fps
             Note that high frequency will cause high time-lag.
     :param is_interpolate: Use interpolator while stepping.
-    :param enable_camera_viewer: Use camera or not.
+    :param is_show_camera_in_cv: Use camera or not.
     """
     
     def __init__(self,
                  robot=None,
                  *,
-                 control_freq=200,
-                 enable_camera_viewer=False,
                  controller='JNTIMP',
+                 control_freq=200,
                  is_interpolate=False,
-                 camera_name=None,
                  render_mode='human',
+                 is_show_camera_in_cv=False,
                  is_render_camera_offscreen = False,
-                 camera_in_window = "frontview",
+                 camera_in_render=None,
+                 camera_in_window = "free",
                  ):
 
         super().__init__(
             robot=robot,
             control_freq=control_freq,
             render_mode=render_mode,
-            is_show_camera_in_cv=enable_camera_viewer,
-            camera_in_render=camera_name,
+            is_show_camera_in_cv=is_show_camera_in_cv,
             is_render_camera_offscreen = is_render_camera_offscreen,
+            camera_in_render=camera_in_render,
             camera_in_window = camera_in_window,
         )
 

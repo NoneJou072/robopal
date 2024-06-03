@@ -13,7 +13,7 @@ class PickAndPlaceEnv(ManipulateEnv):
                  robot=DianaPickAndPlace,
                  render_mode='human',
                  control_freq=20,
-                 enable_camera_viewer=False,
+                 is_show_camera_in_cv=False,
                  controller='CARTIK',
                  is_normalized_action=True,
                  is_end_pose_randomize=True
@@ -22,7 +22,7 @@ class PickAndPlaceEnv(ManipulateEnv):
             robot=robot,
             render_mode=render_mode,
             control_freq=control_freq,
-            enable_camera_viewer=enable_camera_viewer,
+            is_show_camera_in_cv=is_show_camera_in_cv,
             controller=controller,
             is_normalized_action=is_normalized_action,
             is_end_pose_randomize=is_end_pose_randomize

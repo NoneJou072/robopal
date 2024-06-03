@@ -18,7 +18,7 @@ class BimanualManipulate(RobotEnv):
                  robot=None,
                  render_mode='human',
                  control_freq=20,
-                 enable_camera_viewer=False,
+                 is_show_camera_in_cv=False,
                  controller='CARTIK',
                  is_interpolate=False,
                  ):
@@ -26,7 +26,7 @@ class BimanualManipulate(RobotEnv):
             robot=robot,
             render_mode=render_mode,
             control_freq=control_freq,
-            enable_camera_viewer=enable_camera_viewer,
+            is_show_camera_in_cv=is_show_camera_in_cv,
             controller=controller,
             is_interpolate=is_interpolate,
         )

@@ -17,8 +17,8 @@ if __name__ == "__main__":
         render_mode='human',
         control_freq=200,
         controller='CARTIK',
-        enable_camera_viewer=True,
-        camera_name='cam'
+        is_show_camera_in_cv=True,
+        camera_in_render='cam'
     )
 
     keyboard_recoder = KeyboardIO()
