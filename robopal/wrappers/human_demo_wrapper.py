@@ -70,6 +70,7 @@ class HumanDemonstrationWrapper(object):
                 "robot": self.env.get_configs("robot"),
                 "control_freq" : self.env.control_freq,
                 "controller" : self.env.controller.name,
+                "is_render_camera_offscreen": self.env.is_render_camera_offscreen,
                 "is_randomize_end" : self.env.is_randomize_end,
                 "is_randomize_object" : self.env.is_randomize_object,
             }

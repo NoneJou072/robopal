@@ -25,8 +25,8 @@ class ManipulateEnv(RobotEnv):
                  is_randomize_object=True,
                  is_show_camera_in_cv=False,
                  is_render_camera_offscreen = False,
-                 camera_in_render=None,
-                 camera_in_window = "free",
+                 camera_in_render="frontview",
+                 camera_in_window="free",
                  ):
         super().__init__(
             robot=robot,

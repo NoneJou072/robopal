@@ -51,7 +51,7 @@ class MujocoEnv:
         render_mode: str = 'human',
         is_show_camera_in_cv: bool = False,
         is_render_camera_offscreen = False,
-        camera_in_render: str = None,
+        camera_in_render: str = "frontview",
         camera_in_window = "free",
     ):
         if isinstance(robot, str):
@@ -86,6 +86,8 @@ class MujocoEnv:
             camera_in_render = camera_in_render,
             camera_in_window = camera_in_window
         )
+        self.is_render_camera_offscreen = is_render_camera_offscreen
+        
         self._initialize_time()
         self._set_init_qpos()
 
@@ -137,7 +139,7 @@ class MujocoEnv:
     def render(self, mode=None) -> Union[None, np.ndarray]:
         """ render one frame in mujoco """
         if self.render_mode in ["human", "rgb_array", "depth"]:
-            self.renderer.render(mode)
+            return self.renderer.render(mode)
 
     def close(self):
         """ close the environment. """

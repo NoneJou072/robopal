@@ -19,8 +19,8 @@ class PickAndPlaceEnv(ManipulateEnv):
                  is_randomize_end=True,
                  is_randomize_object=True,
                  is_render_camera_offscreen = False,
-                 camera_in_render=None,
-                 camera_in_window = "free",
+                 camera_in_render="frontview",
+                 camera_in_window="free",
                  ):
         super().__init__(
             robot=robot,
@@ -104,6 +104,7 @@ class PickAndPlaceEnv(ManipulateEnv):
 
 if __name__ == "__main__":
     env = PickAndPlaceEnv(
+        is_render_camera_offscreen=True,
         is_randomize_end=False,
         is_randomize_object=False,
     )

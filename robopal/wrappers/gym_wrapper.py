@@ -34,7 +34,7 @@ class GymWrapper(gym.Env):
         return self.env.reset(seed=seed, options=options)
 
     def render(self, mode=None):
-        self.env.render(mode)
+        return self.env.render(mode)
 
     def close(self):
         self.env.close()
