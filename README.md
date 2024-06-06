@@ -32,7 +32,7 @@ robopal 为您提供了：
 ### Preparation
 
 * **Windows** / **Linux**
-* [MuJoCo-3.1.4](http://mujoco.org/)
+* [MuJoCo-3.1.5](http://mujoco.org/)
 * Python 3.8 +
 
 ### Install from pip
@@ -59,12 +59,7 @@ python -m robopal.demos.demo_controllers
 ```
 
 ## Contribute
-robopal currently has many shortcomings. Everyone is welcome to raise questions or leave suggestions in the [Issue](), and you are welcome to [Pull Request]() to improve this project together.
-
-## Future works
-* Documentation and tutorials.
-* Teleoperation Interface and `rollout` function (for Imitation Learning).
-* New demos of bimanual, using `petting zoo` style (for Multi-Agents RL).
+robopal currently has many shortcomings. Welcome to raise questions or leave suggestions in [Issue](), and also welcome to [Pull Request]() to improve this project together.
 
 ## Citation
 Please cite robopal if you find useful in this work:

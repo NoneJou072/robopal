@@ -45,6 +45,7 @@ class HumanDemonstrationWrapper(object):
             collect_freq = 1,
             max_collect_horizon = 100,
             is_drop_unsuccess_exp = True,
+            action_filter: np.ndarray = np.zeros(4)
         ):
 
         self.env = env
@@ -52,6 +53,7 @@ class HumanDemonstrationWrapper(object):
         self.collect_freq = collect_freq
         self.max_collect_horizon = max_collect_horizon
         self.is_drop_unsuccess_exp = is_drop_unsuccess_exp
+        self.action_filter = action_filter
 
         if not os.path.exists(self.collections_dir):
             logging.info("HumanDemonstrationWrapper: making new directory at {}".format(self.collections_dir))
@@ -125,7 +127,9 @@ class HumanDemonstrationWrapper(object):
         if not self.has_interaction:
             self.has_interaction = True
 
-        if self.env.cur_timestep % self.collect_freq == 0:
+        if self.env.cur_timestep % self.collect_freq == 0 and\
+            not np.array_equal(self.action_filter[:3], action[:3]):
+            # collect the data
             self.collection.num_samples += 1
             self.collection.actions.append(action)
             self.collection.obs["low_dim"].append(obs)
@@ -133,6 +137,7 @@ class HumanDemonstrationWrapper(object):
             self.collection.dones.append(termination)
             self.collection.rewards.append(reward)
             self.collection.states.append(state)
+
         if self.keyboard_recoder._exit_flag:
             self.close()
 
