@@ -92,7 +92,7 @@ class RobotGenerator(object):
                 self.add_all_component_from_xml(
                     mount_path, 
                     goal_body = (ch_id, 'worldbody'),
-                    is_rename_tag = not len(mount) == 1 and len(manipulator) > 1
+                    is_rename_tag = not (len(mount) == 1 and len(manipulator) > 1)
                 )
 
         if isinstance(manipulator, list):
