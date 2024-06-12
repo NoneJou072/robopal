@@ -35,6 +35,34 @@ class DualDianaMed(BaseRobot):
                 self.agents[1]: np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])}
 
 
+class DualPanda(BaseRobot):
+    """ Dual Panda robots base class. """
+    def __init__(self,
+                 scene='default',
+                 manipulator=['Panda', 'Panda'],
+                 mount='bimanual_mount',
+                 attached_body=['0_attachment', '1_attachment']
+                 ):
+        super().__init__(
+            scene=scene,
+            mount=mount,
+            manipulator=manipulator,
+            attached_body=attached_body,
+        )
+        self.arm_joint_names = {self.agents[0]: ['0_joint1', '0_joint2', '0_joint3', '0_joint4', '0_joint5', '0_joint6', '0_joint7'],
+                            self.agents[1]: ['1_joint1', '1_joint2', '1_joint3', '1_joint4', '1_joint5', '1_joint6', '1_joint7']}
+        self.arm_actuator_names = {self.agents[0]: ['0_actuator1', '0_actuator2', '0_actuator3', '0_actuator4', '0_actuator5', '0_actuator6', '0_actuator7'],
+                               self.agents[1]: ['1_actuator1', '1_actuator2', '1_actuator3', '1_actuator4', '1_actuator5', '1_actuator6', '1_actuator7']}
+        self.base_link_name = {self.agents[0]: '0_link0', self.agents[1]: '1_link0'}
+        self.end_name = {self.agents[0]: '0_attachment', self.agents[1]: '1_attachment'}
+
+    @property
+    def init_qpos(self):
+        """ Robot's init joint position. """
+        return {self.agents[0]: np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0]),
+                self.agents[1]: np.array([0.0, -np.pi / 4.0, 0.0, np.pi / 2.0, 0.00, np.pi / 4.0, 0.0])}
+
+
 class DualDianaGrasp(DualDianaMed):
     def __init__(self):
         super().__init__(

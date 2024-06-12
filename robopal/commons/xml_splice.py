@@ -78,16 +78,23 @@ class RobotGenerator(object):
 
         if isinstance(mount, str):
             mount = [mount]
+        if isinstance(manipulator, str):
+            manipulator = [manipulator]
+        if isinstance(gripper, str):
+            gripper = [gripper]
+
         if isinstance(mount, list):
             for ch_id, ch_name in enumerate(mount):
                 if ch_name.endswith('.xml'):
                     mount_path = ch_name
                 else:
                     mount_path = path.join(MOUNTS_DIR_PATH, ch_name, '{}.xml'.format(ch_name))
-                self.add_all_component_from_xml(mount_path, goal_body=(ch_id, 'worldbody'))
+                self.add_all_component_from_xml(
+                    mount_path, 
+                    goal_body = (ch_id, 'worldbody'),
+                    is_rename_tag = not len(mount) == 1 and len(manipulator) > 1
+                )
 
-        if isinstance(manipulator, str):
-            manipulator = [manipulator]
         if isinstance(manipulator, list):
             for mani_id, mani_name in enumerate(manipulator):
                 if mani_name.endswith('.xml'):
@@ -100,8 +107,6 @@ class RobotGenerator(object):
             if gripper is not None:
                 assert kwargs['attached_body'] is not None, "Please specify the attached_body for the gripper."
                 attached_body = kwargs['attached_body'] if isinstance(kwargs['attached_body'], list) else [kwargs['attached_body']]
-                if isinstance(gripper, str):
-                    gripper = [gripper]
                 if isinstance(gripper, list):
                     for goal_body, g in zip(enumerate(attached_body), gripper):
                         gripper_path = path.join(GRIPPERS_DIR_PATH, g, '{}.xml'.format(g))
@@ -123,7 +128,7 @@ class RobotGenerator(object):
                 for node in self.root.findall(element):
                     self._rename_path(scene, node)
 
-    def add_all_component_from_xml(self, xml: str, goal_body: tuple) -> None:
+    def add_all_component_from_xml(self, xml: str, goal_body: tuple, is_rename_tag=True) -> None:
         """
         For each input xml file, we extract the component we need, and append it into global tree.
 
@@ -135,12 +140,21 @@ class RobotGenerator(object):
         tree = ET.parse(xml)
         root_node = tree.getroot()
         # preprocess
-        self._rename_tag(goal_body[0], root_node)
+        if is_rename_tag:
+            self._rename_tag(goal_body[0], root_node)
 
         # add assets
         if root_node.find('asset') is not None:
             self._rename_path(xml, root_node.find('asset'))
             for asset in root_node.find('asset'):
+                # check if the asset is already in the global tree
+                if 'name' in asset.attrib and \
+                self.root.find(f'.//material[@name=\'{asset.attrib["name"]}\']') is not None:
+                    continue
+                # check if the mesh is already in the global tree
+                if 'file' in asset.attrib and 'name' not in asset.attrib and \
+                self.root.find(f'.//mesh[@file=\'{asset.attrib["file"]}\']') is not None:
+                    continue
                 self.root.find('asset').append(asset)
         # add world-body
         if root_node.find('worldbody') is not None:
@@ -156,6 +170,9 @@ class RobotGenerator(object):
         # add default
         if root_node.find('default') is not None:
             for default in root_node.find('default'):
+                # check if the default class is already in the global tree
+                if self.root.find(f'.//default[@class=\'{default.attrib["class"]}\']') is not None:
+                    continue
                 self.root.find('default').append(default)
         # add contact
         if root_node.find('contact') is not None:
@@ -208,16 +225,6 @@ class RobotGenerator(object):
         for geom in node.findall('.//geom[@name]'):
             geom.attrib['name'] = '{}_{}'.format(id, geom.attrib['name'])
 
-        # for default in node.findall('.//default'):
-        #     if 'class' in default.attrib:
-        #         for geom in node.findall('.//geom'):
-        #             if 'class' in geom.attrib and geom.get('class') == default.attrib['class']:
-        #                 geom.set('class', '{}_{}'.format(id, geom.attrib['class']))
-        #         for body in node.findall('.//body'):
-        #             if 'childclass' in body.attrib and body.get('childclass') == default.attrib['class']:
-        #                 body.set('childclass', '{}_{}'.format(id, body.attrib['childclass']))
-        #         default.set('class', '{}_{}'.format(id, default.attrib['class']))
-
         # find all joint nodes with name attribute
         for joint in node.findall('.//joint[@name]'):
             joint_name = deepcopy(joint.attrib['name'])
@@ -253,6 +260,12 @@ class RobotGenerator(object):
 
         for actuator in node.findall('.//actuator/*[@name]'):
             actuator.set('name', '{}_{}'.format(id, actuator.attrib['name']))
+
+        for tendon in node.findall('.//tendon/*[@name]'):
+            tendon.set('name', '{}_{}'.format(id, tendon.attrib['name']))
+        # find all nodes with tendon attribute, then rename them
+        for node in node.findall('.//*[@tendon]'):
+            node.attrib['tendon'] = '{}_{}'.format(id, node.attrib['tendon'])
 
     def add_node_from_xml(
             self, 

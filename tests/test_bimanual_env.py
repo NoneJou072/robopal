@@ -25,9 +25,9 @@ else:
     raise ValueError('Invaild controller.')
 
 env = RobotEnv(
-    robot=DualDianaMed,
+    robot="DualPanda",
     render_mode='human',
-    control_freq=20,
+    control_freq=200,
     is_interpolate=False,
     controller=args.ctrl,
 )
