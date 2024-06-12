@@ -4,6 +4,7 @@
 
 import robopal
 from robopal.wrappers import HumanDemonstrationWrapper
+from robopal.plugins.devices.keyboard import Keyboard
 
 
 if __name__ == "__main__":
@@ -20,8 +21,8 @@ if __name__ == "__main__":
         is_randomize_object=False,
     )
     
-    env = HumanDemonstrationWrapper(env)
-    env.keyboard_recoder.start()
+    env = HumanDemonstrationWrapper(env, device=Keyboard)
+    env.device.start()
 
     env.reset()
     
@@ -34,7 +35,7 @@ if __name__ == "__main__":
         next_obs, reward, termination, truncation, info = env.step(action)
 
         # Also break if we complete the task
-        if task_completion_hold_count == 0 or env.keyboard_recoder._reset_flag:
+        if task_completion_hold_count == 0 or env.device._reset_flag:
             env.reset()
 
         # state machine to check for having a success for 10 consecutive timesteps

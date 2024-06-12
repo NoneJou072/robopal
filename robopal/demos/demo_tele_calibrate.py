@@ -6,7 +6,7 @@ import numpy as np
 
 from robopal.envs.robot import RobotEnv
 from robopal.robots.diana_med import DianaCalib
-from robopal.plugins.devices.keyboard import KeyboardIO
+from robopal.plugins.devices.keyboard import Keyboard
 import robopal.commons.transform as T
 
 
@@ -21,8 +21,8 @@ if __name__ == "__main__":
         camera_in_render='cam'
     )
 
-    keyboard_recoder = KeyboardIO()
-    keyboard_recoder.start()
+    device = Keyboard()
+    device.start()
     
     env.reset()
     init_pos = env.robot.get_end_xpos()
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     action = np.concatenate([init_pos, init_quat])
 
     for t in range(int(1e6)):
-        action[:3] += keyboard_recoder.get_end_pos_offset()
-        action[3:] = T.mat_2_quat(T.quat_2_mat(action[3:]).dot(keyboard_recoder.get_end_rot_offset()))
+        action[:3] += device.get_end_pos_offset()
+        action[3:] = T.mat_2_quat(T.quat_2_mat(action[3:]).dot(device.get_end_rot_offset()))
         env.step(action)
     env.close()

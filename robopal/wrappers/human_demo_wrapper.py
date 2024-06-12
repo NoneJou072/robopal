@@ -4,7 +4,6 @@ import logging
 import time
 from dataclasses import dataclass, field
 import inspect
-from copy import deepcopy
 import json
 
 import numpy as np
@@ -12,7 +11,6 @@ import h5py
 
 import robopal
 from robopal.envs.manipulation_tasks.robot_manipulate import ManipulateEnv
-from robopal.plugins.devices.keyboard import KeyboardIO
 import robopal.commons.transform as T
 
 ROBOPAL_PATH = os.path.dirname(inspect.getfile(robopal))
@@ -36,11 +34,10 @@ class Collection:
 
 class HumanDemonstrationWrapper(object):
 
-    keyboard_recoder = KeyboardIO()
-
     def __init__(
             self, 
-            env: ManipulateEnv, 
+            env: ManipulateEnv,
+            device: Any = None,
             collections_dir: str = DEFAULT_DATA_DIR_PATH,
             collect_freq = 1,
             max_collect_horizon = 100,
@@ -49,6 +46,7 @@ class HumanDemonstrationWrapper(object):
         ):
 
         self.env = env
+        self.device = device()
         self.collections_dir = collections_dir
         self.collect_freq = collect_freq
         self.max_collect_horizon = max_collect_horizon
@@ -102,13 +100,13 @@ class HumanDemonstrationWrapper(object):
         action = np.zeros(4)
 
         # normalize the action to [-1, 1]
-        action[:3] = self.keyboard_recoder.get_end_pos_offset()
+        action[:3] = self.device.get_end_pos_offset()
         action[:3] *= 20
         
-        # action[3:7] = T.mat_2_quat(T.quat_2_mat(action[3:7]).dot(self.keyboard_recoder.get_end_rot_offset()))
+        # action[3:7] = T.mat_2_quat(T.quat_2_mat(action[3:7]).dot(self.device.get_end_rot_offset()))
 
         # normalized end action, since the end action from the keyboard is a binary value (0 or 1)
-        action[3] = int(self.keyboard_recoder._gripper_flag)
+        action[3] = int(self.device._gripper_flag)
         action[3] = action[3] * 2 - 1
 
         return action.copy()
@@ -138,7 +136,7 @@ class HumanDemonstrationWrapper(object):
             self.collection.rewards.append(reward)
             self.collection.states.append(state)
 
-        if self.keyboard_recoder._exit_flag:
+        if self.device._exit_flag:
             self.close()
 
         return next_obs, reward, termination, truncation, info
@@ -148,7 +146,7 @@ class HumanDemonstrationWrapper(object):
         if self.has_interaction:
             self.save_collection()
 
-        self.keyboard_recoder._reset_flag = False
+        self.device._reset_flag = False
         self.has_interaction = False
 
         ret = self.env.reset(seed, options)

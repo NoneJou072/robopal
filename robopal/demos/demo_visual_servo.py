@@ -37,7 +37,7 @@ class VisualServo(RobotEnv):
         self.detector = cv2.aruco.ArucoDetector(aruco_dictionary, aruco_parameters)
 
     def aruco_detection(self, marker_size):
-        cv_image = self.renderer.render_pixels_from_camera(cam=self.camera_in_render, enable_depth=False)
+        cv_image = self.render("rgb_array")
         if cv_image is not None:
             corners, marker_ids, _ = self.detector.detectMarkers(cv_image)
             if marker_ids is not None:

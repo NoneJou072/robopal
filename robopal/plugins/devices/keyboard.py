@@ -8,7 +8,7 @@ import numpy as np
 import robopal.commons.transform as T
 
 
-class KeyboardIO:
+class Keyboard:
     def __init__(self) -> None:
 
         self._pos_step = 0.001
