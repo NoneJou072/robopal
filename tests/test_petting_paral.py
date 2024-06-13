@@ -1,4 +1,4 @@
-from robopal.envs.bimanual_tasks import BimanualPickAndPlace
+from robopal.envs import BimanualPickAndPlace
 from robopal.wrappers import PettingStyleWrapper
 from pettingzoo.test import parallel_api_test
 

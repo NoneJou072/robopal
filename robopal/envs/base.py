@@ -45,7 +45,7 @@ class MujocoEnv:
 
     def __init__(
         self,
-        robot: Union[BaseRobot, str] = None,
+        robot: Union[BaseRobot, str],
         *,
         control_freq: int = 200,
         render_mode: str = 'human',

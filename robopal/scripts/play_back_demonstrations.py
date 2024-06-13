@@ -39,8 +39,9 @@ def play_demonstrations():
         for episode in demos:
             logging.info("\n>Reading episode: {}".format(episode))
 
-            # for key in file["data"][episode].attrs:
-            #     logging.info("{}: {}".format(key, file["data"][episode].attrs[key]))
+            for key in file["data"][episode].attrs:
+                if key != "model_file":
+                    logging.info("{}: {}".format(key, file["data"][episode].attrs[key]))
 
             env.load_model_from_string(file["data"][episode].attrs["model_file"])
 

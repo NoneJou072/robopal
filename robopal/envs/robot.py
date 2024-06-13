@@ -19,7 +19,7 @@ class RobotEnv(MujocoEnv):
     """
     
     def __init__(self,
-                 robot=None,
+                 robot,
                  *,
                  controller='JNTIMP',
                  control_freq=200,
