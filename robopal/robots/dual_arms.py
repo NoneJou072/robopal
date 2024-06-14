@@ -10,7 +10,7 @@ class DualDianaMed(BaseRobot):
     def __init__(self,
                  scene='default',
                  manipulator=['DianaMed', 'DianaMed'],
-                 gripper=['rethink_gripper', 'rethink_gripper'],
+                 gripper=['RethinkGripper', 'RethinkGripper'],
                  mount=['floor_left', 'floor_right'],
                  attached_body=['0_attachment', '1_attachment']
                  ):
@@ -38,9 +38,9 @@ class DualDianaMed(BaseRobot):
 class DualPanda(BaseRobot):
     """ Dual Panda robots base class. """
     def __init__(self,
-                 scene='default',
+                 scene='grasping',
                  manipulator=['Panda', 'Panda'],
-                 gripper=['panda_hand', 'panda_hand'],
+                 gripper=['PandaHand', 'PandaHand'],
                  mount='bimanual_mount',
                  attached_body=['0_attachment', '1_attachment']
                  ):
@@ -58,6 +58,10 @@ class DualPanda(BaseRobot):
         self.base_link_name = {self.agents[0]: '0_link0', self.agents[1]: '1_link0'}
         self.end_name = {self.agents[0]: '0_eef', self.agents[1]: '1_eef'}
 
+    def add_assets(self):
+        # set mount pose.
+        self.mjcf_generator.set_node_attrib('body', 'table', {'pos': '.2 .6 0', 'quat': "1 0 0 1"})
+
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
@@ -70,7 +74,7 @@ class DualDianaGrasp(DualDianaMed):
         super().__init__(
             scene='grasping',
             manipulator=['DianaMed', 'DianaMed'],
-            gripper=['rethink_gripper', 'rethink_gripper'],
+            gripper=['RethinkGripper', 'RethinkGripper'],
             mount=['cylinder', 'cylinder2'],
             attached_body=['0_attachment', '1_attachment']
         )
@@ -96,7 +100,7 @@ class DualDianaReach(DualDianaMed):
         super().__init__(
             scene='grasping',
             manipulator=['DianaMed', 'DianaMed'],
-            gripper=['rethink_gripper', 'rethink_gripper'],
+            gripper=['RethinkGripper', 'RethinkGripper'],
             mount=['cylinder', 'cylinder2'],
             attached_body=['0_attachment', '1_attachment']
         )

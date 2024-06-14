@@ -51,7 +51,7 @@ class CustomArm(BaseArm):
     def __init__(self):
         super().__init__(scene='grasping',
                          manipulator='CustomArm.xml',
-                         gripper='rethink_gripper',
+                         gripper='RethinkGripper',
                          mount='top_point')
 ```
 

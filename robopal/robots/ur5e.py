@@ -38,7 +38,7 @@ class UR5e(BaseRobot):
 class UR5eConveyor(UR5e):
     def __init__(self):
         super().__init__(scene='default',
-                         gripper='robotiq_gripper',
+                         gripper='RobotiqGripper',
                          mount='cylinder')
 
     def add_assets(self):
@@ -58,7 +58,7 @@ class UR5eConveyor(UR5e):
 class UR5eGrasp(UR5e):
     def __init__(self):
         super().__init__(scene='grasping',
-                         gripper='robotiq_gripper',
+                         gripper='RobotiqGripper',
                          mount='top_point')
 
         self.end_name = {self.agents[0]: '0_eef'}

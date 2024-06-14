@@ -7,7 +7,7 @@ if __name__ == "__main__":
     robot = BaseRobot(
         scene='default',
         manipulator='DianaMed',
-        gripper='panda_hand',
+        gripper='PandaHand',
         mount=None,
         attached_body='0_attachment',
     )

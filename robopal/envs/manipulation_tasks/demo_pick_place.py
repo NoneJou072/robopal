@@ -16,7 +16,7 @@ class PickAndPlaceEnv(ManipulateEnv):
                  is_show_camera_in_cv=False,
                  controller='CARTIK',
                  is_normalized_action=True,
-                 is_randomize_end=True,
+                 is_randomize_end=False,
                  is_randomize_object=True,
                  is_render_camera_offscreen = False,
                  camera_in_render="frontview",
@@ -92,7 +92,7 @@ class PickAndPlaceEnv(ManipulateEnv):
             random_x_pos, random_y_pos = np.random.uniform([0.35, -0.15], [0.55, 0.15])
             block_pose = np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0])
 
-            goal_pos = np.random.uniform([0.35, -0.15, 0.46], [0.55, 0.15, 0.66])
+            goal_pos = np.random.uniform([0.35, -0.15, 0.46], [0.55, 0.15, 0.65])
             while np.linalg.norm(block_pose[:3] - goal_pos) <= 0.05:
                 goal_pos = np.random.uniform([0.35, -0.15, 0.46], [0.55, 0.15, 0.65])
 

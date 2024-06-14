@@ -6,8 +6,10 @@ import copy
 import mujoco
 import numpy as np
 
+import robopal
 from robopal.commons.xml_splice import RobotGenerator
-from robopal.robots.grippers import BaseEnd, END_MAP
+import robopal.robots
+from robopal.robots.grippers import BaseEnd
 
 REGISTERED_ROBOTS = {}
 
@@ -101,9 +103,13 @@ class BaseRobot(metaclass=RobotMetaClass):
             if self.gripper_names is None:
                 self.end = None
             else:
-                self.end: Dict[str, BaseEnd] = {
-                    agent: END_MAP[gripper](self.robot_data) for agent, gripper in zip(self.agents, self.gripper_names)
-                }
+                self.end: Dict[str, BaseEnd] = {}
+                for agent, gripper in zip(self.agents, self.gripper_names):
+                    try:
+                        self.end[agent] = robopal.robots.REGISTERED_ENDS[gripper](self.robot_data)
+                    except KeyError:
+                        logging.error(f"End {gripper} is not registered. Available robots are {robopal.robots.REGISTERED_ENDS.keys()}.")
+                        raise KeyError
         else:
             self.end = None  # by default, user should specify the end effector.
             assert self.end is not None, 'Please specify the end effector by manual setting `self.end`.'

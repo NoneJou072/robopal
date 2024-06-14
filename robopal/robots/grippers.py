@@ -90,11 +90,3 @@ class PandaHand(BaseEnd):
             self.robot_data.joint('0_finger_joint1').qpos,
             self.robot_data.joint('0_finger_joint1').qvel * self.dt
         ], axis=0)
-
-
-# TODO: Reafactor
-END_MAP = {
-    "rethink_gripper": RethinkGripper,
-    "robotiq_gripper": RobotiqGripper,
-    "panda_hand": PandaHand,
-}

@@ -38,7 +38,7 @@ class Panda(BaseRobot):
 class PandaGrasp(Panda):
     def __init__(self):
         super().__init__(scene='grasping',
-                         gripper='panda_hand',
+                         gripper='PandaHand',
                          mount='top_point')
 
         self.end_name = {self.agents[0]: '0_eef'}

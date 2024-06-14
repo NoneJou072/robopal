@@ -2,7 +2,6 @@ import argparse
 import numpy as np
 import logging
 
-from robopal.robots.dual_arms import DualDianaMed
 from robopal.envs import RobotEnv
 
 logging.basicConfig(level=logging.INFO)
@@ -20,15 +19,14 @@ if args.ctrl == 'JNTIMP':
 
 elif args.ctrl == 'CARTIK':
     actions = [np.array([0.3, 0.4, 0.4, 1, 0, 0, 0]),
-               np.array([0.4, -0.4, 0.6, 1, 0, 0, 0])]
+               np.array([0.4, -0.4, 0.5, 1, 0, 0, 0])]
 else:
     raise ValueError('Invaild controller.')
 
 env = RobotEnv(
-    robot="DualPanda",
+    "DualPanda",
     render_mode='human',
     control_freq=200,
-    is_interpolate=False,
     controller=args.ctrl,
 )
 actions = {agent: actions[id] for id, agent in enumerate(env.agents)}

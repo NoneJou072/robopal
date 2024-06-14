@@ -77,23 +77,13 @@ class BimanualReach(BimanualManipulate):
 
     def reset_object(self):
         # express the position of the block in the world frame
-        # goal1 -> agent 0, goal2 -> agent 1
-        goal1_x_pos = np.random.uniform(0.55, 0.75)
-        goal1_y_pos = np.random.uniform(-0.15, 0.15)
-        goal1_z_pos = np.random.uniform(0.46, 0.66)
-        goal1_pos = np.array([goal1_x_pos, goal1_y_pos, goal1_z_pos])
-        self.set_site_pos('goal_site0', goal1_pos)
+        goal_pos_0 = np.random.uniform([0.55, -0.15, 0.46], [0.75, 0.15, 0.66])
+        self.set_site_pos('goal_site0', goal_pos_0)
 
-        goal2_x_pos = np.random.uniform(0.15, 0.35)
-        goal2_y_pos = np.random.uniform(-0.15, 0.15)
-        goal2_z_pos = np.random.uniform(0.46, 0.66)
-        goal2_pos = np.array([goal2_x_pos, goal2_y_pos, goal2_z_pos])
-        while np.linalg.norm(goal1_pos - goal2_pos) <= 0.05:
-            goal2_x_pos = np.random.uniform(0.15, 0.35)
-            goal2_y_pos = np.random.uniform(-0.15, 0.15)
-            goal2_z_pos = np.random.uniform(0.45, 0.66)
-            goal2_pos = np.array([goal2_x_pos, goal2_y_pos, goal2_z_pos])
-        self.set_site_pos('goal_site1', goal2_pos)
+        goal_pos_1 = np.random.uniform([0.15, -0.15, 0.46], [0.35, 0.15, 0.66])
+        while np.linalg.norm(goal_pos_0 - goal_pos_1) <= 0.05:
+            goal_pos_1 = np.random.uniform([0.15, -0.15, 0.46], [0.35, 0.15, 0.66])
+        self.set_site_pos('goal_site1', goal_pos_1)
 
 
 if __name__ == "__main__":

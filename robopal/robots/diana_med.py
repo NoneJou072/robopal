@@ -75,7 +75,7 @@ class DianaCalib(DianaMed):
 class DianaGrasp(DianaMed):
     def __init__(self):
         super().__init__(scene='grasping',
-                         gripper='rethink_gripper',
+                         gripper='RethinkGripper',
                          mount='top_point')
         self.end_name = {self.agents[0]: '0_eef'}
         self.pos_max_bound = np.array([0.6, 0.2, 0.3])
@@ -162,7 +162,7 @@ class DianaCabinet(DianaPickAndPlace):
 class DianaAssemble(DianaMed):
     def __init__(self):
         super().__init__(scene='grasping',
-                         gripper='rethink_gripper',
+                         gripper='RethinkGripper',
                          mount='top_point')
 
     def add_assets(self):
