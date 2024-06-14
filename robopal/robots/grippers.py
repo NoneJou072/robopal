@@ -24,9 +24,10 @@ class BaseEnd(object, metaclass=EndMetaClass):
     # dt will pass in after the environment is instantiated
     dt: int = None
     
-    def __init__(self, robot_data) -> None:
+    def __init__(self, robot_data, agent) -> None:
 
         self.robot_data = robot_data
+        self.agent_id = agent[-1]
 
         self._ctrl_range = [-1, 1]
 
@@ -44,30 +45,30 @@ class BaseEnd(object, metaclass=EndMetaClass):
 
 
 class RethinkGripper(BaseEnd):
-    def __init__(self, robot_data) -> None:
-        super().__init__(robot_data)
+    def __init__(self, robot_data, agent) -> None:
+        super().__init__(robot_data, agent)
 
         self._ctrl_range = [-0.01, 0.02]
 
     def apply_action(self, action):
-        self.robot_data.actuator('0_gripper_l_finger_joint').ctrl[0] = action
-        self.robot_data.actuator('0_gripper_r_finger_joint').ctrl[0] = action
+        self.robot_data.actuator(f'{self.agent_id}_gripper_l_finger_joint').ctrl[0] = action
+        self.robot_data.actuator(f'{self.agent_id}_gripper_r_finger_joint').ctrl[0] = action
     
     def get_finger_observations(self):
         return np.concatenate([
-            self.robot_data.joint('0_l_finger_joint').qpos,
-            self.robot_data.joint('0_l_finger_joint').qvel * self.dt
+            self.robot_data.joint(f'{self.agent_id}_l_finger_joint').qpos,
+            self.robot_data.joint(f'{self.agent_id}_l_finger_joint').qvel * self.dt
         ], axis=0)
 
 
 class RobotiqGripper(BaseEnd):
-    def __init__(self, robot_data) -> None:
-        super().__init__(robot_data)
+    def __init__(self, robot_data, agent) -> None:
+        super().__init__(robot_data, agent)
 
         self._ctrl_range = [0, 0.83]
 
     def apply_action(self, action):
-        self.robot_data.actuator('0_robotiq_2f_85').ctrl[0] = action
+        self.robot_data.actuator(f'{self.agent_id}_robotiq_2f_85').ctrl[0] = action
 
     def open(self):
         self.apply_action(self._ctrl_range[0])
@@ -77,16 +78,16 @@ class RobotiqGripper(BaseEnd):
 
 
 class PandaHand(BaseEnd):
-    def __init__(self, robot_data) -> None:
-        super().__init__(robot_data)
+    def __init__(self, robot_data, agent) -> None:
+        super().__init__(robot_data, agent)
 
         self._ctrl_range = [0, 255]
 
     def apply_action(self, action):
-        self.robot_data.actuator('0_actuator8').ctrl[0] = action
+        self.robot_data.actuator(f'{self.agent_id}_actuator8').ctrl[0] = action
 
     def get_finger_observations(self):
         return np.concatenate([
-            self.robot_data.joint('0_finger_joint1').qpos,
-            self.robot_data.joint('0_finger_joint1').qvel * self.dt
+            self.robot_data.joint(f'{self.agent_id}_finger_joint1').qpos,
+            self.robot_data.joint(f'{self.agent_id}_finger_joint1').qvel * self.dt
         ], axis=0)

@@ -100,7 +100,7 @@ class DualDianaReach(DualDianaMed):
         super().__init__(
             scene='grasping',
             manipulator=['DianaMed', 'DianaMed'],
-            gripper=['RethinkGripper', 'RethinkGripper'],
+            gripper=['RethinkGripper', 'PandaHand'],
             mount=['cylinder', 'cylinder2'],
             attached_body=['0_attachment', '1_attachment']
         )

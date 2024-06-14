@@ -49,8 +49,7 @@ class BimanualReach(BimanualManipulate):
             end_pos := self.get_site_pos(f'{agent[-1]}_grip_site'),
             # gripper linear velocity
             end_vel := self.get_site_xvelp(f'{agent[-1]}_grip_site') * self.dt,
-            self.mj_data.joint(f'{agent[-1]}_r_finger_joint').qpos,
-            self.mj_data.joint(f'{agent[-1]}_r_finger_joint').qvel * self.dt,
+            self.robot.end[agent].get_finger_observations(),
         ], axis=0)
         obs[8:14] = np.concatenate([
             # goal position in global coordinates

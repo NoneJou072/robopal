@@ -106,7 +106,7 @@ class BaseRobot(metaclass=RobotMetaClass):
                 self.end: Dict[str, BaseEnd] = {}
                 for agent, gripper in zip(self.agents, self.gripper_names):
                     try:
-                        self.end[agent] = robopal.robots.REGISTERED_ENDS[gripper](self.robot_data)
+                        self.end[agent] = robopal.robots.REGISTERED_ENDS[gripper](self.robot_data, agent)
                     except KeyError:
                         logging.error(f"End {gripper} is not registered. Available robots are {robopal.robots.REGISTERED_ENDS.keys()}.")
                         raise KeyError
