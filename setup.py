@@ -19,11 +19,11 @@ setup(
         'numpy>=1.23.5',
         'mujoco>=3.1.4',
         'gymnasium',
+        'pettingzoo',
         'rich'
     ],
     extras_require={
         'planning': ['ruckig~=0.9.2'],
-        'multi-agents': ['pettingzoo']
     },
     classifiers=[
         "License :: OSI Approved :: MIT License",

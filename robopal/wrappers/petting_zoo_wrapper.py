@@ -1,12 +1,14 @@
 import functools
 from copy import copy
+import logging
 
 import numpy as np
 from gymnasium import spaces
 try:
     from pettingzoo import ParallelEnv
-except:
-    pass
+except ImportError:
+    logging.warning("PettingZoo not installed. PettingStyleWrapper will not be available.")
+
 from robopal.envs import RobotEnv
 
 
