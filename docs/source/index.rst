@@ -19,16 +19,17 @@ robopal
    :caption: MODULES
 
    modules/controllers
-   modules/wrappers
-   modules/renderers
    modules/robots
+   modules/environment
+   modules/renderers
+   modules/wrappers
 
 .. toctree::
    :hidden:
    :maxdepth: 1
    :caption: TUTORIALS
 
-   tutorials/behavior_cloning
+   tutorials/imitation_learning
 
 .. toctree::
    :hidden:

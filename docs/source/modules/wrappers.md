@@ -1,15 +1,19 @@
 
-# Wrappers: Stylize your environment
+# Wrapper: Stylize your environment
 
 robopal 的环境接口具备 OpenAI [Gymnasium](https://gymnasium.farama.org/index.html) 的 API 风格。
 通过结合 robopal 中提供的不同类型的 `wrapper`，可以方便地将仿真环境包装成 gym 环境，从而结合其他 RL 算法库进行训练。
 
 ## GymWrapper
-
+pass
 ## GoalEnvWrapper
 
-下面是一个简单的示例，演示了使用 [Stable Baselines3](https://github.com/DLR-RM/stable-baselines3) 训练 *Pick-and-Place* 任务。
-其中，使用的环境来自于 `robopal/demos/single_task_manipulation` 目录下的 `PickAndPlaceEnv` 环境。
+下面的示例演示了使用 [Stable Baselines3](https://github.com/DLR-RM/stable-baselines3) 训练 *Pick-and-Place* 任务。
+其中，使用的环境来自于 `robopal/envs/manipulation_tasks/single_task_manipulation` 目录下的 `PickAndPlaceEnv` 环境。
+
+<details>
+  <summary><b>GoalEnvWrapper Showcase <span style="color:red;">(click to expand)</span></b></summary>
+<p>
 
 ```python
 from stable_baselines3 import HerReplayBuffer
@@ -66,8 +70,15 @@ model.learn(int(1e6), callback=TensorboardCallback(log_dir=log_dir))
 
 model.save("./her_bit_env")
 ```
+</p>
+</details>
 
 ## PettingStyleWrapper
+下面的示例演示了使用 [RLlib]() 训练 *BimanualReach* 任务。
+其中，使用的环境来自于 `robopal/envs/bimanual_tasks/bimanual_reach.py` 目录下的 `BimanualReach` 环境。
+<details>
+  <summary><b>PettingStyleWrapper Showcase <span style="color:red;">(click to expand)</span></b></summary>
+<p>
 
 ```python
 import os
@@ -122,3 +133,5 @@ if __name__ == "__main__":
     )
 
 ```
+</p>
+</details>

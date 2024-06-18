@@ -1,8 +1,11 @@
 # Quick Start
 
-## First Demo
-**robopal** 提供了不同的机器人控制器，尝试运行下面路径的脚本来使用吧。
-> `python -m robopal.demos.demo_controllers`
+## Demo Lists
+**robopal** 为使用者提供了一些基础的运行示例，尝试运行下面的脚本来更进一步了解 robopal。
 
+* > `python -m robopal.demos.demo_controllers`
 
+* > `python -m robopal.demos.demo_enviroments`
+
+* > `python -m robopal.demos.demo_grasping`
 
