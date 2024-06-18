@@ -1,6 +1,6 @@
 import robopal
 import robopal.envs
-from robopal.wrappers import GymWrapper
+from robopal.wrappers import GymWrapper, PettingStyleWrapper
 import logging
 
 if __name__ == "__main__":
@@ -15,10 +15,19 @@ if __name__ == "__main__":
         env_name, 
         render_mode="human"
     )
-    env = GymWrapper(env)
+
+    if len(env.agents) == 1:
+        env = GymWrapper(env)
+    else:
+        env = PettingStyleWrapper(env)
 
     env.reset()
     for _ in range(400):
-        action = env.action_space.sample()
+        if len(env.agents) == 1:
+            action = env.action_space.sample()
+        else:
+            action = {
+                agent: env.action_space(agent).sample() for agent in env.agents
+            }
         env.step(action)
     env.close()
