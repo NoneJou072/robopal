@@ -46,6 +46,9 @@ class ManipulateEnv(RobotEnv):
 
         self.max_episode_steps = 50
 
+        self.obs_dim: np.ndarray = None
+        self.action_dim: np.ndarray = None
+
         self._timestep = 0
         self.goal_pos = None
         self.desired_position = self.init_pos[self.agents[0]]
@@ -67,8 +70,8 @@ class ManipulateEnv(RobotEnv):
         """ Take one step in the environment.
 
         :param action:  The action space is 4-dimensional, with the first 3 dimensions corresponding to the desired
-        position of the block in Cartesian coordinates, and the last dimension corresponding to the
-        desired gripper opening (0 for closed, 1 for open).
+        linear velocities of the end effector in Cartesian coordinates, and the last dimension corresponding to the
+        desired gripper state (0 denotes closed, 1 denotes open).
         :return: obs, reward, terminated, truncated, info
         """
         self._timestep += 1

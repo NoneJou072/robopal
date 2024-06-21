@@ -1,15 +1,15 @@
 import numpy as np
 
+import robopal
 from robopal.envs import BimanualManipulate
 import robopal.commons.transform as trans
-from robopal.robots.dual_arms import DualDianaGrasp
 from robopal.wrappers import PettingStyleWrapper
 
 class BimanualPickAndPlace(BimanualManipulate):
     name = 'BimanualPickAndPlace-v0'
     
     def __init__(self,
-                 robot=DualDianaGrasp,
+                 robot='DualPandaPickAndPlace',
                  render_mode='human',
                  control_freq=20,
                  is_show_camera_in_cv=False,
@@ -23,7 +23,7 @@ class BimanualPickAndPlace(BimanualManipulate):
             controller=controller,
         )
 
-        self.obs_dim = (23,)
+        self.obs_dim = (21,)
         self.action_dim = (4,)
 
         self.max_action = 1.0
@@ -44,57 +44,50 @@ class BimanualPickAndPlace(BimanualManipulate):
         """
         obs = np.zeros(self.obs_dim)
 
-        obs[0:3] = (  # gripper position in global coordinates
-            end_pos := self.get_site_pos('0_grip_site')
-        )
-        obs[3:6] = (  # block position in global coordinates
-            object_pos := self.get_body_pos('green_block')
-        )
-        obs[6:9] = (  # Relative block position with respect to gripper position in globla coordinates.
-            end_pos - object_pos
-        )
-        obs[9:12] = (  # block rotation
-            trans.mat_2_euler(self.get_body_rotm('green_block'))
-        )
-        obs[12:15] = (  # gripper linear velocity
-            end_vel := self.get_site_xvelp('0_grip_site') * self.dt
-        )
-        object_velp = self.get_body_xvelp('green_block') * self.dt
-        obs[15:18] = (  # velocity with respect to the gripper
-            object_velp - end_vel
-        )
+        obs[0:8] = np.concatenate([
+            # gripper position in global coordinates
+            end_pos := self.get_site_pos(f'{agent[-1]}_grip_site'),
+            # gripper linear velocity
+            end_vel := self.get_site_xvelp(f'{agent[-1]}_grip_site') * self.dt,
+            self.robot.end[agent].get_finger_observations(),
+        ], axis=0)
 
-        obs[18:21] = self.get_body_xvelr('green_block') * self.dt
-        obs[21] = self.mj_data.joint('0_r_finger_joint').qpos[0]
-        obs[22] = self.mj_data.joint('0_r_finger_joint').qvel[0] * self.dt
+        obs[8:21] = np.concatenate([
+            # block position in global coordinates
+            object_pos := self.get_body_pos('green_block'),
+            # Relative block position with respect to gripper position in globla coordinates.
+            end_pos - object_pos,
+            # block rotation
+            trans.mat_2_quat(self.get_body_rotm('green_block')),
+            # block linear velocity
+            self.get_body_xvelp('green_block') * self.dt
+        ], axis=0)
 
         return obs.copy()
 
     def _get_info(self, agent) -> dict:
-        return {'is_success': self._is_success(self.get_body_pos('green_block'), self.get_site_pos('goal_site'), th=0.02)}
+        return {
+            'is_success': self._is_success(self.get_body_pos('green_block'), self.get_site_pos('goal_site'), th=0.02)
+        }
 
     def reset_object(self):
         random_x_pos = np.random.uniform(0.35, 0.55)
         random_y_pos = np.random.uniform(-0.15, 0.15)
         self.set_object_pose('green_block:joint', np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0]))
 
-        random_goal_x_pos = np.random.uniform(0.35, 0.55)
-        random_goal_y_pos = np.random.uniform(-0.15, 0.15)
-        random_goal_z_pos = np.random.uniform(0.46, 0.66)
-
+        goal_pos = np.random.uniform([0.35, -0.15, 0.46], [0.55, 0.15, 0.66])
         block_pos = np.array([random_x_pos, random_y_pos, 0.46])
-        goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
         while np.linalg.norm(block_pos - goal_pos) <= 0.05:
-            random_goal_x_pos = np.random.uniform(0.4, 0.6)
-            random_goal_y_pos = np.random.uniform(-0.2, 0.2)
-            random_goal_z_pos = np.random.uniform(0.45, 0.66)
-            goal_pos = np.array([random_goal_x_pos, random_goal_y_pos, random_goal_z_pos])
-        site_id = self.get_site_id('goal_site')
-        self.mj_model.site_pos[site_id] = goal_pos
+            goal_pos = np.random.uniform([0.35, -0.15, 0.46], [0.55, 0.15, 0.66])
+        self.set_site_pos('goal_site', goal_pos)
 
 
 if __name__ == "__main__":
-    env = BimanualPickAndPlace(render_mode='human')
+    env = robopal.make(
+        'BimanualPickAndPlace-v0',
+        robot='DualPandaPickAndPlace',
+        render_mode='human'
+    )
     env = PettingStyleWrapper(env)
     env.reset()
     for t in range(int(1e5)):

@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Union
 import logging
 import time
 from dataclasses import dataclass, field
@@ -111,7 +111,7 @@ class HumanDemonstrationWrapper(object):
 
         return action.copy()
     
-    def step(self, action: np.ndarray | Dict[str, np.ndarray]):
+    def step(self, action: Union[np.ndarray, Dict[str, np.ndarray]]):
         """ Input actions should be normalized, since the action 
         will un-normalize before applying to the environment.
         """
