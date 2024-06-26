@@ -65,34 +65,18 @@ class DualPanda(BaseRobot):
     @property
     def init_qpos(self):
         """ Robot's init joint position. """
-        return {self.agents[0]: np.array([-0.61,  -0.84,  0.47, -2.54,  0.35,  1.75, 0.44]),
+        return {self.agents[0]: np.array([1.57,  -0.,  0., -1.57,  0.,  1.57, -0.78]),
                 self.agents[1]: np.array([-0.61,  -0.84,  0.47, -2.54,  0.35,  1.75, 0.44])}
 
 
-class DualDianaGrasp(DualDianaMed):
-    def __init__(self):
-        super().__init__(
-            scene='grasping',
-            manipulator=['DianaMed', 'DianaMed'],
-            gripper=['RethinkGripper', 'RethinkGripper'],
-            mount=['cylinder', 'cylinder2'],
-            attached_body=['0_attachment', '1_attachment']
-        )
+class DualPandaPickAndPlace(DualPanda):
 
     def add_assets(self):
+        super().add_assets()
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/green_cube.xml')
 
         goal_site = """<site name="goal_site" pos="0.4 0.0 0.5" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere" />"""
         self.mjcf_generator.add_node_from_str('worldbody', goal_site)
-
-        # set mount pose.
-        self.mjcf_generator.set_node_attrib('body', '0_mount_base_link', {'pos': '1.2 0.0 0.3', 'quat': "0 0 0 1"})
-        self.mjcf_generator.set_node_attrib('body', '1_mount_base_link', {'pos': '-0.4 0.0 0.3', 'quat': "1 0 0 0"})
-
-    @property
-    def init_qpos(self):
-        return {self.agents[0]: np.array([0, 0.1, 0, 2.28, 0, -1, 0]),
-                self.agents[1]: np.array([0, 0.1, 0, 2.28, 0, -1, 0])}
 
 
 class DualDianaReach(DualDianaMed):

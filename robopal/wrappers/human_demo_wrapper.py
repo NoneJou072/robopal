@@ -170,8 +170,8 @@ class HumanDemonstrationWrapper(object):
         if len(self.collection.actions) == 0:
             return
 
-        self.num_collects += 1
         ep_data_grp = self.root_group.create_group("demo_{}".format(self.num_collects))
+        self.num_collects += 1
 
         # add attrs
         self.total += self.collection.num_samples

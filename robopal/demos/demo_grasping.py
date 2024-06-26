@@ -10,7 +10,7 @@ GRASIPING_ROBOTS = [UR5eGrasp, DianaGrasp, PandaGrasp]
 if __name__ == "__main__":
     for robot in GRASIPING_ROBOTS:
         env = RobotEnv(
-            robot=robot,
+            robot,
             render_mode='human',
             control_freq=100,
             controller='CARTIK',

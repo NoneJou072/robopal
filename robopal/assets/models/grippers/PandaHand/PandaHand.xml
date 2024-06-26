@@ -16,7 +16,7 @@
         <geom type="mesh" contype="0" conaffinity="0" group="2"/>
       </default>
       <default class="collision">
-        <geom type="mesh" group="3"/>
+        <geom type="mesh" group="4" conaffinity="1" contype="0" condim="4" friction="1 1 1" solimp="1 1 1"/>
         <default class="fingertip_pad_collision_1">
           <geom type="box" size="0.0085 0.004 0.0085" pos="0 0.0055 0.0445"/>
         </default>
