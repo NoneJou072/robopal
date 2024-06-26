@@ -18,6 +18,7 @@ if __name__ == "__main__":
         control_freq=200,
         controller='CARTIK',
         is_show_camera_in_cv=True,
+        is_render_camera_offscreen=True,
         camera_in_render='cam'
     )
 
