@@ -16,14 +16,15 @@ setup(
     python_requires=">=3.8",
     include_package_data=True,
     install_requires=[
-        'numpy>=1.23.5',
-        'mujoco>=3.1.4',
+        'numpy>=1.26.4',
+        'mujoco>=3.1.6',
         'gymnasium',
         'pettingzoo',
         'rich'
     ],
     extras_require={
         'planning': ['ruckig~=0.9.2'],
+        'gamepad': ['pygame'],
     },
     classifiers=[
         "License :: OSI Approved :: MIT License",

@@ -1,18 +1,20 @@
 import time
 import logging
+
 try:
     from pynput import keyboard
 except ImportError:
     raise("pynput is not installed. Please install it by running 'pip install pynput'")
 import numpy as np
 import robopal.commons.transform as T
+from robopal.plugins.devices import BaseDevice
 
 
-class Keyboard:
+class Keyboard(BaseDevice):
     def __init__(self) -> None:
 
-        self._pos_step = 0.001
-        self._rot_step = 0.001
+        self._pos_step = 0.01
+        self._rot_step = 0.01
         self._is_ctrl_l_pressed = False
         self._is_shift_pressed = False
         self._end_pos_offset = np.array([0.0, 0.0, 0.0])
@@ -114,7 +116,7 @@ class Keyboard:
             pass
 
     def get_end_pos_offset(self):
-        return np.clip(self._end_pos_offset, -0.05, 0.05)
+        return np.clip(self._end_pos_offset, -0.04, 0.04)
     
     def get_end_rot_offset(self):
         return self._end_rot_offset
