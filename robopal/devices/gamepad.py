@@ -6,7 +6,7 @@ except ImportError:
     logging.warn("pygame is not installed. If you want to use the gamepad, Please install it by running 'pip install pygame'")
 
 import numpy as np
-from robopal.plugins.devices import BaseDevice
+from robopal.devices import BaseDevice
 
 
 class Gamepad(BaseDevice):

@@ -1,6 +1,6 @@
 import numpy as np
 from robopal.demos.demo_admit_rl.demo_admit_test import AdmitGymEnv
-from robopal.plugins.unity_interface.mjremote import mjremote
+from robopal.undo.unity.mjremote import mjremote
 
 
 class VisualForceAdmit(AdmitGymEnv):

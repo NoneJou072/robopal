@@ -6,7 +6,7 @@ import numpy as np
 
 from robopal.envs.robot import RobotEnv
 from robopal.robots.diana_med import DianaCalib
-from robopal.plugins.devices.keyboard import Keyboard
+from robopal.devices.keyboard import Keyboard
 import robopal.commons.transform as T
 
 

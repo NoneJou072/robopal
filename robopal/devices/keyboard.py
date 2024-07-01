@@ -7,7 +7,7 @@ except ImportError:
     raise("pynput is not installed. Please install it by running 'pip install pynput'")
 import numpy as np
 import robopal.commons.transform as T
-from robopal.plugins.devices import BaseDevice
+from robopal.devices import BaseDevice
 
 
 class Keyboard(BaseDevice):
