@@ -13,48 +13,52 @@ COLLECTIONS_DIR_NAME = 'collections/collections_*'
 DEFAULT_DATA_DIR_PATH = os.path.join(ROBOPAL_PATH, COLLECTIONS_DIR_NAME)
 
 
-def play_demonstrations():
-    for state_file in sorted(glob(DEFAULT_DATA_DIR_PATH)):
+def play_all():
+    for state_dir in sorted(glob(DEFAULT_DATA_DIR_PATH)):
+        play_demonstrations(state_dir)
 
-        # read .hdf5 files
-        file = h5py.File(state_file + '/demo.hdf5','r')   
-        logging.info("Reading from {}".format(state_file + '/demo.hdf5'))
+def play_demonstrations(demo_dir=None):
 
-        env_args = json.loads(file["data"].attrs["env_args"])
-        env_name = env_args["env_name"]
-        env_meta = env_args["env_kwargs"]
-        logging.info(f"env name: {env_name}")
-        logging.info(f"env meta: {env_meta}")
+    # read .hdf5 files
+    file = h5py.File(demo_dir + '/demo.hdf5','r')   
+    logging.info("Reading from {}".format(demo_dir + '/demo.hdf5'))
 
-        env = robopal.make(
-            env_name,
-            **env_meta
-        )
+    env_args = json.loads(file["data"].attrs["env_args"])
+    env_name = env_args["env_name"]
+    env_meta = env_args["env_kwargs"]
+    logging.info(f"env name: {env_name}")
+    logging.info(f"env meta: {env_meta}")
 
-        demos = list(file["data"].keys())
-        inds = np.argsort([int(elem[5:]) for elem in demos])
-        demos = [demos[i] for i in inds]
+    env = robopal.make(
+        env_name,
+        **env_meta
+    )
 
-        # playback each episode
-        for episode in demos:
-            logging.info("\n>Reading episode: {}".format(episode))
+    demos = list(file["data"].keys())
+    inds = np.argsort([int(elem[5:]) for elem in demos])
+    demos = [demos[i] for i in inds]
 
-            for key in file["data"][episode].attrs:
-                if key != "model_file":
-                    logging.info("{}: {}".format(key, file["data"][episode].attrs[key]))
+    # playback each episode
+    for episode in demos:
+        logging.info("\n>Reading episode: {}".format(episode))
 
-            env.load_model_from_string(file["data"][episode].attrs["model_file"])
+        for key in file["data"][episode].attrs:
+            if key != "model_file":
+                logging.info("{}: {}".format(key, file["data"][episode].attrs[key]))
 
-            first_state = file["data"][episode]["states"][0]
+        env.load_model_from_string(file["data"][episode].attrs["model_file"])
 
-            env.load_state(first_state)
-            env.forward()
-            env.update_init_pose_to_current()
+        first_state = file["data"][episode]["states"][0]
 
-            for action in file["data"][episode]["actions"]:
-                env.step(action)
-                    
-        env.renderer.close()
+        env.load_state(first_state)
+        env.forward()
+        env.update_init_pose_to_current()
+
+        for action in file["data"][episode]["actions"]:
+            print(np.around(action, 4))
+            env.step(action)
+                
+    env.renderer.close()
 
 if __name__ == "__main__":
-    play_demonstrations()
+    play_demonstrations("robopal/collections/collections_1719889041_5205944")

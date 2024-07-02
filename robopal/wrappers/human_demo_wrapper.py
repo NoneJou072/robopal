@@ -98,6 +98,7 @@ class HumanDemonstrationWrapper(object):
         self.collection: Collection = None
         self.num_collects  = 0
         self.total = 0
+        self.task_completion_hold_count = -1  # counter to collect 10 timesteps after reaching goal
 
         # disable the viewer keyboard
         self.env.renderer.enable_viewer_keyboard = False
@@ -143,7 +144,7 @@ class HumanDemonstrationWrapper(object):
 
         if self.has_interaction and self.env.cur_timestep % self.collect_freq == 0:
             collect_flag = True
-            if self.is_drop_invalid_action:
+            if self.is_drop_invalid_action and self.task_completion_hold_count < 0:
                 collect_flag = self._check_action(action, obs, next_obs)
             if collect_flag:
                 # collect the data
@@ -229,7 +230,7 @@ class HumanDemonstrationWrapper(object):
         """
         valid = True
         if np.linalg.norm(self._last_action - action) < 1e-3:
-            if np.linalg.norm(obs - next_obs) < 1e-3:
+            if np.linalg.norm(obs - next_obs) < 1e-2:
                 valid = False
         self._last_action = action
         return valid

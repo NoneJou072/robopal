@@ -55,7 +55,7 @@ class Keyboard(BaseDevice):
                 elif self._is_shift_pressed:  # shift + up
                     self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self._rot_step * np.array([0, -1, 0])))
                 else:   # up
-                    self._end_pos_offset[0] += self._pos_step
+                    self._end_pos_offset[0] -= self._pos_step
             elif key == keyboard.Key.down:
                 if self._is_ctrl_l_pressed:
                     if self._is_shift_pressed: # ctrl + shift + down
@@ -65,17 +65,17 @@ class Keyboard(BaseDevice):
                 elif self._is_shift_pressed:  # shift + down
                     self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self._rot_step * np.array([0, 1, 0])))
                 else:  # down
-                    self._end_pos_offset[0] -= self._pos_step
+                    self._end_pos_offset[0] += self._pos_step
             elif key == keyboard.Key.left:
                 if self._is_shift_pressed:  # shift + left
                     self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self._rot_step * np.array([1, 0, 0])))
                 else:  # left
-                    self._end_pos_offset[1] += self._pos_step
+                    self._end_pos_offset[1] -= self._pos_step
             elif key == keyboard.Key.right:
                 if self._is_shift_pressed:  # shift + right
                     self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self._rot_step * np.array([-1, 0, 0])))
                 else:  # right
-                    self._end_pos_offset[1] -= self._pos_step
+                    self._end_pos_offset[1] += self._pos_step
 
             elif key == keyboard.Key.ctrl_l:
                 self._is_ctrl_l_pressed = True
