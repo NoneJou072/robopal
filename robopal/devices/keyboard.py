@@ -4,7 +4,7 @@ import logging
 try:
     from pynput import keyboard
 except ImportError:
-    raise("pynput is not installed. Please install it by running 'pip install pynput'")
+    logging.warn("pynput is not installed. Please install it by running 'pip install pynput'")
 import numpy as np
 import robopal.commons.transform as T
 from robopal.devices import BaseDevice
@@ -115,8 +115,8 @@ class Keyboard(BaseDevice):
         except AttributeError:
             pass
 
-    def get_end_pos_offset(self):
-        return np.clip(self._end_pos_offset, -0.04, 0.04)
-    
-    def get_end_rot_offset(self):
-        return self._end_rot_offset
+    def get_outputs(self):
+        return (
+            np.clip(self._end_pos_offset, -0.04, 0.04),
+            self._end_rot_offset,
+        )

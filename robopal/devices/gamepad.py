@@ -6,71 +6,92 @@ except ImportError:
     logging.warn("pygame is not installed. If you want to use the gamepad, Please install it by running 'pip install pygame'")
 
 import numpy as np
+import robopal.commons.transform as T
 from robopal.devices import BaseDevice
 
 
 class Gamepad(BaseDevice):
-    def __init__(self):
+    def __init__(self) -> None:
         self.joystick = None
+
+        self._pos_step = 0.01
+        self._rot_step = 0.01
+        self._is_ctrl_l_pressed = False
+        self._is_shift_pressed = False
+        self._end_pos_offset = np.array([0.0, 0.0, 0.0])
+        self._end_rot_offset = np.eye(3)
+
+        self._reset_flag = False
+        self._exit_flag = False
+        self._gripper_flag = 0
+        self._agent_id = 0
 
     def start(self):
         self.command_introduction()
 
-        # 初始化 Pygame
         pygame.init()
-
-        # 初始化手柄
         pygame.joystick.init()
 
-        # 检查是否有手柄连接
+        # ckeck if the gamepad is connected
         if pygame.joystick.get_count() == 0:
-            print("没有检测到手柄")
+            logging.error("Gamepad not found. Please connect the gamepad and try again.")
         else:
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
-            print(f"检测到手柄: {self.joystick.get_name()}")
+            logging.info(f"Gamepad has found: {self.joystick.get_name()}")
 
     def command_introduction(self):
-        logging.error("Not support now, please use other devices.")
+        logging.info("Move <LS> to move the end effector along the x/y-axis.")
+        logging.info("Press <LT/RT> to move the end effector along the z-axis.")
+        # logging.info("Press <SHIFT + ARROW> to rotate the end effector along the x/y-axis.")
+        # logging.info("Press <CTRL + SHIFT + ARROW> to rotate the end effector along the z-axis.")
+        logging.info("Press <RB> to open/close the gripper.")
+        logging.info("Press <X> to switch the agent.")
+        logging.info("Press <ESC> to exit.")
 
     def listen(self):
         for event in pygame.event.get():
             if event.type == pygame.JOYAXISMOTION:
-                # 读取轴的输入
                 axis_id = event.axis
                 axis_value = self.joystick.get_axis(axis_id)
-                # print(f"轴 {axis_id} 值: {axis_value:.2f}")
 
             if event.type == pygame.JOYBUTTONDOWN:
-                # 读取按键的输入
+                button_id = event.button
+
+                if button_id == 2:
+                    self._agent_id = 0 if self._agent_id else 1
+                elif button_id == 3:
+                    self._reset_flag = True
+                elif button_id == 5:
+                    self._gripper_flag = not self._gripper_flag
+                elif button_id == 8:
+                    # Stop listener
+                    self._exit_flag = True
+                    return False
+                
                 for i in range(self.joystick.get_numbuttons()):
                     button = self.joystick.get_button(i)
-                    # if button:
-                    #     print(f"按键 {i} 按下")
 
             # if event.type == pygame.JOYBUTTONUP:
-            #     # 按键释放
             #     print(f"按键 {event.button} 释放")
 
             if event.type == pygame.JOYHATMOTION:
-                # 读取方向键输入
                 for i in range(self.joystick.get_numhats()):
                     hat = self.joystick.get_hat(i)
-                    # print(f"方向键 {i} 值: {hat}")
 
     def get_axis(self):
-        """ 手动读取轴的输入 
+        """ read the axis value of the gamepad
         """
         self.listen()
         return {f"axis_{i}": self.joystick.get_axis(i) for i in range(self.joystick.get_numaxes())}
     
     def get_button(self):
-        """ 手动读取按键的输入 
+        """ read the button value of the gamepad
         """
         self.listen()
         return {f"button_{i}": self.joystick.get_button(i) for i in range(self.joystick.get_numbuttons())}
     
-    def get_action_increment(self):
+    def get_outputs(self):
         self.listen()
 
         axis_value = self.get_axis()
@@ -78,7 +99,9 @@ class Gamepad(BaseDevice):
 
         pos_increment_scale = 0.01
         pos_increment = np.array([
-            axis_value["axis_0"], -axis_value["axis_1"], 0.5 * (axis_value["axis_5"] - axis_value["axis_2"]) * (1 - button_value["button_10"])
+            axis_value["axis_1"], 
+            axis_value["axis_0"], 
+            0.5 * (axis_value["axis_5"] - axis_value["axis_2"]) * (1 - button_value["button_10"])
         ]) * pos_increment_scale
 
         rot_increment_scale = 0.1
@@ -87,7 +110,10 @@ class Gamepad(BaseDevice):
         rot_increment_z = 0.5 * (axis_value["axis_5"] - axis_value["axis_2"]) * button_value["button_10"]
         rot_increment = np.array([rot_increment_x, rot_increment_y, rot_increment_z]) * rot_increment_scale
 
-        return pos_increment, rot_increment
+        return (
+            np.clip(pos_increment, -0.04, 0.04),
+            rot_increment
+        )
 
     def __del__(self):
         pygame.joystick.quit()

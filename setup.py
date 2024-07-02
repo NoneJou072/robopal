@@ -20,11 +20,12 @@ setup(
         'mujoco>=3.1.6',
         'gymnasium',
         'pettingzoo',
-        'rich'
+        'rich',
+        'pynput',
+        'pygame',
     ],
     extras_require={
         'planning': ['ruckig~=0.9.2'],
-        'gamepad': ['pygame'],
     },
     classifiers=[
         "License :: OSI Approved :: MIT License",

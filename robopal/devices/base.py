@@ -19,8 +19,5 @@ class BaseDevice(object):
     def command_introduction(self):
         pass
 
-    def get_end_pos_offset(self):
-        pass
-    
-    def get_end_rot_offset(self):
+    def get_outputs(self):
         pass

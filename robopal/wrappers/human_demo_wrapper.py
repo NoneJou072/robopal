@@ -12,6 +12,7 @@ import h5py
 import robopal
 from robopal.envs.manipulation_tasks.robot_manipulate import ManipulateEnv
 import robopal.commons.transform as T
+from robopal.devices import BaseDevice
 
 ROBOPAL_PATH = os.path.dirname(inspect.getfile(robopal))
 COLLECTIONS_DIR_NAME = 'collections/collections_' + str(time.time()).replace(".", "_")
@@ -37,21 +38,27 @@ class HumanDemonstrationWrapper(object):
     def __init__(
             self, 
             env: ManipulateEnv,
-            device: Any = None,
+            device: BaseDevice = None,
             collections_dir: str = DEFAULT_DATA_DIR_PATH,
             collect_freq = 1,
             max_collect_horizon = 100,
             is_drop_unsuccess_exp = True,
-            action_filter: np.ndarray = np.zeros(4)
+            is_drop_invalid_action = True,
+            saved_action_type = "velocity"
         ):
 
         self.env = env
-        self.device = device()
+        self.device: BaseDevice = device()
         self.collections_dir = collections_dir
         self.collect_freq = collect_freq
         self.max_collect_horizon = max_collect_horizon
         self.is_drop_unsuccess_exp = is_drop_unsuccess_exp
-        self.action_filter = action_filter
+        self.is_drop_invalid_action = is_drop_invalid_action
+        self.saved_action_type = saved_action_type
+        if self.saved_action_type == "position":
+            logging.warn("HumanDemonstrationWrapper: saved action type is set to position, note the action is unnormalized.")
+
+        self._last_action = np.zeros(4)
 
         if not os.path.exists(self.collections_dir):
             logging.info("HumanDemonstrationWrapper: making new directory at {}".format(self.collections_dir))
@@ -73,6 +80,7 @@ class HumanDemonstrationWrapper(object):
                 "is_render_camera_offscreen": self.env.is_render_camera_offscreen,
                 "is_randomize_end" : self.env.is_randomize_end,
                 "is_randomize_object" : self.env.is_randomize_object,
+                "action_type" : self.saved_action_type,
             }
         }
         # store env config as an attribute
@@ -100,8 +108,8 @@ class HumanDemonstrationWrapper(object):
         action = np.zeros(4)
 
         # normalize the action to [-1, 1]
-        action[:3] = self.device.get_end_pos_offset()
-        action[:3] *= 20
+        action[:3] = self.device.get_outputs()[0] * 40
+        action[:3] = action[:3].clip(-1, 1)
         
         # action[3:7] = T.mat_2_quat(T.quat_2_mat(action[3:7]).dot(self.device.get_end_rot_offset()))
 
@@ -122,19 +130,30 @@ class HumanDemonstrationWrapper(object):
 
         next_obs, reward, termination, truncation, info = self.env.step(action)
 
-        if not self.has_interaction:
+        if not self.has_interaction and action[:3].any() != 0:
             self.has_interaction = True
+            logging.info("HumanDemonstrationWrapper: interaction has started")
 
-        if self.env.cur_timestep % self.collect_freq == 0 and\
-            not np.array_equal(self.action_filter[:3], action[:3]):
-            # collect the data
-            self.collection.num_samples += 1
-            self.collection.actions.append(action)
-            self.collection.obs["low_dim"].append(obs)
-            self.collection.next_obs["low_dim"].append(next_obs)
-            self.collection.dones.append(termination)
-            self.collection.rewards.append(reward)
-            self.collection.states.append(state)
+        if self.saved_action_type == "velocity":
+            pass
+        elif self.saved_action_type == "position":
+            action[:3] = self.env.desired_position
+        else:
+            raise ValueError(f"Invalid action type: {self.saved_action_type}")
+
+        if self.has_interaction and self.env.cur_timestep % self.collect_freq == 0:
+            collect_flag = True
+            if self.is_drop_invalid_action:
+                collect_flag = self._check_action(action, obs, next_obs)
+            if collect_flag:
+                # collect the data
+                self.collection.num_samples += 1
+                self.collection.actions.append(action)
+                self.collection.obs["low_dim"].append(obs)
+                self.collection.next_obs["low_dim"].append(next_obs)
+                self.collection.dones.append(termination)
+                self.collection.rewards.append(reward)
+                self.collection.states.append(state)
 
         if self.device._exit_flag:
             self.close()
@@ -204,3 +223,14 @@ class HumanDemonstrationWrapper(object):
         logging.info("HumanDemonstrationWrapper: closed hdf5 file")
 
         self.env.close()
+
+    def _check_action(self, action: np.ndarray, obs: np.ndarray, next_obs: np.ndarray):
+        """ check if the action is valid
+        """
+        valid = True
+        if np.linalg.norm(self._last_action - action) < 1e-3:
+            if np.linalg.norm(obs - next_obs) < 1e-3:
+                valid = False
+        self._last_action = action
+        return valid
+    
