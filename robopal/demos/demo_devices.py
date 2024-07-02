@@ -6,11 +6,19 @@ import numpy as np
 
 from robopal.envs.robot import RobotEnv
 from robopal.robots.diana_med import DianaCalib
-from robopal.devices import Keyboard
 import robopal.commons.transform as T
 
 
 if __name__ == "__main__":
+    device = input("Please input the device you want to use (keyboard/gamepad): ")
+    if device == 'keyboard':
+        from robopal.devices import Keyboard
+        device = Keyboard()
+    elif device == 'gamepad':
+        from robopal.devices import Gamepad
+        device = Gamepad()
+    else:
+        raise ValueError("Invalid device type.")
 
     env = RobotEnv(
         robot=DianaCalib,
@@ -22,7 +30,6 @@ if __name__ == "__main__":
         camera_in_render='cam'
     )
 
-    device = Keyboard()
     device.start()
     
     env.reset()
@@ -33,6 +40,6 @@ if __name__ == "__main__":
     for t in range(int(1e6)):
         device_outputs = device.get_outputs()
         action[:3] += device_outputs[0]
-        action[3:] = T.mat_2_quat(T.quat_2_mat(action[3:]).dot(device_outputs[1]))
+        action[3:] = T.mat_2_quat(T.quat_2_mat(action[3:]).dot(T.euler_2_mat(device_outputs[1])))
         env.step(action)
     env.close()
