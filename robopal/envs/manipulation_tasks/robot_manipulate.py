@@ -20,7 +20,7 @@ class ManipulateEnv(RobotEnv):
                  control_freq=20,
                  controller='CARTIK',
                  is_interpolate=False,
-                 is_normalized_action=True,
+                 action_type="velocity",
                  is_randomize_end=True,
                  is_randomize_object=True,
                  is_show_camera_in_cv=False,
@@ -40,7 +40,7 @@ class ManipulateEnv(RobotEnv):
             camera_in_window=camera_in_window,
         )
 
-        self.is_normalized_action = is_normalized_action
+        self.action_type = action_type
         self.is_randomize_end = is_randomize_end
         self.is_randomize_object = is_randomize_object
 
@@ -57,15 +57,19 @@ class ManipulateEnv(RobotEnv):
         self.grip_max_bound = self.robot.end[self.agents[0]]._ctrl_range[1]
         self.grip_min_bound = self.robot.end[self.agents[0]]._ctrl_range[0]
 
-    def action_unnormalize(self, action) -> Tuple[np.ndarray, Any]:
+    def compute_end_position(self, input, type: str) -> Tuple[np.ndarray, Any]:
         """ Map to target action space bounds
         """
-        actual_pos_action = self.desired_position + self.pos_ratio * action[:3]
-        actual_pos_action = actual_pos_action.clip(self.robot.pos_min_bound, self.robot.pos_max_bound)
-        gripper_ctrl = (action[3] + 1) * (self.grip_max_bound - self.grip_min_bound) / 2 + self.grip_min_bound * np.ones(1)
+        if self.action_type == "velocity":
+            actual_pos = self.desired_position + self.action_scale * input
+        elif self.action_type == "position":
+            actual_pos = input
+        else:
+            raise ValueError(f"Invalid action type: {self.action_type}")
         
-        return np.concatenate([actual_pos_action, gripper_ctrl], axis=0)
-
+        actual_pos = actual_pos.clip(self.robot.pos_min_bound, self.robot.pos_max_bound)
+        return actual_pos
+    
     def step(self, action) -> Tuple:
         """ Take one step in the environment.
 
@@ -77,14 +81,15 @@ class ManipulateEnv(RobotEnv):
         self._timestep += 1
 
         # normalized actions should be un-normalized before applying to the environment
-        if self.is_normalized_action:
-            action = self.action_unnormalize(action)
-
+        end_pos = self.compute_end_position(action[:3], type=self.action_type)
+        
         # take one step
-        self.robot.end[self.agents[0]].apply_action(action[3])
-        super().step(action[:3])
+        normalized_gripper_ctrl = action[3]
+        unnormalized_gripper_ctrl = (normalized_gripper_ctrl + 1) * (self.grip_max_bound - self.grip_min_bound) / 2 + self.grip_min_bound
+        self.robot.end[self.agents[0]].apply_action(unnormalized_gripper_ctrl)
+        super().step(end_pos)
 
-        self.desired_position = action[:3]
+        self.desired_position = end_pos
 
         obs = self._get_obs()
         reward = self.compute_rewards()
