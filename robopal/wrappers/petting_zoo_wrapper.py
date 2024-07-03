@@ -1,6 +1,7 @@
 import functools
 from copy import copy
 import logging
+from typing import Dict
 
 import numpy as np
 from gymnasium import spaces
@@ -45,7 +46,7 @@ class PettingStyleWrapper(ParallelEnv):
 
         return self.env.reset(seed=seed, options=options)
 
-    def step(self, actions: dict[str, np.ndarray]):
+    def step(self, actions: Dict[str, np.ndarray]):
         """ Takes in an action for the current agent (specified by agent_selection).
         """
         return self.env.step(actions)
