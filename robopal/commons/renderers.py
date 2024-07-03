@@ -162,6 +162,7 @@ class MjRenderer:
             self.traj.append(pos.copy())
             self.viewer.user_scn.ngeom = len(self.traj)
         else:
+            self.traj = deque(maxlen=len(pos))
             for p in pos:
                 self.traj.append(p.copy())
             self.viewer.user_scn.ngeom = len(pos)
@@ -170,7 +171,7 @@ class MjRenderer:
             mujoco.mjv_initGeom(
                 self.viewer.user_scn.geoms[i],
                 type=mujoco.mjtGeom.mjGEOM_SPHERE,
-                size=[0.01, 0, 0],
+                size=[0.005, 0, 0],
                 pos=point,
                 mat=np.eye(3).flatten(),
                 rgba=np.concatenate([np.random.uniform(0, 1, 3), np.array([1])], axis=0)

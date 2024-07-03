@@ -52,7 +52,7 @@ class ManipulateEnv(RobotEnv):
         self._timestep = 0
         self.goal_pos = None
         self.desired_position = self.init_pos[self.agents[0]]
-        self.pos_ratio = 0.1
+        self.action_scale = 0.1
 
         self.grip_max_bound = self.robot.end[self.agents[0]]._ctrl_range[1]
         self.grip_min_bound = self.robot.end[self.agents[0]]._ctrl_range[0]
