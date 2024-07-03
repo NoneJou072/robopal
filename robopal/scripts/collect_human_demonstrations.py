@@ -18,13 +18,15 @@ if __name__ == "__main__":
         camera_in_window="frontview",
         is_render_camera_offscreen=True,
         is_randomize_end=False,
-        is_randomize_object=False,
+        is_randomize_object=True,
     )
     
     env = HumanDemonstrationWrapper(
         env, 
-        device=Keyboard,
-        saved_action_type="position"
+        device=Gamepad,
+        collect_freq = 4,
+        saved_action_type="position",
+        is_render_actions=True,
     )
     env.device.start()
     

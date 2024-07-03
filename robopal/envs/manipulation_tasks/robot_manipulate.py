@@ -57,7 +57,7 @@ class ManipulateEnv(RobotEnv):
         self.grip_max_bound = self.robot.end[self.agents[0]]._ctrl_range[1]
         self.grip_min_bound = self.robot.end[self.agents[0]]._ctrl_range[0]
 
-    def compute_end_position(self, input, type: str) -> Tuple[np.ndarray, Any]:
+    def compute_end_position(self, input) -> Tuple[np.ndarray, Any]:
         """ Map to target action space bounds
         """
         if self.action_type == "velocity":
@@ -81,7 +81,7 @@ class ManipulateEnv(RobotEnv):
         self._timestep += 1
 
         # normalized actions should be un-normalized before applying to the environment
-        end_pos = self.compute_end_position(action[:3], type=self.action_type)
+        end_pos = self.compute_end_position(action[:3])
         
         # take one step
         normalized_gripper_ctrl = action[3]

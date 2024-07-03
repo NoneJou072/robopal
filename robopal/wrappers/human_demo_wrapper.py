@@ -38,13 +38,15 @@ class HumanDemonstrationWrapper(object):
     def __init__(
             self, 
             env: ManipulateEnv,
+            *,
             device: BaseDevice = None,
             collections_dir: str = DEFAULT_DATA_DIR_PATH,
             collect_freq = 1,
             max_collect_horizon = 100,
             is_drop_unsuccess_exp = True,
             is_drop_invalid_action = True,
-            saved_action_type = "velocity"
+            saved_action_type = "velocity",
+            is_render_actions = False,
         ):
 
         self.env = env
@@ -57,6 +59,9 @@ class HumanDemonstrationWrapper(object):
         self.saved_action_type = saved_action_type
         if self.saved_action_type == "position":
             logging.warn("HumanDemonstrationWrapper: saved action type is set to position, note the action is unnormalized.")
+        self.is_render_actions = is_render_actions
+        if self.is_render_actions and self.saved_action_type == "velocity":
+            raise ValueError("HumanDemonstrationWrapper: render actions is only available for position action type")
 
         self._last_action = np.zeros(4)
 
@@ -109,9 +114,7 @@ class HumanDemonstrationWrapper(object):
         action = np.zeros(4)
 
         # normalize the action to [-1, 1]
-        action[:3] = self.device.get_outputs()[0] * 40
-        action[:3] = action[:3].clip(-1, 1)
-        
+        action[:3] = (2 * self.device.get_outputs()[0]).clip(-1, 1)
         # action[3:7] = T.mat_2_quat(T.quat_2_mat(action[3:7]).dot(self.device.get_end_rot_offset()))
 
         # normalized end action, since the end action from the keyboard is a binary value (0 or 1)
@@ -124,12 +127,11 @@ class HumanDemonstrationWrapper(object):
         """ Input actions should be normalized, since the action 
         will un-normalize before applying to the environment.
         """
-        # collect current observation
-        obs = self.env._get_obs()
-        self.env.save_state()
-        state = self.env.get_state()
 
         next_obs, reward, termination, truncation, info = self.env.step(action)
+
+        self.env.save_state()
+        state = self.env.get_state()
 
         if not self.has_interaction and action[:3].any() != 0:
             self.has_interaction = True
@@ -145,16 +147,23 @@ class HumanDemonstrationWrapper(object):
         if self.has_interaction and self.env.cur_timestep % self.collect_freq == 0:
             collect_flag = True
             if self.is_drop_invalid_action and self.task_completion_hold_count < 0:
-                collect_flag = self._check_action(action, obs, next_obs)
+                collect_flag = self._check_action(action, self.collection.obs["low_dim"][-1], next_obs)
             if collect_flag:
                 # collect the data
                 self.collection.num_samples += 1
                 self.collection.actions.append(action)
-                self.collection.obs["low_dim"].append(obs)
+                self.collection.obs["low_dim"].append(next_obs)
                 self.collection.next_obs["low_dim"].append(next_obs)
                 self.collection.dones.append(termination)
                 self.collection.rewards.append(reward)
                 self.collection.states.append(state)
+
+                # render actions
+                if self.is_render_actions:
+                    # change to local frame
+                    offset = self.env.robot.kine_data.body(self.env.robot.base_link_name["arm0"]).xpos
+                    render_pos = action[:3] + offset
+                    self.env.renderer.add_visual_point(render_pos)
 
         if self.device._exit_flag:
             self.close()
@@ -169,17 +178,26 @@ class HumanDemonstrationWrapper(object):
         self.device._reset_flag = False
         self.has_interaction = False
 
-        ret = self.env.reset(seed, options)
+        obs, info = self.env.reset(seed, options)
 
         # delete old and make new collection
         del self.collection
         self.collection = Collection(
             model_file=self.env.get_configs("model_file")
         )
+        self.env.save_state()
+        state = self.env.get_state()
+        self.collection.obs["low_dim"].append(obs)
+        self.collection.states.append(state)
 
-        return ret
+        if self.is_render_actions:
+            self.env.renderer.traj.clear()
+
+        return obs, info
     
     def save_collection(self):
+        """ Save the collected data in the hdf5 file.
+        """
         # drop unsuccessful episode
         if self.is_drop_unsuccess_exp:
             if not self.env._get_info()["is_success"]:
@@ -189,7 +207,11 @@ class HumanDemonstrationWrapper(object):
         # check the collection
         if len(self.collection.actions) == 0:
             return
+        if len(self.collection.obs["low_dim"]) > self.collection.num_samples:
+            self.collection.obs["low_dim"] = self.collection.obs["low_dim"][:-1]
+            self.collection.states = self.collection.states[:-1]
 
+        # create a new group for each episode
         ep_data_grp = self.root_group.create_group("demo_{}".format(self.num_collects))
         self.num_collects += 1
 
@@ -198,13 +220,12 @@ class HumanDemonstrationWrapper(object):
         ep_data_grp.attrs["num_samples"] = self.collection.num_samples
         ep_data_grp.attrs["model_file"] = self.collection.model_file
 
-        # write datasets
+        # create datasets for each data type
         ep_data_grp.create_dataset("states", data=np.array(self.collection.states, dtype=np.float32))
         ep_data_grp.create_dataset("actions", data=np.array(self.collection.actions, dtype=np.float32))
         ep_data_grp.create_dataset("rewards", data=np.array(self.collection.actions, dtype=np.float32))
         ep_data_grp.create_dataset("dones", data=np.array(self.collection.actions, dtype=np.float32))
 
-        # write obs
         obs_group = ep_data_grp.create_group("obs")
         for key, value in self.collection.obs.items():
             obs_group.create_dataset(key, data=np.array(value, dtype=np.float32))

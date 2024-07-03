@@ -10,17 +10,18 @@ class PickAndPlaceEnv(ManipulateEnv):
     name = 'PickAndPlace-v1'
     
     def __init__(self,
-                 robot=DianaPickAndPlace,
+                 robot="PandaPickAndPlace",
                  render_mode='human',
                  control_freq=20,
                  is_show_camera_in_cv=False,
                  controller='CARTIK',
                  action_type="velocity",
-                 is_randomize_end=False,
-                 is_randomize_object=True,
                  is_render_camera_offscreen = False,
                  camera_in_render="frontview",
                  camera_in_window="free",
+                 is_randomize_end=False,
+                 is_randomize_object=True,
+                 is_randomize_goal=False,
                  ):
         super().__init__(
             robot=robot,
@@ -36,7 +37,7 @@ class PickAndPlaceEnv(ManipulateEnv):
             camera_in_window=camera_in_window,
         )
 
-        self.obs_dim = (23,)
+        self.obs_dim = (22,)
         self.goal_dim = (3,)
         self.action_dim = (4,)
 
@@ -44,6 +45,8 @@ class PickAndPlaceEnv(ManipulateEnv):
         self.min_action = -1.0
 
         self.max_episode_steps = 50
+
+        self.is_randomize_goal = is_randomize_goal
 
     def _get_obs(self) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -53,28 +56,23 @@ class PickAndPlaceEnv(ManipulateEnv):
         """
         obs = np.zeros(self.obs_dim)
 
-        obs[0:3] = (  # gripper position in global coordinates
-            end_pos := self.get_site_pos('0_grip_site')
-        )
-        obs[3:6] = (  # block position in global coordinates
+        obs[0:15] = np.concatenate([  
+            self.robot.get_arm_qpos(),
+            # gripper position in global coordinates
+            end_pos := self.get_site_pos('0_grip_site'),
+            # gripper linear velocity
+            self.get_site_xvelp('0_grip_site') * self.dt,
+            self.robot.end['arm0'].get_finger_observations()
+        ])
+        obs[15:18] = (  # block position in global coordinates
             object_pos := self.get_body_pos('green_block')
         )
-        obs[6:9] = (  # Relative block position with respect to gripper position in globla coordinates.
-            end_pos - object_pos
+        obs[18:22] = (  # block rotation
+            self.get_body_quat('green_block')
         )
-        obs[9:12] = (  # block rotation
-            trans.mat_2_euler(self.get_body_rotm('green_block'))
-        )
-        obs[12:15] = (  # gripper linear velocity
-            end_vel := self.get_site_xvelp('0_grip_site') * self.dt
-        )
-        object_velp = self.get_body_xvelp('green_block') * self.dt
-        obs[15:18] = (  # velocity with respect to the gripper
-            object_velp - end_vel
-        )
-
-        obs[18:21] = self.get_body_xvelr('green_block') * self.dt
-        obs[21:23] = self.robot.end['arm0'].get_finger_observations()
+        # obs[11:14] = (  # Relative block position with respect to gripper position in globla coordinates.
+        #     end_pos - object_pos
+        # )
 
         return obs.copy()
     
@@ -84,6 +82,16 @@ class PickAndPlaceEnv(ManipulateEnv):
     def _get_desired_goal(self) -> np.ndarray:
         return self.get_site_pos('goal_site')
     
+    def compute_rewards(self, achieved_goal: np.ndarray = np.zeros(3), desired_goal: np.ndarray = np.zeros(3), info: dict = None, **kwargs):
+        """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
+        target position, and 0 if the block is in the final target position (the block is considered to have
+        reached the goal if the Euclidean distance between both is lower than 0.05 m).
+        """
+        d = self.goal_distance(self._get_achieved_goal(), self._get_desired_goal())
+        if kwargs:
+            return -(d >= kwargs['th']).astype(np.float64)
+        return -(d >= 0.02).astype(np.float64)
+    
     def _get_info(self) -> dict:
         return {'is_success': self._is_success(self.get_body_pos('green_block'), self.get_site_pos('goal_site'), th=0.02)}
 
@@ -91,12 +99,14 @@ class PickAndPlaceEnv(ManipulateEnv):
         if self.is_randomize_object:
             random_x_pos, random_y_pos = np.random.uniform([0.35, -0.15], [0.55, 0.15])
             block_pose = np.array([random_x_pos, random_y_pos, 0.46, 1.0, 0.0, 0.0, 0.0])
+            self.set_object_pose('green_block:joint', block_pose)
+        else:
+            self.set_object_pose('green_block:joint', np.array([0.5, 0.1, 0.46, 1.0, 0.0, 0.0, 0.0]))
 
+        if self.is_randomize_goal:
             goal_pos = np.random.uniform([0.35, -0.15, 0.46], [0.55, 0.15, 0.65])
             while np.linalg.norm(block_pose[:3] - goal_pos) <= 0.05:
                 goal_pos = np.random.uniform([0.35, -0.15, 0.46], [0.55, 0.15, 0.65])
-
-            self.set_object_pose('green_block:joint', block_pose)
             self.set_site_pos('goal_site', goal_pos)
 
         return super().reset_object()

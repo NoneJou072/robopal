@@ -7,6 +7,13 @@ import json
 import h5py
 import numpy as np
 import robopal
+from rich.progress import (
+    BarColumn,
+    Progress,
+    TextColumn,
+	MofNCompleteColumn,
+    TimeRemainingColumn,
+)
 
 ROBOPAL_PATH = os.path.dirname(inspect.getfile(robopal))
 COLLECTIONS_DIR_NAME = 'collections/collections_*'
@@ -38,27 +45,35 @@ def play_demonstrations(demo_dir=None):
     inds = np.argsort([int(elem[5:]) for elem in demos])
     demos = [demos[i] for i in inds]
 
+    progress = Progress(
+            TextColumn("[bold blue]{task.description}", justify="right"),
+            MofNCompleteColumn(),
+            BarColumn(bar_width=40),
+            "[progress.percentage]{task.percentage:>3.1f}%",
+            TimeRemainingColumn(),
+    )
+
     # playback each episode
-    for episode in demos:
-        logging.info("\n>Reading episode: {}".format(episode))
+    with progress:
+        for id in progress.track(range(len(demos)), description="Reading episode:"):
+            episode = demos[id]
 
-        for key in file["data"][episode].attrs:
-            if key != "model_file":
-                logging.info("{}: {}".format(key, file["data"][episode].attrs[key]))
+            for key in file["data"][episode].attrs:
+                if key != "model_file":
+                    logging.info("{}: {}".format(key, file["data"][episode].attrs[key]))
 
-        env.load_model_from_string(file["data"][episode].attrs["model_file"])
+            env.load_model_from_string(file["data"][episode].attrs["model_file"])
 
-        first_state = file["data"][episode]["states"][0]
+            first_state = file["data"][episode]["states"][0]
 
-        env.load_state(first_state)
-        env.forward()
-        env.update_init_pose_to_current()
+            env.load_state(first_state)
+            env.forward()
+            env.update_init_pose_to_current()
 
-        for action in file["data"][episode]["actions"]:
-            print(np.around(action, 4))
-            env.step(action)
+            for action in file["data"][episode]["actions"]:
+                env.step(action)
                 
     env.renderer.close()
 
 if __name__ == "__main__":
-    play_demonstrations("robopal/collections/collections_1719889041_5205944")
+    play_demonstrations("robopal/collections/collections_1719978428_4136665")
