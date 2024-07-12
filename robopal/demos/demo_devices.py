@@ -40,6 +40,6 @@ if __name__ == "__main__":
     for t in range(int(1e6)):
         device_outputs = device.get_outputs()
         action[:3] += device_outputs[0]
-        action[3:] = T.mat_2_quat(T.quat_2_mat(action[3:]).dot(T.euler_2_mat(device_outputs[1])))
+        action[3:] = T.mat_2_quat(T.quat_2_mat(action[3:]).dot(device_outputs[1]))
         env.step(action)
     env.close()

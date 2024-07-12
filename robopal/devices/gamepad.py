@@ -112,7 +112,7 @@ class Gamepad(BaseDevice):
 
         return (
             np.clip(pos_increment, -0.04, 0.04),
-            rot_increment
+            T.euler_2_mat(rot_increment)
         )
 
     def __del__(self):
