@@ -9,7 +9,7 @@ Submodules
 
    robopal.demos.multi_task_manipulation.demo_cabinet
    robopal.demos.multi_task_manipulation.demo_cube_drawer
-   robopal.demos.multi_task_manipulation.demo_multi_cubes
+   robopal.demos.multi_task_manipulation.demo_triple_stack
 
 Module contents
 ---------------

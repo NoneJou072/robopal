@@ -94,7 +94,7 @@ class DianaPickAndPlace(DianaGrasp):
         self.mjcf_generator.add_node_from_str('worldbody', goal_site)
 
 
-class DianaGraspMultiObjs(DianaPickAndPlace):
+class DianaTripleStack(DianaPickAndPlace):
     def add_assets(self):
         self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/cube/red_cube.xml')
         self.mjcf_generator.set_node_attrib('body', 'red_block', {'pos': '0.5 -0.1 0.46'})

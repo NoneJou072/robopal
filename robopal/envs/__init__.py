@@ -4,7 +4,7 @@ from .manipulation_tasks.robot_manipulate import ManipulateEnv
 
 # single agent environments
 from .manipulation_tasks.demo_pick_place import PickAndPlaceEnv
-from .manipulation_tasks.demo_multi_cubes import MultiCubesEnv
+from .manipulation_tasks.demo_triple_stack import TripleStackEnv
 from .manipulation_tasks.demo_drawer import DrawerEnv
 from .manipulation_tasks.demo_cabinet import LockedCabinetEnv
 from .manipulation_tasks.demo_cube_drawer import DrawerCubeEnv
@@ -16,7 +16,7 @@ from .bimanual_tasks.bimanual_reach import BimanualReach
 
 ENVS = [
     PickAndPlaceEnv,
-    MultiCubesEnv,
+    TripleStackEnv,
     DrawerEnv,
     LockedCabinetEnv,
     DrawerCubeEnv,

@@ -10,7 +10,7 @@ Submodules
    robopal.envs.manipulation_tasks.demo_cabinet
    robopal.envs.manipulation_tasks.demo_cube_drawer
    robopal.envs.manipulation_tasks.demo_drawer
-   robopal.envs.manipulation_tasks.demo_multi_cubes
+   robopal.envs.manipulation_tasks.demo_triple_stack
    robopal.envs.manipulation_tasks.demo_pick_place
    robopal.envs.manipulation_tasks.robot_manipulate
    robopal.envs.manipulation_tasks.robot_manipulate_dense
