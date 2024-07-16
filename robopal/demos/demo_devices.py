@@ -56,17 +56,15 @@ def multi_env_test(device):
 
     for t in range(int(1e6)):
         device_outputs = device.get_outputs()
-        # action[:3] += device_outputs[0]
-        # action[3:] = T.mat_2_quat(T.quat_2_mat(action[3:]).dot(device_outputs[1]))
         
         if device._agent_id == 0:
-            a1_action[:3] = device_outputs[0]
-            a1_action[3] = int(device._gripper_flag)
+            a1_action[:3] = device_outputs[0] * 2
+            a1_action[3] = int(device._gripper_flag) * 2 - 1
             a2_action[:3] = np.zeros(3)
         elif device._agent_id == 1:
             a1_action[:3] = np.zeros(3)
-            a2_action[:3] = device_outputs[0]
-            a2_action[3] = int(device._gripper_flag)
+            a2_action[:3] = device_outputs[0] * 2
+            a2_action[3] = int(device._gripper_flag) * 2 - 1
         else:
             raise ValueError("Invalid agent id.")
         

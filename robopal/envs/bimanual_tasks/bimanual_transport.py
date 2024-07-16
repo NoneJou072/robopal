@@ -30,10 +30,10 @@ class BimanualTransport(BimanualManipulate):
 
         self.max_episode_steps = 200
 
-        self.pos_max_bound = {self.agents[0]: np.array([0.65, 0.2, 0.6]),
-                              self.agents[1]: np.array([0.65, 0.2, 0.6])}
-        self.pos_min_bound = {self.agents[0]: np.array([0.3, -0.2, 0.2]),
-                              self.agents[1]: np.array([0.3, -0.2, 0.2])}
+        self.pos_max_bound = {self.agents[0]: np.array([0.7, 0.2, 0.6]),
+                              self.agents[1]: np.array([0.7, 0.2, 0.6])}
+        self.pos_min_bound = {self.agents[0]: np.array([0.3, -0.2, 0.1]),
+                              self.agents[1]: np.array([0.3, -0.2, 0.1])}
 
     def _get_obs(self, agent) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position

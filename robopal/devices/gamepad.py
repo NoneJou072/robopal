@@ -30,13 +30,13 @@ class Gamepad(BaseDevice):
         logging.info(f"Gamepad has found: {self.joystick.get_name()}")
 
     def command_introduction(self):
-        logging.info("Move <LS> to move the end effector along the x/y-axis.")
+        logging.info("\nMove <LS> to move the end effector along the x/y-axis.")
         logging.info("Press <LT/RT> to move the end effector along the z-axis.")
         logging.info("Move <RS> to rotate the end effector along the x/y-axis.")
         logging.info("Press <LT/RT + RS> to rotate the end effector along the z-axis.")
         logging.info("Press <RB> to open/close the gripper.")
         logging.info("Press <X> to switch the agent.")
-        logging.info("Press <ESC> to exit.")
+        logging.info("Press <ESC> to exit.\n")
 
     def listen(self):
         for event in pygame.event.get():
@@ -46,10 +46,9 @@ class Gamepad(BaseDevice):
 
             if event.type == pygame.JOYBUTTONDOWN:
                 button_id = event.button
-
                 if button_id == 2:
                     self._agent_id = 0 if self._agent_id else 1
-                    logging.info("Switching agent to: ", self._agent_id)
+                    logging.info(f"Switching agent to: {self._agent_id}")
                 elif button_id == 3:
                     self._reset_flag = True
                 elif button_id == 5:
@@ -61,7 +60,6 @@ class Gamepad(BaseDevice):
                 
                 for i in range(self.joystick.get_numbuttons()):
                     button = self.joystick.get_button(i)
-
 
             if event.type == pygame.JOYHATMOTION:
                 for i in range(self.joystick.get_numhats()):

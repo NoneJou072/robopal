@@ -8,8 +8,8 @@
 ====================================================== -©vk©-->
     <worldbody>
         <body name="hammer">
-            <freejoint/>
-            <geom name="hammer_visual" mesh="hammer" contype="0" conaffinity="0" rgba="1 0 0 0.0" />
+            <joint type="free" damping="0.01" frictionloss="0.00"/>
+            <geom name="hammer_visual" type="mesh" mesh="hammer" contype="0" conaffinity="0" rgba="0.73 0.5 0.39 1.0" />
             <geom name="hammer_contact0" mesh="contact0" class="object_col" rgba="0.73 0.5 0.39 1" />
             <geom name="hammer_contact1" mesh="contact1" class="object_col" rgba="1 1 1 1" />
         </body>

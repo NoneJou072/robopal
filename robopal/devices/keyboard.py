@@ -30,13 +30,13 @@ class Keyboard(BaseDevice):
         listener.start()
 
     def command_introduction(self):
-        logging.info("Press <ARROW> to move the end effector along the x/y-axis.")
+        logging.info("\nPress <ARROW> to move the end effector along the x/y-axis.")
         logging.info("Press <CTRL + ARROW> to move the end effector along the z-axis.")
         logging.info("Press <SHIFT + ARROW> to rotate the end effector along the x/y-axis.")
         logging.info("Press <CTRL + SHIFT + ARROW> to rotate the end effector along the z-axis.")
         logging.info("Press <CAPSLOCK> to open/close the gripper.")
         logging.info("Press <ALT> to switch the agent.")
-        logging.info("Press <ESC> to exit.")
+        logging.info("Press <ESC> to exit.\n")
 
     def on_press(self, key):
         try:

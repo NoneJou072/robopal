@@ -126,8 +126,8 @@ class DualPandaTransport(DualPanda):
         self.mjcf_generator.set_node_attrib('body', 'carton', {'pos': '0.8 -0.0 0.49'})
 
         # set mount pose.
-        self.mjcf_generator.set_node_attrib('body', '0_mount_base_link', {'pos': '1.2 0.0 0.3', 'quat': "0 0 0 1"})
-        self.mjcf_generator.set_node_attrib('body', '1_mount_base_link', {'pos': '-0.4 0.0 0.3', 'quat': "1 0 0 0"})
+        self.mjcf_generator.set_node_attrib('body', '0_mount_base_link', {'pos': '1.1 0.0 0.3', 'quat': "0 0 0 1"})
+        self.mjcf_generator.set_node_attrib('body', '1_mount_base_link', {'pos': '-0.3 0.0 0.3', 'quat': "1 0 0 0"})
 
     @property
     def init_qpos(self):
