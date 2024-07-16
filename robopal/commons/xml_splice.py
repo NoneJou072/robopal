@@ -280,7 +280,7 @@ class RobotGenerator(object):
 
         sub_tree = ET.parse(xml_path)
 
-        for node_type in ['worldbody', 'asset', 'actuator']:
+        for node_type in ['worldbody', 'asset', 'actuator', 'default']:
             # find the sub node
             sub_node = sub_tree.getroot().find(node_type)
             if sub_node is not None:

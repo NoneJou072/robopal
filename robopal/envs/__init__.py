@@ -13,6 +13,7 @@ from .manipulation_tasks.demo_cube_drawer import DrawerCubeEnv
 from .bimanual_tasks.bimanual_manipulate import BimanualManipulate
 from .bimanual_tasks.bimanual_pick_place import BimanualPickAndPlace
 from .bimanual_tasks.bimanual_reach import BimanualReach
+from .bimanual_tasks.bimanual_transport import BimanualTransport
 
 ENVS = [
     PickAndPlaceEnv,
@@ -22,5 +23,6 @@ ENVS = [
     DrawerCubeEnv,
     BimanualReach,
     BimanualPickAndPlace,
+    BimanualTransport,
 ]
 REGISTERED_ENVS = {env.name: env for env in ENVS}

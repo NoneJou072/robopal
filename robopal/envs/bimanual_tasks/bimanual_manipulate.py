@@ -1,6 +1,5 @@
-import mujoco
-import numpy as np
 import logging
+import numpy as np
 from typing import Dict, Union, Tuple, Any
 from robopal.envs import RobotEnv
 import robopal.commons.transform as T
@@ -21,40 +20,44 @@ class BimanualManipulate(RobotEnv):
                  is_show_camera_in_cv=False,
                  controller='CARTIK',
                  is_interpolate=False,
+                 is_shared_obs=False,
                  ):
         super().__init__(
             robot=robot,
             render_mode=render_mode,
             control_freq=control_freq,
-            is_show_camera_in_cv=is_show_camera_in_cv,
             controller=controller,
+            is_show_camera_in_cv=is_show_camera_in_cv,
             is_interpolate=is_interpolate,
         )
 
+        self.is_shared_obs = is_shared_obs  # TODO: check if this is necessary
         self.max_episode_steps = 50
 
         self._timestep = 0
         self.goal_pos = None
+        self.desired_positions = self.init_pos
 
-        self.pos_ratio = 0.1
+        self.action_scale = 0.1
         self.pos_max_bound = {self.agents[0]: np.array([0.65, 0.2, 0.4]),
                               self.agents[1]: np.array([0.65, 0.2, 0.4])}
         self.pos_min_bound = {self.agents[0]: np.array([0.3, -0.2, 0.14]),
                               self.agents[1]: np.array([0.3, -0.2, 0.14])}
 
-    def action_normalize(self, action, agent) -> Tuple[np.ndarray, Any]:
+    def compute_end_position(self, action, agent) -> np.ndarray:
+        """ Map to target action space bounds
         """
-        Map to target action space bounds
-        """
-        current_pos, _ = self.controller.forward_kinematics(self.robot.get_arm_qpos(agent), agent=agent)
-        next_pos = current_pos + self.pos_ratio * action[:3]
+        next_pos = self.desired_positions[agent] + self.action_scale * action[:3]
         next_pos = next_pos.clip(self.pos_min_bound[agent], self.pos_max_bound[agent])
+        return next_pos
+
+    def normalize_gripper_ctrl(self, action, agent):
         gripper_ctrl = (
             (action[3] + 1) 
             * (self.robot.end[agent]._ctrl_range[1] - self.robot.end[agent]._ctrl_range[0]) / 2 
             + self.robot.end[agent]._ctrl_range[0]
         )
-        return next_pos, gripper_ctrl
+        return gripper_ctrl
 
     def step(
         self, actions: Dict[str, np.ndarray]
@@ -77,13 +80,15 @@ class BimanualManipulate(RobotEnv):
         arms_actions = {agent: None for agent in self.agents}
         grippers_actions = {agent: None for agent in self.agents}
         for agent in self.agents:
-            arms_actions[agent], grippers_actions[agent] = self.action_normalize(
-                actions[agent], agent)
-            
+            arms_actions[agent] = self.compute_end_position(actions[agent], agent)
+            grippers_actions[agent] = self.normalize_gripper_ctrl(actions[agent], agent)
+
         # take one step
         for agent in self.agents:
             self.robot.end[agent].apply_action(grippers_actions[agent])
         super().step(arms_actions)
+
+        self.desired_positions = arms_actions
 
         observations = {agent: self._get_obs(agent) for agent in self.agents}
 
@@ -139,6 +144,7 @@ class BimanualManipulate(RobotEnv):
 
         self._timestep = 0
         # self.set_random_init_position()
+        self.update_init_pose_to_current()
 
         observations = {
             agent: self._get_obs(agent)
@@ -149,6 +155,12 @@ class BimanualManipulate(RobotEnv):
         infos = {agent: self._get_info(agent) for agent in self.agents}
 
         return observations, infos
+    
+    def update_init_pose_to_current(self):
+        super().update_init_pose_to_current()
+
+        # reset the desired position to the initial position
+        self.desired_position = self.init_pos
 
     def reset_object(self):
         pass

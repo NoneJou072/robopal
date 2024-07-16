@@ -11,19 +11,13 @@ from robopal.devices import BaseDevice
 
 
 class Keyboard(BaseDevice):
-    def __init__(self) -> None:
-
-        self._pos_step = 0.01
-        self._rot_step = 0.01
+    def __init__(self, pos_scale=0.01, rot_scale=0.01) -> None:
+        super().__init__(pos_scale, rot_scale)
+        
         self._is_ctrl_l_pressed = False
         self._is_shift_pressed = False
         self._end_pos_offset = np.array([0.0, 0.0, 0.0])
         self._end_rot_offset = np.eye(3)
-
-        self._reset_flag = False
-        self._exit_flag = False
-        self._gripper_flag = 0
-        self._agent_id = 0
 
     def start(self):
         
@@ -49,33 +43,33 @@ class Keyboard(BaseDevice):
             if key == keyboard.Key.up:
                 if self._is_ctrl_l_pressed: 
                     if self._is_shift_pressed: # ctrl + shift + up
-                        self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self._rot_step * np.array([0, 0, 1])))
+                        self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self.rot_scale * np.array([0, 0, 1])))
                     else:   # ctrl + up
-                        self._end_pos_offset[2] += self._pos_step
+                        self._end_pos_offset[2] += self.pos_scale
                 elif self._is_shift_pressed:  # shift + up
-                    self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self._rot_step * np.array([0, -1, 0])))
+                    self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self.rot_scale * np.array([0, -1, 0])))
                 else:   # up
-                    self._end_pos_offset[0] -= self._pos_step
+                    self._end_pos_offset[0] -= self.pos_scale
             elif key == keyboard.Key.down:
                 if self._is_ctrl_l_pressed:
                     if self._is_shift_pressed: # ctrl + shift + down
-                        self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self._rot_step * np.array([0, 0, -1])))
+                        self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self.rot_scale * np.array([0, 0, -1])))
                     else:  # ctrl + down
-                        self._end_pos_offset[2] -= self._pos_step
+                        self._end_pos_offset[2] -= self.pos_scale
                 elif self._is_shift_pressed:  # shift + down
-                    self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self._rot_step * np.array([0, 1, 0])))
+                    self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self.rot_scale * np.array([0, 1, 0])))
                 else:  # down
-                    self._end_pos_offset[0] += self._pos_step
+                    self._end_pos_offset[0] += self.pos_scale
             elif key == keyboard.Key.left:
                 if self._is_shift_pressed:  # shift + left
-                    self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self._rot_step * np.array([1, 0, 0])))
+                    self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self.rot_scale * np.array([1, 0, 0])))
                 else:  # left
-                    self._end_pos_offset[1] -= self._pos_step
+                    self._end_pos_offset[1] -= self.pos_scale
             elif key == keyboard.Key.right:
                 if self._is_shift_pressed:  # shift + right
-                    self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self._rot_step * np.array([-1, 0, 0])))
+                    self._end_rot_offset = self._end_rot_offset.dot(T.euler_2_mat(self.rot_scale * np.array([-1, 0, 0])))
                 else:  # right
-                    self._end_pos_offset[1] += self._pos_step
+                    self._end_pos_offset[1] += self.pos_scale
 
             elif key == keyboard.Key.ctrl_l:
                 self._is_ctrl_l_pressed = True

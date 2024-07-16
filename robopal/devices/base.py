@@ -1,13 +1,8 @@
 class BaseDevice(object):
-    def __init__(self) -> None:
+    def __init__(self, pos_scale=0.01, rot_scale=0.01) -> None:
 
-        self._pos_step = 0.001
-        self._rot_step = 0.001
-        self._is_ctrl_l_pressed = False
-        self._is_shift_pressed = False
-        self._end_pos_offset = None
-        self._end_rot_offset = None
-
+        self.pos_scale = pos_scale
+        self.rot_scale = rot_scale
         self._reset_flag = False
         self._exit_flag = False
         self._gripper_flag = 0

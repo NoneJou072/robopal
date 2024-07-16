@@ -105,3 +105,32 @@ class DualDianaReach(DualDianaMed):
         return {self.agents[0]: np.array([0, 0.1, 0, 2.28, 0, -1, 0]),
                 self.agents[1]: np.array([0, 0.1, 0, 2.28, 0, -1, 0])}
     
+
+class DualPandaTransport(DualPanda):
+    def __init__(self):
+        super().__init__(
+            scene='grasping',
+            mount=['cylinder', 'cylinder2'],
+            attached_body=['0_attachment', '1_attachment']
+        )
+
+    def add_assets(self):
+
+        # add hammer
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/hammer/assets.xml')
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/hammer/body.xml')
+        self.mjcf_generator.set_node_attrib('body', 'hammer', {'pos': '0.1 0.0 0.5', 'quat': "0 0 0 1"})
+
+        # add carton
+        self.mjcf_generator.add_node_from_xml(ASSET_DIR + '/objects/carton/carton.xml')
+        self.mjcf_generator.set_node_attrib('body', 'carton', {'pos': '0.8 -0.0 0.49'})
+
+        # set mount pose.
+        self.mjcf_generator.set_node_attrib('body', '0_mount_base_link', {'pos': '1.2 0.0 0.3', 'quat': "0 0 0 1"})
+        self.mjcf_generator.set_node_attrib('body', '1_mount_base_link', {'pos': '-0.4 0.0 0.3', 'quat': "1 0 0 0"})
+
+    @property
+    def init_qpos(self):
+        return {self.agents[0]: np.array([-0.61,  -0.84,  0.47, -2.54,  0.35,  1.75, 0.44]),
+                self.agents[1]: np.array([-0.61,  -0.84,  0.47, -2.54,  0.35,  1.75, 0.44])}
+    
