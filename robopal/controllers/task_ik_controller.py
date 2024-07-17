@@ -48,6 +48,7 @@ class CartesianIKController(JointImpedanceController):
 
         for agent, act in action.items():
             assert len(act) in (3, 7), "Invalid action length."
+            p_cur, r_cur = self.forward_kinematics(self.robot.get_arm_qpos(agent))
 
             if not self.is_pd:
                 p_goal = act[:3]
@@ -61,6 +62,7 @@ class CartesianIKController(JointImpedanceController):
                                                             pd_goal=self.vel_des, pd_cur=pd_cur[:3])
                 p_goal = p_incre + p_cur
                 r_goal = r_cur + r_incre
+
             ret[agent] = self.ik(p_goal, r_goal, agent)
 
         return super().step_controller(ret)
@@ -71,11 +73,9 @@ class CartesianIKController(JointImpedanceController):
         x = self.robot.get_arm_qpos(agent)
         x_prev = x.copy()
         
-        radius=.2
-        ik_target = lambda x: self._ik_res(x, pos=pos, quat=quat, reg_target=x_prev, radius=radius, reg=.01, agent=agent)
-        jac_target = lambda x, r: self._ik_jac(x, r, pos=pos, quat=quat, radius=radius, reg=.01, agent=agent)
-        x, _ = minimize.least_squares(x, ik_target, self.robot.mani_joint_bounds[agent], jacobian=jac_target, eps=1e-6, verbose=0)
-
+        ik_target = lambda x: self._ik_res(x, pos=pos, quat=quat, reg_target=x_prev, radius=.1, reg=1e-2, agent=agent)
+        jac_target = lambda x, r: self._ik_jac(x, r, pos=pos, quat=quat, radius=.1, reg=1e-2, agent=agent)
+        x, _ = minimize.least_squares(x, ik_target, self.robot.mani_joint_bounds[agent], jacobian=jac_target, verbose=0)
         return x
 
     def _ik_res(self, x, pos=None, quat=None, radius=6, reg=1e-3, reg_target=None, agent='arm0'):
@@ -90,21 +90,26 @@ class CartesianIKController(JointImpedanceController):
         Returns:
             The residual of the Inverse Kinematics task.
         """
+        res = []
+        for i in range(x.shape[1]):
+            p_cur, r_cur = self.forward_kinematics(x[:, i], agent)
 
-        # Position residual.
-        p_cur, r_cur = self.forward_kinematics(x, agent)
-        res_pos = p_cur - pos
+            # Position residual.
+            res_pos = p_cur - pos
+            
+            # Orientation residual: quaternion difference.
+            res_quat = np.empty(3)
+            mujoco.mju_subQuat(res_quat, quat, r_cur)
+            res_quat *= radius
 
-        # Orientation residual: quaternion difference.
-        res_quat = np.empty(3)
-        mujoco.mju_subQuat(res_quat, quat, r_cur)
-        res_quat *= radius
+            # Regularization residual.
+            reg_target = self.robot.init_qpos[agent] if reg_target is None else reg_target
+            res_reg = reg * (x[:, i] - reg_target)
 
-        # Regularization residual.
-        reg_target = self.robot.init_qpos[agent] if reg_target is None else reg_target
-        res_reg = reg * (x.squeeze() - reg_target)
-        
-        return np.hstack((res_pos, res_quat, res_reg))
+            res_i = np.hstack((res_pos, res_quat, res_reg))
+            res.append(np.atleast_2d(res_i).T)
+
+        return np.hstack(res)
 
     def _ik_jac(self, x, res, pos=None, quat=None, radius=.04, reg=1e-3, agent='arm0'):
         """Analytic Jacobian of inverse kinematics residual
@@ -130,14 +135,22 @@ class CartesianIKController(JointImpedanceController):
         # Get end-effector site Jacobian.
         jac_pos = np.empty((3, self.robot.robot_model.nv))
         jac_quat = np.empty((3, self.robot.robot_model.nv))
-        mujoco.mj_jacBody(self.robot.robot_model, self.robot.kine_data, jac_pos, jac_quat, self.robot.kine_data.body(self.robot.end_name[agent]).id)
+        mujoco.mj_jacBody(
+            self.robot.robot_model, self.robot.kine_data, jac_pos, jac_quat, self.robot.kine_data.body(self.robot.end_name[agent]).id
+        )
         jac_pos = jac_pos[:, self.robot.arm_joint_indexes[agent]]
         jac_quat = jac_quat[:, self.robot.arm_joint_indexes[agent]]
 
-        # Get Deffector, the 3x3 mju_subquat Jacobian
-        effector_quat = T.mat_2_quat(
-            self.robot.kine_data.body(self.robot.end_name[agent]).xmat.reshape(3, 3)
-        )
+        if self.reference == 'base':
+            base2world_mat = self.robot.get_base_xmat(agent)
+            jac_pos = base2world_mat.T @ jac_pos
+            jac_quat = base2world_mat.T @ jac_quat
+
+        # Get Deffector, the 3x3 mjd_subQuat Jacobian
+        effector_quat = self.robot.kine_data.body(self.robot.end_name[agent]).xquat
+        if self.reference == 'base':
+            effector_mat = base2world_mat.T @ T.quat_2_mat(effector_quat)
+            effector_quat = T.mat_2_quat(effector_mat)
         Deffector = np.empty((3, 3))
         mujoco.mjd_subQuat(quat, effector_quat, None, Deffector)
 
@@ -145,11 +158,6 @@ class CartesianIKController(JointImpedanceController):
         target_mat = T.quat_2_mat(quat)
         mat = radius * Deffector.T @ target_mat.T
         jac_quat = mat @ jac_quat
-
-        if self.reference == 'base':
-            base2world_mat = self.robot.get_base_xmat(agent)
-            jac_pos = base2world_mat.T @ jac_pos
-            jac_quat = base2world_mat.T @ jac_quat
 
         # Regularization Jacobian.
         jac_reg = reg * np.eye(len(self.robot.arm_joint_indexes[agent]))
