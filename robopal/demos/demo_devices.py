@@ -1,7 +1,3 @@
-""" Camera calibration environment.
-    In this case, we will show the detail process of hand-eye calibration.
-    Press 'Enter' to take a picture.
-"""
 import numpy as np
 import logging
 import robopal
@@ -11,7 +7,10 @@ import robopal.commons.transform as T
 
 
 def single_env_test(device):
-
+    """ Camera calibration environment.
+    In this case, we will show the detail process of hand-eye calibration.
+    Press 'Enter' to take a picture.
+    """
     env = RobotEnv(
         robot=DianaCalib,
         render_mode='human',
@@ -51,12 +50,19 @@ def multi_env_test(device):
     
     env.reset()
 
-    a1_action = np.zeros(4)
-    a2_action = np.zeros(4)
-
+    a1_action = np.array([0, 0, 0, 1], dtype=np.float32)
+    a2_action = np.array([0, 0, 0, 1], dtype=np.float32)
+    actions = {env.agents[0]: a1_action,
+                env.agents[1]: a2_action}
+    
+    last_agent_id = device._agent_id
     for t in range(int(1e6)):
         device_outputs = device.get_outputs()
-        
+        if device._agent_id != last_agent_id:
+            if (int(device._gripper_flag) * 2 - 1) != int(actions[env.agents[device._agent_id]][3]):
+                device._gripper_flag = not device._gripper_flag
+        last_agent_id = device._agent_id
+
         if device._agent_id == 0:
             a1_action[:3] = device_outputs[0] * 2
             a1_action[3] = int(device._gripper_flag) * 2 - 1
@@ -70,6 +76,7 @@ def multi_env_test(device):
         
         actions = {env.agents[0]: a1_action,
                     env.agents[1]: a2_action}
+
         env.step(actions)
 
         if device._reset_flag:
