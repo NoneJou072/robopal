@@ -77,9 +77,9 @@ def multi_env_test(device):
         actions = {env.agents[0]: a1_action,
                     env.agents[1]: a2_action}
 
-        env.step(actions)
+        _, _, _, _, info = env.step(actions)
 
-        if device._reset_flag:
+        if device._reset_flag or info["arm0"]["is_success"]:
             env.reset()
             a1_action = np.zeros(4)
             a2_action = np.zeros(4)

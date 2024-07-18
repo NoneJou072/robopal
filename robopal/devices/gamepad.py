@@ -28,6 +28,7 @@ class Gamepad(BaseDevice):
         self.joystick = pygame.joystick.Joystick(0)
         self.joystick.init()
         logging.info(f"Gamepad has found: {self.joystick.get_name()}")
+        logging.info(f"Number of gamepad: {pygame.joystick.get_count()}")
 
     def command_introduction(self):
         logging.info("\nMove <LS> to move the end effector along the x/y-axis.")

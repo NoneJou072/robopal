@@ -22,18 +22,18 @@ class BimanualTransport(BimanualManipulate):
             controller=controller,
         )
 
-        self.obs_dim = (25,)
+        self.obs_dim = (29,)
         self.action_dim = (4,)
 
         self.max_action = 1.0
         self.min_action = -1.0
 
-        self.max_episode_steps = 200
+        self.max_episode_steps = 500
 
         self.pos_max_bound = {self.agents[0]: np.array([0.7, 0.2, 0.6]),
                               self.agents[1]: np.array([0.7, 0.2, 0.6])}
-        self.pos_min_bound = {self.agents[0]: np.array([0.3, -0.2, 0.1]),
-                              self.agents[1]: np.array([0.3, -0.2, 0.1])}
+        self.pos_min_bound = {self.agents[0]: np.array([0.2, -0.2, 0.1]),
+                              self.agents[1]: np.array([0.2, -0.2, 0.1])}
 
     def _get_obs(self, agent) -> dict:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
@@ -62,9 +62,10 @@ class BimanualTransport(BimanualManipulate):
         ], axis=0)
 
         # environment observations
-        obs[16:25] = np.concatenate([
+        obs[16:29] = np.concatenate([
             # hammer position
             hammer_pos := self.get_body_pos('hammer'),
+            hammer_quat := self.get_body_quat('hammer'),
             # relative position between the hammer and the gripper
             a1_end_pos - hammer_pos,
             a2_end_pos - hammer_pos,
@@ -73,29 +74,24 @@ class BimanualTransport(BimanualManipulate):
         return obs.copy()
     
     def compute_rewards(self, agent: str):
-        # dist = self.goal_distance(
-        #     self.get_site_pos(f'{agent[-1]}_grip_site'), 
-        #     self.get_site_pos(f'goal_site{agent[-1]}')
-        # )
-        # dist_reward = 1.0 / (1.0 + dist**2)
-        # dist_reward *= dist_reward
-        # reward = np.where(dist <= 0.02, dist_reward * 2, dist_reward)
-        # return reward
-        return 0
+        dist = self.goal_distance(
+            self.get_body_pos('hammer'), 
+            self.get_body_pos('carton')
+        )
+        dist_reward = 1.0 / (1.0 + dist**2)
+        dist_reward *= dist_reward
+        reward = np.where(dist <= 0.02, dist_reward * 2, dist_reward)
+        return reward
 
     def _get_info(self, agent) -> dict:
-        return {}
-        # return {'is_success': self._is_success(self.get_body_pos('green_block'), self.get_site_pos('goal_site'), th=0.02)}
+        return {
+            'is_success': self._is_success(self.get_body_pos('hammer'), self.get_body_pos('carton'), th=0.04)
+        }
 
     def reset_object(self):
         # express the position of the block in the world frame
         # goal_pos_0 = np.random.uniform([0.55, -0.15, 0.46], [0.75, 0.15, 0.66])
         # self.set_site_pos('goal_site0', goal_pos_0)
-
-        # goal_pos_1 = np.random.uniform([0.15, -0.15, 0.46], [0.35, 0.15, 0.66])
-        # while np.linalg.norm(goal_pos_0 - goal_pos_1) <= 0.05:
-        #     goal_pos_1 = np.random.uniform([0.15, -0.15, 0.46], [0.35, 0.15, 0.66])
-        # self.set_site_pos('goal_site1', goal_pos_1)
         pass
 
 

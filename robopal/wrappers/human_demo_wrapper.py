@@ -91,12 +91,6 @@ class HumanDemonstrationWrapper(object):
         # store env config as an attribute
         self.root_group.attrs["env_args"] = json.dumps(env_args)
 
-        # choose one agent
-        self.agent = "arm0"
-
-        # memorize the init pose
-        self.env.robot.end[self.agent].open()
-
         # remember whether any environment interaction has occurred
         self.has_interaction = False
 
@@ -109,7 +103,7 @@ class HumanDemonstrationWrapper(object):
         self.env.renderer.enable_viewer_keyboard = False
     
     def get_action(self):
-        """ compute next actions based on the keyboard input
+        """ compute next actions from the device outputs
         """
         action = np.zeros(4)
 
@@ -123,26 +117,29 @@ class HumanDemonstrationWrapper(object):
 
         return action.copy()
     
-    def step(self, action: Union[np.ndarray, Dict[str, np.ndarray]]):
-        """ Input actions should be normalized, since the action 
-        will un-normalize before applying to the environment.
-        """
-
-        next_obs, reward, termination, truncation, info = self.env.step(action)
-
-        self.env.save_state()
-        state = self.env.get_state()
-
-        if not self.has_interaction and action[:3].any() != 0:
-            self.has_interaction = True
-            logging.info("HumanDemonstrationWrapper: interaction has started")
-
+    def _preprocess_action_before_saved(self, action: np.ndarray):
         if self.saved_action_type == "velocity":
             pass
         elif self.saved_action_type == "position":
             action[:3] = self.env.desired_position
         else:
             raise ValueError(f"Invalid action type: {self.saved_action_type}")
+        return action
+
+    def step(self, action: Union[np.ndarray, Dict[str, np.ndarray]]):
+        """ Input actions should be normalized, since the action 
+        will un-normalize before applying to the environment.
+        """
+        if not self.has_interaction and action[:3].any() != 0:
+            self.has_interaction = True
+            logging.info("HumanDemonstrationWrapper: interaction has started")
+
+        next_obs, reward, termination, truncation, info = self.env.step(action)
+
+        self.env.save_state()
+        state = self.env.get_state()
+
+        action = self._preprocess_action_before_saved(action)
 
         if self.has_interaction and self.env.cur_timestep % self.collect_freq == 0:
             collect_flag = True
