@@ -1,5 +1,5 @@
-from stable_baselines3 import HerReplayBuffer
-from sb3_contrib import TQC
+from stable_baselines3 import HerReplayBuffer, SAC
+# from sb3_contrib import TQC
 from stable_baselines3.common.callbacks import BaseCallback
 from robopal.envs.manipulation_tasks.demo_pick_place import PickAndPlaceEnv
 from robopal.wrappers import GoalEnvWrapper
@@ -16,7 +16,7 @@ class TensorboardCallback(BaseCallback):
 
     def _on_step(self) -> bool:
         if self.n_calls % 51200 == 0:
-            self.model.save(self.log_dir + f"/model_saved/TQC/diana_pick_place_v2_{self.n_calls}")
+            self.model.save(self.log_dir + f"/model_saved/SAC/diana_pick_place_v2_{self.n_calls}")
         return True
 
 
@@ -26,7 +26,7 @@ env = PickAndPlaceEnv(render_mode=None)
 env = GoalEnvWrapper(env)
 
 # Initialize the model
-model = TQC(
+model = SAC(
     'MultiInputPolicy',
     env,
     replay_buffer_class=HerReplayBuffer,

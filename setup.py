@@ -23,6 +23,7 @@ setup(
         'rich',
         'pynput',
         'pygame',
+        'h5py'
     ],
     extras_require={
         'planning': ['ruckig~=0.9.2'],
