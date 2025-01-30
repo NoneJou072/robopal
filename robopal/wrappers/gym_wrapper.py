@@ -72,4 +72,4 @@ class GoalEnvWrapper(GymWrapper):
         return obs, info
 
     def compute_reward(self, achieved_goal, desired_goal, info: dict = None, **kwargs):
-        return self.env.compute_rewards(achieved_goal, desired_goal, info, **kwargs)
+        return np.vstack([self.env.compute_rewards(achieved_goal, desired_goal, info, **kwargs)] * achieved_goal.shape[0])
