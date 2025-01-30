@@ -1,6 +1,6 @@
 import abc
 import logging
-from typing import Union, List, Dict
+from typing import Union, List, Dict, Iterable
 import copy
 
 import mujoco
@@ -40,10 +40,10 @@ class BaseRobot(metaclass=RobotMetaClass):
 
     def __init__(self,
                  scene: str = 'default',
-                 mount: Union[str, List[str]] = None,
-                 manipulator: Union[str, List[str]] = None,
-                 gripper: Union[str, List[str]] = None,
-                 attached_body: Union[str, List[str]] = None,
+                 mount: Union[str, Iterable[str]] = None,
+                 manipulator: Union[str, Iterable[str]] = None,
+                 gripper: Union[str, Iterable[str]] = None,
+                 attached_body: Union[str, Iterable[str]] = None,
                  specified_xml_path: str = None
                  ):
 

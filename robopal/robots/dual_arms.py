@@ -9,10 +9,10 @@ class DualDianaMed(BaseRobot):
     """ Dual DianaMed robots base class. """
     def __init__(self,
                  scene='default',
-                 manipulator=['DianaMed', 'DianaMed'],
-                 gripper=['RethinkGripper', 'RethinkGripper'],
-                 mount=['floor_left', 'floor_right'],
-                 attached_body=['0_attachment', '1_attachment']
+                 manipulator=('DianaMed', 'DianaMed'),
+                 gripper=('RethinkGripper', 'RethinkGripper'),
+                 mount=('floor_left', 'floor_right'),
+                 attached_body=('0_attachment', '1_attachment')
                  ):
         super().__init__(
             scene=scene,
@@ -39,10 +39,10 @@ class DualPanda(BaseRobot):
     """ Dual Panda robots base class. """
     def __init__(self,
                  scene='grasping',
-                 manipulator=['Panda', 'Panda'],
-                 gripper=['PandaHand', 'PandaHand'],
+                 manipulator=('Panda', 'Panda'),
+                 gripper=('PandaHand', 'PandaHand'),
                  mount='bimanual_mount',
-                 attached_body=['0_attachment', '1_attachment']
+                 attached_body=('0_attachment', '1_attachment')
                  ):
         super().__init__(
             scene=scene,
