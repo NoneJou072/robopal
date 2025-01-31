@@ -106,11 +106,15 @@ class RobotGenerator(object):
 
             if gripper is not None:
                 assert kwargs['attached_body'] is not None, "Please specify the attached_body for the gripper."
-                attached_body = kwargs['attached_body'] if isinstance(kwargs['attached_body'], Iterable) else [kwargs['attached_body']]
+                attached_body = kwargs['attached_body']
+                if isinstance(kwargs['attached_body'], str):
+                    attached_body = [attached_body]
+                logging.info(f"attached_body: {attached_body}, type: {type(attached_body)}")
                 if isinstance(gripper, Iterable):
                     for goal_body, g in zip(enumerate(attached_body), gripper):
                         gripper_path = path.join(GRIPPERS_DIR_PATH, g, '{}.xml'.format(g))
                         self.add_all_component_from_xml(gripper_path, goal_body=goal_body)
+                        logging.info(f"Add gripper {g} to the {goal_body}.")
 
     def _init_scene(self, scene):
         """
