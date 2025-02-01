@@ -44,7 +44,8 @@ class BaseRobot(metaclass=RobotMetaClass):
                  manipulator: Union[str, Iterable[str]] = None,
                  gripper: Union[str, Iterable[str]] = None,
                  attached_body: Union[str, Iterable[str]] = None,
-                 specified_xml_path: str = None
+                 specified_xml_path: str = None,
+                 agent_num: int = 0
                  ):
 
         self.specified_xml_path = specified_xml_path
@@ -57,17 +58,17 @@ class BaseRobot(metaclass=RobotMetaClass):
                 attached_body=attached_body,
                 xml_path=specified_xml_path,
         )
-        
+
+        self.agent_num = agent_num  # by default, user should specify the agent number if not using the xml file.
+
         if specified_xml_path is None:
             manipulator = [manipulator] if isinstance(manipulator, str) else manipulator
-            self.gripper_names = [gripper] if isinstance(gripper, str) else gripper
 
             self.add_assets()
 
             self.agent_num = len(manipulator)
             xml_path = self.mjcf_generator.save_xml()
         else:
-            self.agent_num = 0  # by default, user should specify the agent number.
             assert self.agent_num > 0, 'Please specify the agent number by setting `self.agent_num`.'
             xml_path = self.mjcf_generator.get_xml_path()
 
@@ -80,7 +81,8 @@ class BaseRobot(metaclass=RobotMetaClass):
         logging.info(f'Activated agents: {self.agents}')
         
         self.build_from_xml(xml_path)
-        self.create_end_effector()
+
+        self.create_end_effector(gripper)
 
         # manipulator infos
         self._arm_joint_names = dict()
@@ -98,21 +100,19 @@ class BaseRobot(metaclass=RobotMetaClass):
         self.init_quat = dict()
         self.init_pos = dict()
 
-    def create_end_effector(self):
-        if self.specified_xml_path is None:
-            if self.gripper_names is None:
-                self.end = None
-            else:
-                self.end: Dict[str, BaseEnd] = {}
-                for agent, gripper in zip(self.agents, self.gripper_names):
-                    try:
-                        self.end[agent] = robopal.robots.REGISTERED_ENDS[gripper](self.robot_data, agent)
-                    except KeyError:
-                        logging.error(f"End {gripper} is not registered. Available robots are {robopal.robots.REGISTERED_ENDS.keys()}.")
-                        raise KeyError
+    def create_end_effector(self, gripper):
+        gripper_names = [gripper] if isinstance(gripper, str) else gripper
+
+        if gripper_names is None:
+            self.end = None
         else:
-            self.end = None  # by default, user should specify the end effector.
-            assert self.end is not None, 'Please specify the end effector by manual setting `self.end`.'
+            self.end: Dict[str, BaseEnd] = {}
+            for agent, gripper in zip(self.agents, gripper_names):
+                try:
+                    self.end[agent] = robopal.robots.REGISTERED_ENDS[gripper](self.robot_data, self.robot_model, agent)
+                except KeyError:
+                    logging.error(f"End {gripper} is not registered. Available robots are {robopal.robots.REGISTERED_ENDS.keys()}.")
+                    raise KeyError
 
     def build_from_xml(self, xml_path):
         self.robot_model = mujoco.MjModel.from_xml_path(filename=xml_path, assets=None)

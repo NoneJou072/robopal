@@ -134,7 +134,8 @@ class MujocoEnv:
     def reset_object(self):
         """ Set pose of the object. """
         # override mjcf with reseted model
-        mujoco.mj_saveLastXML(self.robot.mjcf_generator.get_xml_path(), self.mj_model)
+        # mujoco.mj_saveLastXML(self.robot.mjcf_generator.get_xml_path(), self.mj_model)
+        pass
 
     def render(self, mode=None) -> Union[None, np.ndarray]:
         """ render one frame in mujoco """

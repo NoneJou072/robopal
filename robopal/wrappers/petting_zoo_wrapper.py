@@ -10,7 +10,7 @@ try:
 except ImportError:
     logging.warning("PettingZoo not installed. PettingStyleWrapper will not be available.")
 
-from robopal.envs import RobotEnv
+from robopal.envs import MujocoEnv
 
 
 class PettingStyleWrapper(ParallelEnv):
@@ -28,7 +28,7 @@ class PettingStyleWrapper(ParallelEnv):
         ],
     }
 
-    def __init__(self, env: RobotEnv):
+    def __init__(self, env: MujocoEnv):
         """ The init method takes in environment arguments.
         """
 

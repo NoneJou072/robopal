@@ -32,8 +32,8 @@ class JointImpedanceController(BaseController):
 
     def set_jnt_params(self, b: np.ndarray, k: np.ndarray):
         """ Used for changing the parameters. """
-        self.B = b
-        self.K = k
+        self.B = np.array(b)
+        self.K = np.array(k)
 
     def compute_jnt_torque(
             self,

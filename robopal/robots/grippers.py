@@ -23,13 +23,14 @@ class BaseEnd(object, metaclass=EndMetaClass):
 
     # dt will pass in after the environment is instantiated
     dt: int = None
-    
-    def __init__(self, robot_data, agent) -> None:
+
+    _ctrl_range = [-1, 1]
+
+    def __init__(self, robot_data, robot_model, agent) -> None:
 
         self.robot_data = robot_data
+        self.robot_model = robot_model
         self.agent_id = agent[-1]
-
-        self._ctrl_range = [-1, 1]
 
     def apply_action(self, action: np.ndarray) -> None:
         pass
@@ -45,10 +46,8 @@ class BaseEnd(object, metaclass=EndMetaClass):
 
 
 class RethinkGripper(BaseEnd):
-    def __init__(self, robot_data, agent) -> None:
-        super().__init__(robot_data, agent)
 
-        self._ctrl_range = [-0.01, 0.02]
+    _ctrl_range = [-0.01, 0.02]
 
     def apply_action(self, action):
         self.robot_data.actuator(f'{self.agent_id}_gripper_l_finger_joint').ctrl[0] = action
@@ -62,10 +61,8 @@ class RethinkGripper(BaseEnd):
 
 
 class RobotiqGripper(BaseEnd):
-    def __init__(self, robot_data, agent) -> None:
-        super().__init__(robot_data, agent)
 
-        self._ctrl_range = [0, 0.83]
+    _ctrl_range = [0, 0.83]
 
     def apply_action(self, action):
         self.robot_data.actuator(f'{self.agent_id}_robotiq_2f_85').ctrl[0] = action
@@ -78,10 +75,8 @@ class RobotiqGripper(BaseEnd):
 
 
 class PandaHand(BaseEnd):
-    def __init__(self, robot_data, agent) -> None:
-        super().__init__(robot_data, agent)
 
-        self._ctrl_range = [0, 255]
+    _ctrl_range = [0, 255]
 
     def apply_action(self, action):
         self.robot_data.actuator(f'{self.agent_id}_actuator8').ctrl[0] = action
