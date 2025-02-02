@@ -158,7 +158,7 @@ class HumanDemonstrationWrapper(object):
                 # render actions
                 if self.is_render_actions:
                     # change to local frame
-                    offset = self.env.robot.kine_data.body(self.env.robot.base_link_name["arm0"]).xpos
+                    offset = self.env.robot.kine_data.body(self.env.robot.base_link_name["agent0"]).xpos
                     render_pos = action[:3] + offset
                     self.env.renderer.add_visual_point(render_pos)
 

@@ -62,7 +62,7 @@ class PickAndPlaceEnv(ManipulateEnv):
             end_pos := self.get_site_pos('0_grip_site'),
             # gripper linear velocity
             self.get_site_xvelp('0_grip_site') * self.dt,
-            self.robot.end['arm0'].get_finger_observations()
+            self.robot.end['agent0'].get_finger_observations()
         ])
         obs[15:18] = (  # block position in global coordinates
             object_pos := self.get_body_pos('green_block')
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     env = PickAndPlaceEnv(
         is_render_camera_offscreen=True,
         is_randomize_end=False,
-        is_randomize_object=False,
+        is_randomize_object=True,
     )
     env = GoalEnvWrapper(env)
     env.reset()

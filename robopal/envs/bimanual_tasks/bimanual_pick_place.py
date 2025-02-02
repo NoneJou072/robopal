@@ -5,6 +5,7 @@ from robopal.envs import BimanualManipulate
 import robopal.commons.transform as trans
 from robopal.wrappers import PettingStyleWrapper
 
+
 class BimanualPickAndPlace(BimanualManipulate):
     name = 'BimanualPickAndPlace-v0'
     
@@ -36,7 +37,7 @@ class BimanualPickAndPlace(BimanualManipulate):
         self.pos_min_bound = {self.agents[0]: np.array([0.3, -0.2, 0.2]),
                               self.agents[1]: np.array([0.3, -0.2, 0.2])}
 
-    def _get_obs(self, agent) -> dict:
+    def _get_obs(self, agent: str = None) -> np.ndarray:
         """ The observation space is 16-dimensional, with the first 3 dimensions corresponding to the position
         of the block, the next 3 dimensions corresponding to the position of the goal, the next 3 dimensions
         corresponding to the position of the gripper, the next 3 dimensions corresponding to the vector
@@ -65,7 +66,7 @@ class BimanualPickAndPlace(BimanualManipulate):
 
         return obs.copy()
 
-    def _get_info(self, agent) -> dict:
+    def _get_info(self, agent: str = None) -> dict:
         return {
             'is_success': self._is_success(self.get_body_pos('green_block'), self.get_site_pos('goal_site'), th=0.02)
         }

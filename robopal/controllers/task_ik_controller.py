@@ -67,7 +67,7 @@ class CartesianIKController(JointImpedanceController):
 
         return super().step_controller(ret)
 
-    def ik(self, pos, quat, agent='arm0', q_init=None):
+    def ik(self, pos, quat, agent='agent0', q_init=None):
         del q_init
 
         x = self.robot.get_arm_qpos(agent)
@@ -78,7 +78,7 @@ class CartesianIKController(JointImpedanceController):
         x, _ = minimize.least_squares(x, ik_target, self.robot.mani_joint_bounds[agent], jacobian=jac_target, verbose=0)
         return x
 
-    def _ik_res(self, x, pos=None, quat=None, radius=6, reg=1e-3, reg_target=None, agent='arm0'):
+    def _ik_res(self, x, pos=None, quat=None, radius=6, reg=1e-3, reg_target=None, agent='agent0'):
         """Residual for inverse kinematics.
 
         Args:
@@ -111,7 +111,7 @@ class CartesianIKController(JointImpedanceController):
 
         return np.hstack(res)
 
-    def _ik_jac(self, x, res, pos=None, quat=None, radius=.04, reg=1e-3, agent='arm0'):
+    def _ik_jac(self, x, res, pos=None, quat=None, radius=.04, reg=1e-3, agent='agent0'):
         """Analytic Jacobian of inverse kinematics residual
 
         Args:

@@ -9,10 +9,17 @@ logging.basicConfig(level=logging.INFO)
 
 class BimanualManipulate(RobotEnv):
     """
-    The control frequency of the robot is of f = 20 Hz. This is achieved by applying the same action
+    The control frequency of the robot is of f=20 Hz. This is achieved by applying the same action
     in 50 subsequent simulator step (with a time step of dt = 0.001 s) before returning the control to the robot.
+    :parameter robot: The robot model to be used in the environment.
+    :parameter render_mode: The mode in which the environment is rendered. Possible values are 'human' and 'rgb_array'.
+    :parameter control_freq: The control frequency of the robot.
+    :parameter is_show_camera_in_cv: Whether to show the camera feed in a window.
+    :parameter controller: The controller to be used in the environment. Possible values are 'CARTIK' and 'JNTIMP'.
+    :parameter is_interpolate: Whether to interpolate the actions.
+    :parameter is_shared_obs: Whether to share the observations between the agents.
+    :parameter gripper_ctrl_mode: The mode in which the gripper is controlled. Possible values are 'abs' and 'rel'.
     """
-
     def __init__(self,
                  robot=None,
                  render_mode='human',
@@ -21,6 +28,7 @@ class BimanualManipulate(RobotEnv):
                  controller='CARTIK',
                  is_interpolate=False,
                  is_shared_obs=False,
+                 gripper_ctrl_mode='abs',
                  ):
         super().__init__(
             robot=robot,
@@ -37,23 +45,36 @@ class BimanualManipulate(RobotEnv):
         self._timestep = 0
         self.goal_pos = None
         self.desired_positions = self.init_pos
+        self.desired_gripper_actions = {agent: 0 for agent in self.agents}
 
         self.action_scale = 0.1
+        self.gripper_action_scale = 0.1
+
         self.pos_max_bound = {self.agents[0]: np.array([0.65, 0.2, 0.4]),
                               self.agents[1]: np.array([0.65, 0.2, 0.4])}
         self.pos_min_bound = {self.agents[0]: np.array([0.3, -0.2, 0.14]),
                               self.agents[1]: np.array([0.3, -0.2, 0.14])}
 
-    def compute_end_position(self, action, agent) -> np.ndarray:
+        self.gripper_ctrl_mode = gripper_ctrl_mode
+
+    def compute_manipulator_action(self, action, agent) -> np.ndarray:
         """ Map to target action space bounds
         """
-        next_pos = self.desired_positions[agent] + self.action_scale * action[:3]
-        next_pos = next_pos.clip(self.pos_min_bound[agent], self.pos_max_bound[agent])
-        return next_pos
+        self.desired_positions[agent] = self.desired_positions[agent] + self.action_scale * action[3]
+        self.desired_positions[agent] = self.desired_positions[agent].clip(self.pos_min_bound[agent], self.pos_max_bound[agent])
+        return self.desired_positions[agent]
+
+    def compute_gripper_action(self, action, agent) -> np.ndarray:
+        """ Map to target action space bounds
+        """
+        self.desired_gripper_actions[agent] = self.desired_gripper_actions[agent] + self.gripper_action_scale * action[3]
+        self.desired_gripper_actions[agent] = self.desired_gripper_actions[agent].clip(-1, 1)
+        ret = self.normalize_gripper_ctrl(self.desired_gripper_actions[agent], agent)
+        return ret
 
     def normalize_gripper_ctrl(self, action, agent):
         gripper_ctrl = (
-            (action[3] + 1) 
+            (action + 1)
             * (self.robot.end[agent]._ctrl_range[1] - self.robot.end[agent]._ctrl_range[0]) / 2 
             + self.robot.end[agent]._ctrl_range[0]
         )
@@ -77,18 +98,16 @@ class BimanualManipulate(RobotEnv):
         """
         self._timestep += 1
 
-        arms_actions = {agent: None for agent in self.agents}
-        grippers_actions = {agent: None for agent in self.agents}
+        manipulator_actions = {agent: None for agent in self.agents}
+        gripper_actions = {agent: None for agent in self.agents}
         for agent in self.agents:
-            arms_actions[agent] = self.compute_end_position(actions[agent], agent)
-            grippers_actions[agent] = self.normalize_gripper_ctrl(actions[agent], agent)
+            manipulator_actions[agent] = self.compute_manipulator_action(actions[agent], agent)
+            gripper_actions[agent] = self.compute_gripper_action(actions[agent], agent)
 
         # take one step
         for agent in self.agents:
-            self.robot.end[agent].apply_action(grippers_actions[agent])
-        super().step(arms_actions)
-
-        self.desired_positions = arms_actions
+            self.robot.end[agent].apply_action(gripper_actions[agent])
+        super().step(manipulator_actions)
 
         observations = {agent: self._get_obs(agent) for agent in self.agents}
 

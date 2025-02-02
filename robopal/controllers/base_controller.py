@@ -27,9 +27,9 @@ class BaseController(object):
         """ reset controller. """
         pass
 
-    def forward_kinematics(self, q, agent='arm0'):
+    def forward_kinematics(self, q, agent='agent0'):
 
-        def set_joint_qpos(qpos: np.ndarray, agent: str = 'arm0'):
+        def set_joint_qpos(qpos: np.ndarray, agent: str = 'agent0'):
             """ Set joint position. """
             assert qpos.shape[0] == self.robot.jnt_num
             for j, per_arm_joint_names in enumerate(self.robot.arm_joint_names[agent]):

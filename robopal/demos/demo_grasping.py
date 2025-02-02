@@ -18,12 +18,12 @@ if __name__ == "__main__":
         env.reset()
         env.controller.reference = 'world'
 
-        env.robot.end['arm0'].open()
+        env.robot.end['agent0'].open()
         action = env.get_body_pos('green_block')
         for t in range(int(200)):
             env.step(action)
         for t in range(int(250)):
-            env.robot.end['arm0'].close()
+            env.robot.end['agent0'].close()
             env.step(action)
         action += np.array([0.0, 0.0, 0.29])
         for t in range(int(200)):

@@ -125,6 +125,9 @@ class MujocoEnv:
         mujoco.mj_resetData(self.mj_model, self.mj_data)
         self.reset_object()
         self._set_init_qpos()
+        if self.robot.end is not None:
+            for agent in self.agents:
+                self.robot.end[agent].reset()
         self.forward()
 
         if isinstance(options, dict):
@@ -169,13 +172,13 @@ class MujocoEnv:
             self.set_joint_qpos(self.robot.init_qpos[agent], agent)
         self.forward()
 
-    def set_joint_qpos(self, qpos: np.ndarray, agent: str = 'arm0'):
+    def set_joint_qpos(self, qpos: np.ndarray, agent: str = 'agent0'):
         """ Set joint position. """
         assert qpos.shape[0] == self.robot.jnt_num
         for j, per_arm_joint_names in enumerate(self.robot.arm_joint_names[agent]):
             self.mj_data.joint(per_arm_joint_names).qpos = qpos[j]
 
-    def set_actuator_ctrl(self, torque: np.ndarray, agent: str = 'arm0'):
+    def set_actuator_ctrl(self, torque: np.ndarray, agent: str = 'agent0'):
         """ Set joint torque. """
         assert torque.shape[0] == self.robot.jnt_num
         for j, per_arm_actuator_names in enumerate(self.robot.arm_actuator_names[agent]):

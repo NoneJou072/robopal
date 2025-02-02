@@ -63,7 +63,7 @@ class TripleStackEnv(ManipulateEnv):
         obs[0:8] = np.concatenate((
             self.get_site_pos('0_grip_site'),  # gripper position in global coordinates
             self.get_site_xvelp('0_grip_site') * self.dt,  # gripper linear velocity
-            self.robot.end['arm0'].get_finger_observations()
+            self.robot.end['agent0'].get_finger_observations()
         ))
 
         # red block state

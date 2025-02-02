@@ -44,6 +44,9 @@ class BaseEnd(object, metaclass=EndMetaClass):
     def get_finger_observations(self):
         pass
 
+    def reset(self):
+        pass
+
 
 class RethinkGripper(BaseEnd):
 

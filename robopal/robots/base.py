@@ -77,7 +77,7 @@ class BaseRobot(metaclass=RobotMetaClass):
         # deepcopy for computing kinematics.
         self.kine_data: mujoco.MjData = None
 
-        self.agents = [f'arm{i}' for i in range(self.agent_num)]
+        self.agents = [f'agent{i}' for i in range(self.agent_num)]
         logging.info(f'Activated agents: {self.agents}')
         
         self.build_from_xml(xml_path)
@@ -185,7 +185,7 @@ class BaseRobot(metaclass=RobotMetaClass):
         """ Robot name. """
         return self.__class__.__name__
 
-    def get_arm_qpos(self, agent: str = 'arm0') -> np.ndarray:
+    def get_arm_qpos(self, agent: str = 'agent0') -> np.ndarray:
         """ Get arm joint position of the specified agent.
 
         :param agent: agent name
@@ -193,7 +193,7 @@ class BaseRobot(metaclass=RobotMetaClass):
         """
         return np.array([self.robot_data.joint(j).qpos[0] for j in self.arm_joint_names[agent]])
 
-    def get_arm_qvel(self, agent: str = 'arm0') -> np.ndarray:
+    def get_arm_qvel(self, agent: str = 'agent0') -> np.ndarray:
         """ Get arm joint velocity of the specified agent.
 
         :param agent: agent name
@@ -201,7 +201,7 @@ class BaseRobot(metaclass=RobotMetaClass):
         """
         return np.array([self.robot_data.joint(j).qvel[0] for j in self.arm_joint_names[agent]])
 
-    def get_arm_qacc(self, agent: str = 'arm0') -> np.ndarray:
+    def get_arm_qacc(self, agent: str = 'agent0') -> np.ndarray:
         """ Get arm joint accelerate of the specified agent.
 
         :param agent: agent name
@@ -209,7 +209,7 @@ class BaseRobot(metaclass=RobotMetaClass):
         """
         return np.array([self.robot_data.joint(j).qacc[0] for j in self.arm_joint_names[agent]])
     
-    def get_arm_tau(self, agent: str = 'arm0') -> np.ndarray:
+    def get_arm_tau(self, agent: str = 'agent0') -> np.ndarray:
         """ Get arm joint torque of the specified agent.
 
         :param agent: agent name
@@ -217,7 +217,7 @@ class BaseRobot(metaclass=RobotMetaClass):
         """
         return np.array([self.robot_data.actuator(a).ctrl[0] for a in self.arm_actuator_names[agent]])
 
-    def get_mass_matrix(self, agent: str = 'arm0') -> np.ndarray:
+    def get_mass_matrix(self, agent: str = 'agent0') -> np.ndarray:
         """ Get Mass Matrix
         ref https://github.com/ARISE-Initiative/robosuite/blob/master/robosuite/controllers/base_controller.py#L61
 
@@ -230,19 +230,19 @@ class BaseRobot(metaclass=RobotMetaClass):
         mass_matrix = np.reshape(mass_matrix, (len(self.robot_data.qvel), len(self.robot_data.qvel)))
         return mass_matrix[self.arm_joint_indexes[agent], :][:, self.arm_joint_indexes[agent]]
 
-    def get_coriolis_gravity_compensation(self, agent: str = 'arm0') -> np.ndarray:
+    def get_coriolis_gravity_compensation(self, agent: str = 'agent0') -> np.ndarray:
         return self.robot_data.qfrc_bias[self.arm_joint_indexes[agent]]
     
-    def get_end_xpos(self, agent: str = 'arm0') -> np.ndarray:
+    def get_end_xpos(self, agent: str = 'agent0') -> np.ndarray:
         return self.robot_data.body(self.end_name[agent]).xpos.copy()
 
-    def get_end_xquat(self, agent: str = 'arm0') -> np.ndarray:
+    def get_end_xquat(self, agent: str = 'agent0') -> np.ndarray:
         return self.robot_data.body(self.end_name[agent]).xquat.copy()
 
-    def get_end_xmat(self, agent: str = 'arm0') -> np.ndarray:
+    def get_end_xmat(self, agent: str = 'agent0') -> np.ndarray:
         return self.robot_data.body(self.end_name[agent]).xmat.copy().reshape(3, 3)
     
-    def get_end_xvel(self, agent: str = 'arm0') -> np.ndarray:
+    def get_end_xvel(self, agent: str = 'agent0') -> np.ndarray:
         """ Computing the end effector velocity
 
         :param agent: agent name
@@ -250,16 +250,16 @@ class BaseRobot(metaclass=RobotMetaClass):
         """
         return np.dot(self.get_full_jac(agent), self.get_arm_qvel(agent))
 
-    def get_base_xpos(self, agent: str = 'arm0') -> np.ndarray:
+    def get_base_xpos(self, agent: str = 'agent0') -> np.ndarray:
         return self.robot_data.body(self.base_link_name[agent]).xpos.copy()
 
-    def get_base_xquat(self, agent: str = 'arm0') -> np.ndarray:
+    def get_base_xquat(self, agent: str = 'agent0') -> np.ndarray:
         return self.robot_data.body(self.base_link_name[agent]).xquat.copy()
 
-    def get_base_xmat(self, agent: str = 'arm0') -> np.ndarray:
+    def get_base_xmat(self, agent: str = 'agent0') -> np.ndarray:
         return self.robot_data.body(self.base_link_name[agent]).xmat.copy().reshape(3, 3)
     
-    def get_full_jac(self, agent: str = 'arm0') -> np.ndarray:
+    def get_full_jac(self, agent: str = 'agent0') -> np.ndarray:
         """ Computes the full model Jacobian, expressed in the coordinate world frame.
 
         :param agent: agent name
@@ -274,7 +274,7 @@ class BaseRobot(metaclass=RobotMetaClass):
             jacr[:, self.arm_joint_indexes[agent]]
         ], axis=0).copy()
     
-    def get_full_jac_pinv(self, agent: str = 'arm0') -> np.ndarray:
+    def get_full_jac_pinv(self, agent: str = 'agent0') -> np.ndarray:
         """ Computes the full model Jacobian_pinv expressed in the coordinate world frame.
 
         :param agent: agent name
@@ -282,7 +282,7 @@ class BaseRobot(metaclass=RobotMetaClass):
         """
         return np.linalg.pinv(self.get_full_jac(agent)).copy()
     
-    def get_jac_dot(self, agent: str = 'arm0') -> np.ndarray:
+    def get_jac_dot(self, agent: str = 'agent0') -> np.ndarray:
         """ Computing the Jacobian_dot in the joint frame.
         https://github.com/google-deepmind/mujoco/issues/411#issuecomment-1211001685
 
