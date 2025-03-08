@@ -122,6 +122,12 @@ class RobotEnv(MujocoEnv):
         else:
             return env_args
 
+    def get_end_abs_pos(self, agent):
+        return self.controller.forward_kinematics(self.robot.get_arm_qpos(agent), agent=agent)[0]
+
+    def get_end_abs_quat(self, agent):
+        return self.controller.forward_kinematics(self.robot.get_arm_qpos(agent), agent=agent)[1]
+
     @property
     def dt(self):
         """ Time of each upper step in the environment.

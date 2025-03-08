@@ -60,7 +60,7 @@ class BimanualManipulate(RobotEnv):
     def compute_manipulator_action(self, action, agent) -> np.ndarray:
         """ Map to target action space bounds
         """
-        self.desired_positions[agent] = self.desired_positions[agent] + self.action_scale * action[3]
+        self.desired_positions[agent] = self.desired_positions[agent] + self.action_scale * action[:3]
         self.desired_positions[agent] = self.desired_positions[agent].clip(self.pos_min_bound[agent], self.pos_max_bound[agent])
         return self.desired_positions[agent]
 
@@ -111,7 +111,7 @@ class BimanualManipulate(RobotEnv):
 
         observations = {agent: self._get_obs(agent) for agent in self.agents}
 
-        rewards = {agent: self.compute_rewards(agent) for agent in self.agents}
+        rewards = {agent: self._get_rewards(agent) for agent in self.agents}
         # Check termination conditions
         terminations = {agent: False for agent in self.agents}
 
@@ -127,7 +127,7 @@ class BimanualManipulate(RobotEnv):
 
         return observations, rewards, terminations, truncations, infos
 
-    def compute_rewards(self, agent: str):
+    def _get_rewards(self, agent: str):
         """ Sparse Reward: the returned reward can have two values: -1 if the block hasn’t reached its final
         target position, and 0 if the block is in the final target position (the block is considered to have
         reached the goal if the Euclidean distance between both is lower than 0.05 m).

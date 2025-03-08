@@ -12,6 +12,7 @@ from robopal.commons.renderers import MjRenderer
 import robopal.envs
 import robopal.robots
 from robopal.robots.base import BaseRobot
+import robopal.commons.transform as R
 
 ROBOPAL_PATH = os.path.dirname(inspect.getfile(robopal))
 MJCF_PATH = os.path.join(ROBOPAL_PATH, "assets/robot.xml")
@@ -343,7 +344,8 @@ class MujocoEnv:
         :param name: site name
         :return: site quaternion
         """
-        return self.mj_data.site(name).xquat.copy()
+        rotm = self.get_site_rotm(name)
+        return R.mat_2_quat(rotm)
 
     def get_site_rotm(self, name: str):
         """ Get site rotation matrix from site name.
