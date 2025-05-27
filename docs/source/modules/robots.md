@@ -48,9 +48,9 @@ class DianaMed(BaseArm):
 ### 2.3 使用自定义模型
 除了内置的几种模型外，robopal 还支持使用自定义的模型文件, 下面以命名为 `CustomArm.xml` 的模型文件为例介绍如何导入自定义模型。
 
-1. step1：将模型打包好，放入 `robopal.assets.models.manipulators.CustomArm`, 注意 `.xml` 文件的名称与存放该文件的文件夹名称一致，以将机械臂模型设置成可被 robopal 自动识别的内置模型。
-    在放入 manipulators 文件夹后，最好先测试下 xml 文件是否可以导入 mujoco 中。
+1. step1：将模型打包好，放入 `robopal.assets.models.manipulators.CustomArm`, 注意 `.xml` 文件的名称与存放该文件的文件夹名称一致，以将机械臂模型设置成可被 robopal 自动识别的内置模型。在放入 manipulators 文件夹后，最好先测试下 xml 文件是否可以导入 mujoco 中。
 2. step2：仿照 `robopal.robots` 文件夹中提供内置模型对应的配置文件，创建一个新的配置文件，如 `robopal.robots.custom_arm.py`：
+
 ```python
 import os
 
@@ -87,11 +87,15 @@ class CustomArm(BaseRobot):
         """ Robot's init joint position. """
         return {self.agents[0]: np.array([-0.61,  -0.84,  0.47, -2.54,  0.35,  1.75, 0.44])}
 ```
+
 3. step3：在 `robopal.robots.__init__.py` 中导入自定义模型
+
 ```python
 from .custom_arm import *
 ```
+
 上述操作完成后，你的机械臂已经可以被 robopal 识别到了，接下来可以在 `robopal.tests.test_controller.py` 中引用你的机械臂进行测试。
+
 ```python
 from robopal.robots import CustomArm
 from robopal.envs import RobotEnv
@@ -104,13 +108,16 @@ env = RobotEnv(
     controller=options['ctrl'],
 )
 ```
+
 4. step4：假如测试时有发现机械臂动作执行不正确的情况，需要调整机械臂控制器的参数。例如，如果您使用了 JNTIMP 控制器，可以通过下面的方式调整机械臂的参数：
+
 ```python
 env.controller.set_jnt_params(
     b=20.0 * np.ones(self.dofs),
     k=80.0 * np.ones(self.dofs),
 )
 ```
+
 ### 2.4 写入末端配置
 
 ### 2.5 向场景中添加物体
