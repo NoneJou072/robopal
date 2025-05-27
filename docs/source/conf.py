@@ -3,6 +3,7 @@ import os
 import sys
 project_path = '../../robopal'
 sys.path.insert(0, os.path.abspath(project_path))
+sys.path.append("../..")  # For relative imports in the documentation
 import robopal
 
 # ...

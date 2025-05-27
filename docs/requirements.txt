@@ -4,5 +4,4 @@ sphinx-press-theme
 sphinxcontrib-napoleon
 sphinxcontrib-qthelp
 sphinxcontrib-serializinghtml
-robopal
 recommonmark
