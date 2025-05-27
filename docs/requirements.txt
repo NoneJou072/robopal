@@ -9,3 +9,7 @@ rich
 pynput
 pygame
 h5py
+mujoco
+gymnasium
+pettingzoo
+numpy
